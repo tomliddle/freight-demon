@@ -1,0 +1,124 @@
+apply plugin: 'scala'
+apply plugin: 'idea'
+apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'application'
+
+// jetty runner class
+mainClassName = 'com.tomliddle.JettyLauncher'
+
+
+
+version = '1.0'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+configurations {
+    provided // provided scope
+    container // group for jetty container used to run webapp from ./gradlew jettyRun
+}
+
+configurations.all {
+    // check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+// add provided scope to source compilation
+sourceSets {
+    main { 
+        compileClasspath += configurations.provided 
+        runtimeClasspath += configurations.provided
+		//resources.srcDir 'src/main/webapp'
+    }
+    test { 
+        compileClasspath += configurations.provided 
+        runtimeClasspath += configurations.provided
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+	compile 'com.typesafe.akka:akka-slf4j_2.10:2.3.7'
+
+    compile group: 'org.scala-lang', name: 'scala-library', version: '2.10'
+    compile 'com.typesafe.akka:akka-actor_2.10:2.3.7'
+	compile 'org.eclipse.jetty:jetty-webapp:9.2.6.v20141205'
+
+	// scalatra deps
+    compile group: 'org.scalatra', name: 'scalatra_2.10', version: '2.3.0'
+    //compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
+	//compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
+	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
+
+}
+
+// manually specify gradle version for gradlew
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.2.1'
+}
+
+
+task copyResourcesToLib(type: Copy) {
+    into "$buildDir/libs/src/main/webapp"
+    from {
+        'src/main/webapp'
+    }
+}
+
+task copyToLib(type: Copy) {
+	into "$buildDir/libs"
+	from {
+		configurations.runtime
+	}
+	from {
+		'bin'
+	}
+    dependsOn(copyResourcesToLib)
+}
+
+task localDevelopment(type: Copy) {
+    from configurations.runtime {
+        into "lib"
+    }
+    //from resources.srcDir 'src/main/webapp'
+}
+
+task dist(type: Jar) {
+	manifest {
+		manifest {
+			attributes(
+					"Main-Class": mainClassName,
+					"Class-Path": "."
+			)
+		}
+	}
+
+	// We want all the libs
+	from sourceSets.main.output
+	archiveName='ScalatraWeb.jar'
+	dependsOn(copyToLib)
+}
+
+task release(type: Exec) {
+    executable "bash"
+    args "-c", "./release.sh"
+
+    dependsOn(dist)
+}
+
+
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+        scopes.PROVIDED.plus += [ configurations.provided ]
+    }
+}
+
+//java -cp HomeAutomationRest-1.0-fatJar.jar:* com.tomliddle.JettyLauncher
