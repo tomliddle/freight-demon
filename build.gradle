@@ -55,6 +55,10 @@ dependencies {
 	//compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
 	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
 
+    compile 'com.typesafe.slick:slick_2.10:2.1.0'
+    compile 'com.h2database:h2:1.4.184'
+    compile 'c3p0:c3p0:0.9.1.2'
+
 }
 
 // manually specify gradle version for gradlew

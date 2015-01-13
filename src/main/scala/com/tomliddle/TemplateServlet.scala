@@ -24,17 +24,7 @@ class MyServlet(system: ActorSystem, myActor: ActorRef) extends ScalatraServlet 
 	private val logger = LoggerFactory.getLogger(getClass)
 
 	get("/heating/on") {
-		// Should have async result here really
-		myActor ! HeatingStatus(Status.ON, None)
-		""
-	}
-	get("/heating/off") {
-		myActor ! HeatingStatus(Status.OFF, None)
-		""
-	}
-	get("/heating/thermostat") {
-		myActor ! HeatingStatus(Status.THERMOSTAT, None)
-		""
+
 	}
 	get("/heating/set/:temp") {
 		try {
@@ -47,7 +37,7 @@ class MyServlet(system: ActorSystem, myActor: ActorRef) extends ScalatraServlet 
 		}
 		""
 	}
-	get("/heating/status") {
+	get("/add") {
 		contentType = "application/json"
 		implicit val timeoutT = Timeout(5, TimeUnit.SECONDS)
 		new AsyncResult {
@@ -64,9 +54,9 @@ class MyServlet(system: ActorSystem, myActor: ActorRef) extends ScalatraServlet 
 		}
 	}
 
-	get("/heating") {
+	get("/") {
 		contentType="text/html"
-		new File("src/main/webapp/heating.html")
+		new File("src/main/webapp/index.html")
 	}
 }
 
