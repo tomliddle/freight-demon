@@ -37,11 +37,6 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 	}
 
 
-
-		// create the schema
-
-
-
 	//*********************** LOGINS ETC ***************************
 	get("/") {
 		contentType="text/html"
@@ -53,7 +48,9 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 	}
 
 	post("/register") {
-		users += User("tom", "test")
+		db withDynSession {
+			users += User("tom", "test")
+		}
 	}
 
 	post("/create") {
@@ -69,19 +66,29 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 		val name = params("name")
 		def file = fileParams("image-file")
 		// Return image id
-		images += Image(name, file.get)
+		db withDynSession {
+			images += Image(name, file.get, 1)
+		}
 	}
 
 	get("/image/:id") {
 		val imageId = params("id")
+		db withDynSession {
+			users.filter(_.id == imageId)
+		}
 	}
 
 	get("/image/delete/:id") {
-
+		val imageId = params("id")
+		db withDynSession {
+			images.filter(_.id == imageId).delete
+		}
 	}
 
 	get("/images") {
-
+		db withDynSession {
+			images.filter(_.userId == 1)
+		}
 	}
 
 
