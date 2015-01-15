@@ -1,4 +1,4 @@
-package com.tomliddle
+package com.tomliddle.examples
 
 import scala.slick.driver.H2Driver.simple._
 
@@ -26,11 +26,10 @@ object CaseClassMapping extends App {
 case class User(name: String, id: Option[Int] = None)
 
 class Users(tag: Tag) extends Table[User](tag, "USERS") {
-  // Auto Increment the id primary key column
-  def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
-  // The name can't be null
-  def name = column[String]("NAME", O.NotNull)
-  // the * projection (e.g. select * ...) auto-transforms the tupled
-  // column values to / from a User
-  def * = (name, id.?) <> (User.tupled, User.unapply)
+	def name = column[String]("NAME", O.NotNull)
+	def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+
+	// the * projection (e.g. select * ...) auto-transforms the tupled
+	// column values to / from a User
+	def * = (name, id.?) <> (User.tupled, User.unapply)
 }

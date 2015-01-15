@@ -1,4 +1,4 @@
-package com.tomliddle
+package com.tomliddle.examples
 
 import scala.slick.driver.H2Driver.simple._
 

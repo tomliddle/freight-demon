@@ -1,4 +1,4 @@
-package com.tomliddle
+package com.tomliddle.examples
 
 import scala.slick.driver.H2Driver.simple._
 
@@ -12,7 +12,7 @@ object HelloSlick extends App {
   val coffees: TableQuery[Coffees] = TableQuery[Coffees]
   
   // Create a connection (called a "session") to an in-memory H2 database
-  val db = Database.forURL("jdbc:h2:mem:hello", driver = "org.h2.Driver")
+  val db = Database.forURL("jdbc:h2:~/Projects/test.db", driver = "org.h2.Driver")
   db.withSession { implicit session =>
 
     // Create the schema by combining the DDLs for the Suppliers and Coffees

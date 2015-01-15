@@ -1,37 +1,38 @@
 package com.tomliddle
 
 import scala.slick.driver.H2Driver.simple._
-import scala.slick.lifted.{ForeignKeyQuery, ProvenShape}
+import scala.slick.lifted.{TableQuery}
 
-// A Suppliers table with 6 columns: id, name, street, city, state, zip
-class Suppliers(tag: Tag) extends Table[(Int, String, String, String, String, String)](tag, "SUPPLIERS") {
 
-  // This is the primary key column:
-  def id: Column[Int] = column[Int]("SUP_ID", O.PrimaryKey)
-  def name: Column[String] = column[String]("SUP_NAME")
-  def street: Column[String] = column[String]("STREET")
-  def city: Column[String] = column[String]("CITY")
-  def state: Column[String] = column[String]("STATE")
-  def zip: Column[String] = column[String]("ZIP")
-  
-  // Every table needs a * projection with the same type as the table's type parameter
-  def * : ProvenShape[(Int, String, String, String, String, String)] =
-    (id, name, street, city, state, zip)
+case class User(email: String, name: String, id: Option[Int] = None)
+
+class Users(tag: Tag) extends Table[User](tag, "USERS") {
+	def email: Column[String] = column[String]("email")
+	def name: Column[String] = column[String]("name")
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey,  O.AutoInc)
+
+	// the * projection (e.g. select * ...) auto-transforms the tupled
+	// column values to / from a User
+	def * = (email, name, id.?) <> (User.tupled, User.unapply)
 }
 
-// A Coffees table with 5 columns: name, supplier id, price, sales, total
-class Coffees(tag: Tag) extends Table[(String, Int, Double, Int, Int)](tag, "COFFEES") {
+case class Image(name: String, image: Array[Byte], userId: Option[Int] = None)
 
-  def name: Column[String] = column[String]("COF_NAME", O.PrimaryKey)
-  def supID: Column[Int] = column[Int]("SUP_ID")
-  def price: Column[Double] = column[Double]("PRICE")
-  def sales: Column[Int] = column[Int]("SALES")
-  def total: Column[Int] = column[Int]("TOTAL")
-  
-  def * : ProvenShape[(String, Int, Double, Int, Int)] =
-    (name, supID, price, sales, total)
-  
-  // A reified foreign key relation that can be navigated to create a join
-  def supplier: ForeignKeyQuery[Suppliers, (Int, String, String, String, String, String)] = 
-    foreignKey("SUP_FK", supID, TableQuery[Suppliers])(_.id)
+class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
+	def name: Column[String] = column[String]("NAME", O.PrimaryKey, O.NotNull)
+	def image: Column[Array[Byte]] = column[Array[Byte]]("IMAGE")
+	def userId: Column[Int] = column[Int]("USER_ID")
+
+	def * = (name, image, userId.?) <> (Image.tupled, Image.unapply)
+
+	// A reified foreign key relation that can be navigated to create a join
+	//def supplier: ForeignKeyQuery[Suppliers, (Int, String, String, String, String, String)] =
+	foreignKey("USER_FK", userId, TableQuery[Users])(_.id)
+}
+
+object Tables {
+	val users: TableQuery[Users] = TableQuery[Users]
+	val images: TableQuery[Images] = TableQuery[Images]
+
+
 }
