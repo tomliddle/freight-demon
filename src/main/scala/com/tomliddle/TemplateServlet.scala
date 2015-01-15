@@ -74,20 +74,20 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 	get("/image/:id") {
 		val imageId = params("id")
 		db withDynSession {
-			users.filter(_.id == imageId)
+			users.filter(_.id === imageId.toInt)
 		}
 	}
 
 	get("/image/delete/:id") {
 		val imageId = params("id")
 		db withDynSession {
-			images.filter(_.id == imageId).delete
+			images.filter(_.id === imageId.toInt).delete
 		}
 	}
 
 	get("/images") {
 		db withDynSession {
-			images.filter(_.userId == 1)
+			images.filter(_.userId === 1)
 		}
 	}
 
