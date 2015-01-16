@@ -44,17 +44,20 @@ dependencies {
 
     compile 'ch.qos.logback:logback-classic:1.0.13'
 	compile 'com.typesafe.akka:akka-slf4j_2.10:2.3.8'
+	compile 'com.typesafe.akka:akka-actor_2.10:2.3.7'
 
     compile group: 'org.scala-lang', name: 'scala-library', version: '2.10.4'
 	compile 'org.scala-lang:scala-reflect:2.10.4'
 	compile 'org.scala-lang:scala-compiler:2.10.4'
 
-	compile 'com.typesafe.akka:akka-actor_2.10:2.3.7'
+
 	compile 'org.eclipse.jetty:jetty-webapp:9.2.6.v20141205'
 
 	// scalatra deps
     compile group: 'org.scalatra', name: 'scalatra_2.10', version: '2.3.0'
-    //compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
+	compile 'org.scalatra:scalatra-auth_2.10:2.3.0'
+
+	//compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
 	//compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
 	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
 

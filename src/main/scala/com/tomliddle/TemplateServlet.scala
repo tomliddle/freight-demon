@@ -4,8 +4,10 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import _root_.akka.actor.{ActorRef, ActorSystem, Props}
 import akka.util.Timeout
+import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.examples.Suppliers
 import org.scalatra._
+import org.scalatra.auth.strategy.BasicAuthStrategy
 import org.scalatra.servlet.{SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
 import org.slf4j.LoggerFactory
 import org.json4s._
@@ -18,7 +20,7 @@ import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.driver.H2Driver.simple._
 import Tables._
 
-class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends ScalatraServlet with FutureSupport with FileUploadSupport {
+class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends ScalatraServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3*1024*1024)))
 
@@ -47,13 +49,19 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 
 	}
 
-	post("/register") {
+	get("/register") {
 		db withDynSession {
 			users += User("tom", "test")
 		}
 	}
 
-	post("/create") {
+	get("/users") {
+		db withDynSession {
+			users.list
+		}
+	}
+
+	get("/create") {
 		db withDynSession {
 			(users.ddl ++ images.ddl).create
 		}
@@ -96,6 +104,23 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 		case e: SizeConstraintExceededException => RequestEntityTooLarge("file is too big")
 	}
 
+
+	protected def basicAuth() = {
+		val baReq = new BasicAuthStrategy.BasicAuthRequest(request)
+		if(!baReq.providesAuth) {
+			response.setHeader("WWW-Authenticate", "Basic realm=\"%s\"" format realm)
+			halt(401, "Unauthenticated")
+		}
+		if(!baReq.isBasicAuth) {
+			halt(400, "Bad Request")
+		}
+		scentry.authenticate("Basic")
+	}
+
+	override def unauthenticated() {
+		response.setHeader("WWW-Authenticate", challenge)
+		halt(401, "Unauthenticated")
+	}
 
 
 

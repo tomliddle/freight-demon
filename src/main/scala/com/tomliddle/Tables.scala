@@ -19,7 +19,7 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 case class Image(name: String, image: Array[Byte], user_id: Int, id: Option[Int] = None)
 
 class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
-	def name: Column[String] = column[String]("NAME", O.PrimaryKey, O.NotNull)
+	def name: Column[String] = column[String]("NAME")
 	def image: Column[Array[Byte]] = column[Array[Byte]]("IMAGE")
 	def userId: Column[Int] = column[Int]("USER_ID")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey,  O.AutoInc)
