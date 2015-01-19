@@ -6,6 +6,7 @@ import com.tomliddle.User
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 import org.scalatra.auth.strategy.{BasicAuthStrategy, BasicAuthSupport}
+import org.slf4j.LoggerFactory
 
 
 class MyBasicAuthStrategy(protected override val app: ScalatraBase, realm: String) extends BasicAuthStrategy[User](app, realm) {

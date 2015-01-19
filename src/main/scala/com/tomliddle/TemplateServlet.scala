@@ -20,7 +20,8 @@ import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.driver.H2Driver.simple._
 import Tables._
 
-class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends ScalatraServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
+class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef)
+	extends ScalatraServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3*1024*1024)))
 
@@ -31,7 +32,7 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef) extends Sc
 	private val logger = LoggerFactory.getLogger(getClass)
 
 	before() {
-
+		requireLogin()
 	}
 
 	after() {

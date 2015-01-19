@@ -4,7 +4,13 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.{TableQuery}
 
 
-case class User(email: String, name: String, id: Option[Int] = None)
+case class User(email: String, name: String, id: Option[Int] = None) {
+
+	def forgetMe = {
+		//logger.info("User: this is where you'd invalidate the saved token in you User model")
+	}
+
+}
 
 class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def email: Column[String] = column[String]("email")
