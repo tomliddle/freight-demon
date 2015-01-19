@@ -1,9 +1,9 @@
-package com.tomliddle.auth.strategies
+package com.tomliddle
 
-import com.tomliddle.User
-import org.scalatra.{Cookie, CookieOptions, ScalatraBase}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+
 import org.scalatra.auth.ScentryStrategy
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import org.scalatra.{CookieOptions, ScalatraBase}
 import org.slf4j.LoggerFactory
 
 class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: HttpServletRequest, response: HttpServletResponse)
@@ -41,7 +41,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
     */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
     logger.info("RememberMeStrategy: attempting authentication")
-    if(tokenVal == "foobar") Some(User("foo"))
+    if(tokenVal == "foobar") Some(User("foo", "bar"))
     else None
   }
 
@@ -49,7 +49,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
    * What should happen if the user is currently not authenticated?
    */
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
-    app.redirect("/sessions/new")
+    app.redirect("/login")
   }
 
   /***

@@ -1,10 +1,9 @@
-package com.tomliddle.auth.strategies
+package com.tomliddle
 
-import com.tomliddle.User
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
-
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import org.slf4j.LoggerFactory
 
 class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: HttpServletRequest, response: HttpServletResponse)
@@ -36,7 +35,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: Ht
 
     if(login == "foo" && password == "foo") {
       logger.info("UserPasswordStrategy: login succeeded")
-      Some(User("foo"))
+      Some(User("foo", "bar"))
     } else {
       logger.info("UserPasswordStrategy: login failed")
       None
@@ -47,7 +46,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: Ht
    * What should happen if the user is currently not authenticated?
    */
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
-    app.redirect("/sessions/new")
+    app.redirect("/login")
   }
 
 }
