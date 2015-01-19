@@ -93,21 +93,25 @@
 			<p>Weather: {{#outsideTemp}}{{outsideTemp}}&#8451;{{/outsideTemp}} {{outlook}}</p>
 		</script>
 
+
 		<div class="row">
 			<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
-				<div class="form-group"><input type="number" min="0" max="25" class="form-control" id="targetTemp" value="19"></div>
-				<div class="form-group"><a class="btn btn-primary btn-block" href="/heating/set/" id="targetTempButton" href="#">Set temp...</a></div>
-				<div class="form-group"><a class="btn btn-primary btn-block renderHandler" href="/heating/on">Turn on</a></div>
-				<div class="form-group"><a class="btn btn-primary btn-block renderHandler" href="/heating/off">Turn off</a></div>
-				<div class="form-group"><a class="btn btn-primary btn-block renderHandler" href="/heating/thermostat">Set to thermostat</a></div>
-				<div class="form-group"><a class="btn btn-primary btn-block renderHandler" href="/heating/status">Refresh</a></div>
+				<form method="post" enctype="multipart/form-data">
+					<input type="file" name="image-file" />
+					<input type="submit" />
+				</form>
 			</div>
 		</div>
 
-		<form method="post" enctype="multipart/form-data">
-			<input type="file" name="image-file" />
-			<input type="submit" />
-		</form>
+		<div class="row">
+			<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
+				<form method="post" enctype="multipart/form-data" action="/login">
+					<input type="text" name="login" />
+					<input type="password" name="password" />
+					<input type="submit" />
+				</form>
+			</div>
+		</div>
 
 	</div>
 </div>

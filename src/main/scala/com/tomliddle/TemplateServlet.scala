@@ -99,7 +99,15 @@ class LoginServlet extends ScalatraServlet {
 	}
 
 	post("/login") {
+		<html>
+			Success
+		</html>
 
+	}
+
+	get("/logout") {
+		session.invalidate()
+		redirect("/")
 	}
 }
 
