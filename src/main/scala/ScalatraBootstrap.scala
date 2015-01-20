@@ -3,7 +3,7 @@ import javax.servlet.ServletContext
 import _root_.akka.actor.{Props, ActorSystem}
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.tomliddle.com.tomliddle.Worker
-import com.tomliddle.{LoginServlet, MyServlet}
+import com.tomliddle.{SessionsController, SecureController}
 import scala.slick.jdbc.JdbcBackend.Database
 import org.scalatra._
 
@@ -16,8 +16,8 @@ class ScalatraBootstrap extends LifeCycle {
 
 	override def init(context: ServletContext) {
 		val db = Database.forDataSource(cpds)
-		context.mount(new MyServlet(db, system, myActor), "/secure/*")
-		context.mount(new LoginServlet, "/")
+		context.mount(new SecureController(db, system, myActor), "/*")
+		context.mount(new SessionsController, "/sessions/*")
 	}
 
 	override def destroy(context: ServletContext) {

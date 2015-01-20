@@ -12,7 +12,7 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	protected def toSession   = { case usr: User => usr.id.toString }
 
 	protected val scentryConfig = (new ScentryConfig {
-		override val login = "/login"
+		override val login = "/sessions/new"
 	}).asInstanceOf[ScentryConfiguration]
 
 	protected val logger = LoggerFactory.getLogger(getClass)

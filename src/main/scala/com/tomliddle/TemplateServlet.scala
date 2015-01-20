@@ -14,7 +14,7 @@ import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 import scala.slick.driver.H2Driver.simple._
 import Tables._
 
-class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef)
+class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	extends ScalatraServlet with FutureSupport with FileUploadSupport with  AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
@@ -86,30 +86,56 @@ class MyServlet(db: Database, system: ActorSystem, myActor: ActorRef)
 		}
 	}
 
-
-	error {
-		case e: SizeConstraintExceededException => RequestEntityTooLarge("file is too big")
-	}
-}
-
-class LoginServlet extends ScalatraServlet {
 	get("/") {
-		contentType="text/html"
-		new File("src/main/webapp/index.html")
-	}
-
-	post("/login") {
 		<html>
 			Success
 		</html>
 
 	}
 
-	get("/logout") {
-		session.invalidate()
-		redirect("/")
+
+	error {
+		case e: SizeConstraintExceededException => RequestEntityTooLarge("file is too big")
 	}
 }
+
+class SessionsController extends ScalatraServlet with AuthenticationSupport {
+	before("/new") {
+		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
+
+		if(!isAuthenticated) {
+			scentry.authenticate("RememberMe")
+		}
+	}
+
+	get("/new") {
+		if (isAuthenticated) redirect("/")
+		else {
+			contentType = "text/html"
+			new File("src/main/webapp/index.html")
+		}
+
+	}
+
+	post("/") {
+			scentry.authenticate()
+
+		if (isAuthenticated) {
+			redirect("/")
+		}else{
+			redirect("/sessions/new")
+		}
+	}
+
+	// Never do this in a real app. State changes should never happen as a result of a GET request. However, this does
+	// make it easier to illustrate the logout code.
+	get("/logout") {
+		scentry.logout()
+		redirect("/")
+	}
+
+}
+
 
 
 /*	protected def basicAuth() = {
