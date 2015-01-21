@@ -62,16 +62,16 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 		def file = fileParams("image-file")
 		// Return image id
 		db withDynSession {
-			images += Image(name, file.get, 1)
+			images += Image(name, file.get, "1")
 		}
 	}
 
-	get("/image/:id") {
+/*	get("/image/:id") {
 		val imageId = params("id")
 		db withDynSession {
-			users.filter(_.id === imageId.toInt)
+			users.filter(_.id === imageId)
 		}
-	}
+	}*/
 
 	get("/image/delete/:id") {
 		val imageId = params("id")
@@ -82,7 +82,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 
 	get("/images") {
 		db withDynSession {
-			images.filter(_.userId === 1)
+			images.filter(_.userId === "1")
 		}
 	}
 

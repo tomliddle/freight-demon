@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	self: ScalatraBase =>
 
-	protected def fromSession = { case id: String => User(id.toString, "")  }
-	protected def toSession   = { case usr: User => usr.id.toString }
+	protected def fromSession = { case id: String => User("", "", Some(id))  }
+	protected def toSession   = {
+		case usr: User => usr.id.get
+	}
 
 	protected val scentryConfig = (new ScentryConfig {
 		override val login = "/sessions/new"
