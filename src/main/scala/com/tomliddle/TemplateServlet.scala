@@ -15,7 +15,7 @@ import scala.slick.driver.H2Driver.simple._
 import Tables._
 
 class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
-	extends ScalatraServlet with FutureSupport with FileUploadSupport with  AuthenticationSupport {
+	extends ScalateServlet with FutureSupport with FileUploadSupport with  AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
@@ -99,7 +99,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	}
 }
 
-class SessionsController extends ScalatraServlet with AuthenticationSupport {
+class SessionsController extends ScalateServlet with AuthenticationSupport {
 	before("/new") {
 		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
 
@@ -112,9 +112,8 @@ class SessionsController extends ScalatraServlet with AuthenticationSupport {
 		if (isAuthenticated) redirect("/")
 		else {
 			contentType = "text/html"
-			new File("src/main/webapp/index.html")
+			ssp("/sessions/new")
 		}
-
 	}
 
 	post("/") {
