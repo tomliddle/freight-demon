@@ -24,12 +24,9 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 
 	protected implicit def executor: ExecutionContext = system.dispatcher
 
+
 	before() {
 		requireLogin()
-	}
-
-	after() {
-
 	}
 
 
@@ -87,10 +84,8 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	}
 
 	get("/") {
-		<html>
-			Success
-		</html>
-
+		contentType = "text/html"
+		ssp("/home")
 	}
 
 
@@ -135,6 +130,11 @@ class SessionsController extends ScalateServlet with AuthenticationSupport {
 
 }
 
+
+class ResourceController extends ScalateServlet {
+
+
+}
 
 
 /*	protected def basicAuth() = {

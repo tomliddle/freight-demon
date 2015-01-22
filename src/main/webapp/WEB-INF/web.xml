@@ -13,7 +13,6 @@ configured in Scala code there.
 
     <listener>
         <listener-class>org.scalatra.servlet.ScalatraListener</listener-class>
-		<async-supported>true</async-supported>
     </listener>
 
 </web-app>
