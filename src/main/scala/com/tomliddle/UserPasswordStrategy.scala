@@ -35,7 +35,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: Ht
 
     if(login == "foo" && password == "foo") {
       logger.info("UserPasswordStrategy: login succeeded")
-      Some(User("foo", "bar",Some("id")))
+      Some(User("foo", "bar",Some(1)))
     } else {
       logger.info("UserPasswordStrategy: login failed")
       None

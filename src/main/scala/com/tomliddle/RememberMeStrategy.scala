@@ -41,7 +41,9 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
     */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
     logger.info("RememberMeStrategy: attempting authentication")
-    if(tokenVal == "foobar") Some(User("foo", "bar", Some("id")))
+    if(tokenVal == "foobar") {
+      Some(User("foo", "bar", Some(1)))
+    }
     else None
   }
 

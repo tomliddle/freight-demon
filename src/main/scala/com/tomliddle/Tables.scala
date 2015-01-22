@@ -4,7 +4,7 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.{TableQuery}
 
 
-case class User(email: String, name: String, id: Option[String] = None) {
+case class User(email: String, name: String, id: Option[Int] = None) {
 
 	def forgetMe = {
 		//logger.info("User: this is where you'd invalidate the saved token in you User model")
@@ -15,19 +15,19 @@ case class User(email: String, name: String, id: Option[String] = None) {
 class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def email: Column[String] = column[String]("email")
 	def name: Column[String] = column[String]("name")
-	def id: Column[String] = column[String]("id", O.PrimaryKey,  O.AutoInc)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey,  O.AutoInc)
 
 	// the * projection (e.g. select * ...) auto-transforms the tupled
 	// column values to / from a User
 	def * = (email, name, id.?) <> (User.tupled, User.unapply)
 }
 
-case class Image(name: String, image: Array[Byte], user_id: String, id: Option[Int] = None)
+case class Image(name: String, image: Array[Byte], user_id: Int, id: Option[Int] = None)
 
 class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 	def name: Column[String] = column[String]("NAME")
 	def image: Column[Array[Byte]] = column[Array[Byte]]("IMAGE")
-	def userId: Column[String] = column[String]("USER_ID")
+	def userId: Column[Int] = column[Int]("USER_ID")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey,  O.AutoInc)
 
 	def * = (name, image, userId, id.?) <> (Image.tupled, Image.unapply)

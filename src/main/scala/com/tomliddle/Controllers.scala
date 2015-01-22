@@ -59,7 +59,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 		def file = fileParams("image-file")
 		// Return image id
 		db withDynSession {
-			images += Image(name, file.get, "1")
+			images += Image(name, file.get, 1)
 		}
 	}
 
@@ -79,7 +79,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 
 	get("/images") {
 		db withDynSession {
-			images.filter(_.userId === "1")
+			images.filter(_.userId === 1)
 		}
 	}
 
@@ -132,8 +132,6 @@ class SessionsController extends ScalateServlet with AuthenticationSupport {
 
 
 class ResourceController extends ScalateServlet {
-
-
 }
 
 
