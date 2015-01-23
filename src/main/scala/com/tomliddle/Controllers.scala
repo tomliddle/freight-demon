@@ -35,7 +35,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 
 	post("/register") {
 		db withDynSession {
-			users += User("tom", "test")
+			users += User("tom", "tom@gmail.com", "password")
 		}
 	}
 

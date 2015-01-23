@@ -12,11 +12,8 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: Database)(implic
 		extends ScentryStrategy[User] {
 
 	val logger = LoggerFactory.getLogger(getClass)
-
 	override def name: String = "UserPassword"
-
 	private def login = app.params.getOrElse("login", "")
-
 	private def password = app.params.getOrElse("password", "")
 
 
@@ -36,26 +33,22 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: Database)(implic
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
 		logger.info("UserPasswordStrategy: attempting authentication")
 
-		db withDynSession {
-			users.filter()
-
-
-				if (login == "foo" && password == "foo") {
-					logger.info("UserPasswordStrategy: login succeeded")
-					Some(User("foo", "bar", Some(1)))
-				} else {
-					logger.info("UserPasswordStrategy: login failed")
-					None
-				}
+		db.withDynSession[Option[User]] {
+			getUser(login) match {
+				case dbUser: User =>
+					if (dbUser.passwordHash == password) Some(dbUser)
+					else None
+				case _ => None
+			}
 		}
-
-		/**
-		 * What should happen if the user is currently not authenticated?
-		 */
-		override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse)
-		{
-			app.redirect("/sessions/new")
-		}
-
 	}
+
+	/**
+	 * What should happen if the user is currently not authenticated?
+	 */
+	override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
+		app.redirect("/sessions/new")
+	}
+
+}
 
