@@ -4,12 +4,20 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 import org.slf4j.LoggerFactory
 
+import scala.slick.jdbc.JdbcBackend.Database
 
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	self: ScalatraBase =>
 
-	protected def fromSession = { case id: String => User("", "", Some(id.toInt))  }
-	protected def toSession   = { case usr: User => usr.id.get.toString }
+	var db: Database = _
+
+	protected def fromSession = {
+		case id: String => User("", "", Some(id.toInt))
+	}
+
+	protected def toSession = {
+		case usr: User => usr.id.get.toString
+	}
 
 	protected val scentryConfig = (new ScentryConfig {
 		override val login = "/sessions/new"
@@ -18,7 +26,7 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	protected val logger = LoggerFactory.getLogger(getClass)
 
 	protected def requireLogin() = {
-		if(!isAuthenticated) {
+		if (!isAuthenticated) {
 			redirect(scentryConfig.login)
 		}
 	}
@@ -38,7 +46,7 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	 * progressively use all registered strategies to log the user in, falling back if necessary.
 	 */
 	override protected def registerAuthStrategies = {
-		scentry.register("UserPassword", app => new UserPasswordStrategy(app))
-		scentry.register("RememberMe", app => new RememberMeStrategy(app))
+		scentry.register("UserPassword", app => new UserPasswordStrategy(app, db))
+		scentry.register("RememberMe", app => new RememberMeStrategy(app, db))
 	}
 }

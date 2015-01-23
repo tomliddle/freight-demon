@@ -1,21 +1,21 @@
 package com.tomliddle
 
-import java.io.File
 import java.util.concurrent.TimeUnit
+
 import _root_.akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import org.scalatra._
-import org.scalatra.servlet.{SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
-import org.slf4j.LoggerFactory
+import Tables._
 import org.json4s._
+import org.scalatra._
+import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+
 import scala.concurrent.ExecutionContext
+import scala.slick.driver.H2Driver.simple._
 import scala.slick.jdbc.JdbcBackend.Database
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
-import scala.slick.driver.H2Driver.simple._
-import Tables._
 
 class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
-	extends ScalateServlet with FutureSupport with FileUploadSupport with  AuthenticationSupport {
+		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
@@ -33,7 +33,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	//*********************** LOGINS ETC ***************************
 
 
-	get("/register") {
+	post("/register") {
 		db withDynSession {
 			users += User("tom", "test")
 		}
@@ -42,12 +42,6 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	get("/users") {
 		db withDynSession {
 			users.list
-		}
-	}
-
-	get("/create") {
-		db withDynSession {
-			(users.ddl ++ images.ddl).create
 		}
 	}
 
@@ -63,12 +57,12 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 		}
 	}
 
-/*	get("/image/:id") {
-		val imageId = params("id")
-		db withDynSession {
-			users.filter(_.id === imageId)
+	get("/image/:id") {
+			val imageId = params("id")
+			db withDynSession {
+				images.filter(_.id === imageId.toInt).firstOption
+			}
 		}
-	}*/
 
 	get("/image/delete/:id") {
 		val imageId = params("id")
@@ -94,11 +88,11 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	}
 }
 
-class SessionsController extends ScalateServlet with AuthenticationSupport {
+class SessionsController(db: Database) extends ScalateServlet with AuthenticationSupport {
 	before("/new") {
 		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
 
-		if(!isAuthenticated) {
+		if (!isAuthenticated) {
 			scentry.authenticate("RememberMe")
 		}
 	}
@@ -112,11 +106,11 @@ class SessionsController extends ScalateServlet with AuthenticationSupport {
 	}
 
 	post("/") {
-			scentry.authenticate()
+		scentry.authenticate()
 
 		if (isAuthenticated) {
 			redirect("/")
-		}else{
+		} else {
 			redirect("/sessions/new")
 		}
 	}

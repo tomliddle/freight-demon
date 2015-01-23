@@ -1,14 +1,15 @@
 package com.tomliddle
 
-import org.eclipse.jetty.server.handler._
 import org.eclipse.jetty.server._
+import org.eclipse.jetty.server.handler._
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
 
-object JettyLauncher { // this is my entry object as specified in sbt project definition
+object JettyLauncher {
+	// this is my entry object as specified in sbt project definition
 	def main(args: Array[String]) {
 		val port = 8081
 
@@ -25,7 +26,7 @@ object JettyLauncher { // this is my entry object as specified in sbt project de
 		val handlers = new HandlerCollection
 		val contexts = new ContextHandlerCollection()
 		//val requestLogHandler = new RequestLogHandler
-		handlers.setHandlers(List (contexts, new DefaultHandler()).toArray)
+		handlers.setHandlers(List(contexts, new DefaultHandler()).toArray)
 		server.setHandler(handlers)
 
 		// Context handler
