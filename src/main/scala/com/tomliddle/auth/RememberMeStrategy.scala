@@ -42,7 +42,8 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
 		logger.info("RememberMeStrategy: attempting authentication")
 		if (tokenVal == "foobar") {
-			db.getUser("tom@gmail.com")
+			//db.getUser("tom@gmail.com")
+			None
 		}
 		else None
 	}
@@ -51,7 +52,8 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	 * What should happen if the user is currently not authenticated?
 	 */
 	override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse) {
-		app.redirect("/sessions/new")
+		//app.redirect("/sessions/new")
+		val i = 0
 	}
 
 	/** *

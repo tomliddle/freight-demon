@@ -13,7 +13,6 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	protected def fromSession = {
 		case id: String => {
 			db.getUser(id.toInt).getOrElse(null)
-			//User("", "", "")
 		}
 	}
 
@@ -49,6 +48,6 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	 */
 	override protected def registerAuthStrategies = {
 		scentry.register("UserPassword", app => new UserPasswordStrategy(app, db))
-		scentry.register("RememberMe", app => new RememberMeStrategy(app, db))
+		//scentry.register("RememberMe", app => new RememberMeStrategy(app, db))
 	}
 }
