@@ -1,9 +1,14 @@
 package com.tomliddle
 
+import java.util.UUID
+
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
+import org.scalatra.auth.ScentryStrategy
+import org.scalatra.{CookieSupport, ScalatraBase}
+import Tables._
 
-
+//token: String = UUID.randomUUID().toString,
 case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None) {
 
 	def forgetMe = {
@@ -40,12 +45,51 @@ class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]
 	val images: TableQuery[Images] = TableQuery[Images]
+}
+
+class DatabaseSupport(db: Database) {
+
+	import Database.dynamicSession
 
 	def getUser(id: Int): Option[User] = {
-		users.filter(_.id === id).firstOption
+		db.withDynSession {
+			users.filter(_.id === id).firstOption
+		}
 	}
 	def getUser(email: String): Option[User] = {
-		users.filter(_.email === email).firstOption
+		db.withDynSession {
+			users.filter(_.email === email).firstOption
+		}
 	}
+	//n.b. login == email
+	def getUser(email: String, password: String): Option[User] = {
+		db.withDynSession {
+			users.filter { user => (user.email === email && user.passwordHash === password)}.firstOption
+		}
+	}
+
+	def addUser(user: User): Unit = {
+		db.withDynSession {
+			users += user
+		}
+	}
+
+	def getImage(id: Int): Option[Image] = {
+		db.withDynSession {
+			images.filter(_.id === id).firstOption
+		}
+	}
+	def getImages(userId: Int): List[Image] = {
+		db.withDynSession {
+			images.filter(_.userId === userId).list
+		}
+	}
+
+	def addImage(image: Image) = {
+		db.withDynSession {
+			images += image
+		}
+	}
+
 
 }

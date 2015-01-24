@@ -14,7 +14,7 @@ import scala.slick.driver.H2Driver.simple._
 import scala.slick.jdbc.JdbcBackend.Database
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
-class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
+class SecureController(db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
@@ -34,16 +34,9 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 
 
 	post("/register") {
-		db withDynSession {
-			users += User("tom", "tom@gmail.com", "password")
-		}
+		db.addUser(User(params("email"), params("name"), params("password")))
 	}
 
-	get("/users") {
-		db withDynSession {
-			users.list
-		}
-	}
 
 	// Edit profile
 
@@ -52,12 +45,11 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 		val name = params("name")
 		def file = fileParams("image-file")
 		// Return image id
-		db withDynSession {
-			images += Image(name, file.get, 1)
-		}
+		db.addImage(Image(name, file.get, 1))
+
 	}
 
-	get("/image/:id") {
+/*	get("/image/:id") {
 			val imageId = params("id")
 			db withDynSession {
 				images.filter(_.id === imageId.toInt).firstOption
@@ -72,10 +64,10 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	}
 
 	get("/images") {
-		db withDynSession {
+		db. withDynSession {
 			images.filter(_.userId === 1)
 		}
-	}
+	}*/
 
 	get("/") {
 		contentType = "text/html"
@@ -88,7 +80,7 @@ class SecureController(db: Database, system: ActorSystem, myActor: ActorRef)
 	}
 }
 
-class SessionsController(db: Database) extends ScalateServlet with AuthenticationSupport {
+class SessionsController extends ScalateServlet with AuthenticationSupport {
 	before("/new") {
 		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
 

@@ -6,9 +6,8 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.LoggerFactory
 import scala.slick.jdbc.JdbcBackend.Database
-import Tables._
 
-class UserPasswordStrategy(protected val app: ScalatraBase, db: Database)(implicit request: HttpServletRequest, response: HttpServletResponse)
+class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(implicit request: HttpServletRequest, response: HttpServletResponse)
 		extends ScentryStrategy[User] {
 
 	val logger = LoggerFactory.getLogger(getClass)
@@ -33,14 +32,8 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: Database)(implic
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
 		logger.info("UserPasswordStrategy: attempting authentication")
 
-		db.withDynSession[Option[User]] {
-			getUser(login) match {
-				case dbUser: User =>
-					if (dbUser.passwordHash == password) Some(dbUser)
-					else None
-				case _ => None
-			}
-		}
+		db.getUser(login, password)
+
 	}
 
 	/**

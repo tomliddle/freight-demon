@@ -5,10 +5,9 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.scalatra.auth.ScentryStrategy
 import org.scalatra.{CookieOptions, ScalatraBase}
 import org.slf4j.LoggerFactory
-
 import scala.slick.jdbc.JdbcBackend.Database
 
-class RememberMeStrategy(protected val app: ScalatraBase, db: Database)(implicit request: HttpServletRequest, response: HttpServletResponse)
+class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(implicit request: HttpServletRequest, response: HttpServletResponse)
 		extends ScentryStrategy[User] {
 
 	val logger = LoggerFactory.getLogger(getClass)
@@ -32,7 +31,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: Database)(implicit
 	  * Determine whether the strategy should be run for the current request.
 	  */
 	override def isValid(implicit request: HttpServletRequest): Boolean = {
-		logger.info("RememberMeStrategy: determining isValid: " + (tokenVal != "").toString())
+		logger.info("RememberMeStrategy: determining isValid: " + (tokenVal != "").toString)
 		tokenVal != ""
 	}
 
@@ -44,7 +43,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: Database)(implicit
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
 		logger.info("RememberMeStrategy: attempting authentication")
 		if (tokenVal == "foobar") {
-			Some(User("foo", "bar", "tom@gmail.com"))
+			db.getUser("tom@gmail.com")
 		}
 		else None
 	}
@@ -66,7 +65,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: Database)(implicit
 	override def afterAuthenticate(winningStrategy: String, user: User)(implicit request: HttpServletRequest, response: HttpServletResponse) = {
 		logger.info("rememberMe: afterAuth fired")
 		if (winningStrategy == "RememberMe" ||
-				(winningStrategy == "UserPassword" && checkbox2boolean(app.params.get("rememberMe").getOrElse("").toString))) {
+				(winningStrategy == "UserPassword" && checkbox2boolean(app.params.get("rememberMe").getOrElse("")))) {
 
 			val token = "foobar"
 			app.cookies.set(COOKIE_KEY, token)(CookieOptions(maxAge = oneWeek, path = "/"))

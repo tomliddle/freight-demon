@@ -3,16 +3,19 @@ package com.tomliddle
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 import org.slf4j.LoggerFactory
-
+import Tables._
 import scala.slick.jdbc.JdbcBackend.Database
 
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
-	self: ScalatraBase =>
+	//self: ScalatraBase =>
 
-	var db: Database = _
+	var db: DatabaseSupport = _
 
 	protected def fromSession = {
-		case id: String => User("", "", Some(id.toInt))
+		case id: String => {
+			//db.getUser(_, id.toString).getOrElse(null)
+			User("", "", "")
+		}
 	}
 
 	protected def toSession = {
