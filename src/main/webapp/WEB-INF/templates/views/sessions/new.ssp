@@ -1,13 +1,26 @@
 <p>Please login:</p>
 
+<div class="row">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
+		<form method="post" action="/sessions">
+			<input type="text" name="login" />
+			<input type="password" name="password" />
+			<label>Remember Me:</label><input type="checkbox" name="rememberMe" value="true" />
+			<input type="submit" />
+		</form>
+	</div>
+</div>
 
-<form action="/sessions" method="post">
-    <p>
-        <input type="text" name="login"/><br>
-        <input type="password" name="password"/><br/>
-        <label>Remember Me:</label><input type="checkbox" name="rememberMe" value="true" />
-    </p>
-    <p>
-        <input type="submit">
-    </p>
+
+<div class="row">
+	<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
+		<form method="post" action="/sessions/register">
+			<input type="text" name="login" />
+			<input type="text" name="name" />
+			<input type="password" name="password" />
+			<input type="submit" />
+		</form>
+	</div>
+</div>
+
 </form>

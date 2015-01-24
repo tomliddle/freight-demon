@@ -16,7 +16,8 @@ import scala.slick.jdbc.JdbcBackend.Database
 class ScalatraBootstrap extends LifeCycle {
 
 	private val cpds = new ComboPooledDataSource
-	val database = Database.forDataSource(cpds)
+	private val database = Database.forDataSource(cpds)
+	createData()
 	private val db = new DatabaseSupport(database)
 
 	private val system = ActorSystem("actor_system")
@@ -24,7 +25,7 @@ class ScalatraBootstrap extends LifeCycle {
 
 	override def init(context: ServletContext) {
 		context.mount(new SecureController(db, system, myActor), "/*")
-		context.mount(new SessionsController, "/sessions/*")
+		context.mount(new SessionsController(db), "/sessions/*")
 		context.mount(new ResourceController, "/resource/*")
 	}
 
