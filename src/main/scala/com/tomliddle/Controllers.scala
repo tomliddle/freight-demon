@@ -5,16 +5,14 @@ import java.util.concurrent.TimeUnit
 import _root_.akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import Tables._
+import auth.AuthenticationSupport
 import org.json4s._
 import org.scalatra._
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 
 import scala.concurrent.ExecutionContext
-import scala.slick.driver.H2Driver.simple._
-import scala.slick.jdbc.JdbcBackend.Database
-import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
-class SecureController(db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
+class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
@@ -27,14 +25,6 @@ class SecureController(db: DatabaseSupport, system: ActorSystem, myActor: ActorR
 
 	before() {
 		requireLogin()
-	}
-
-
-	//*********************** LOGINS ETC ***************************
-
-
-	post("/register") {
-		db.addUser(User(params("email"), params("name"), params("password")))
 	}
 
 
@@ -80,7 +70,7 @@ class SecureController(db: DatabaseSupport, system: ActorSystem, myActor: ActorR
 	}
 }
 
-class SessionsController extends ScalateServlet with AuthenticationSupport {
+class SessionsController(protected val db: DatabaseSupport) extends ScalateServlet with AuthenticationSupport {
 	before("/new") {
 		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
 
@@ -98,6 +88,17 @@ class SessionsController extends ScalateServlet with AuthenticationSupport {
 	}
 
 	post("/") {
+		checkAuthentication()
+	}
+
+
+	//*********************** LOGINS ETC ***************************
+	post("/register") {
+		db.addUser(User(params("login"), params("name"), params("password")))
+		checkAuthentication()
+	}
+
+	private def checkAuthentication() = {
 		scentry.authenticate()
 
 		if (isAuthenticated) {

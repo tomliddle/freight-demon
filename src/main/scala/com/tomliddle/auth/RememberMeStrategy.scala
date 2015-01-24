@@ -11,10 +11,9 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 		extends ScentryStrategy[User] {
 
 	val logger = LoggerFactory.getLogger(getClass)
-
 	override def name: String = "RememberMe"
 
-	val COOKIE_KEY = "rememberMe"
+	private val COOKIE_KEY = "rememberMe"
 	private val oneWeek = 7 * 24 * 3600
 
 	/** *

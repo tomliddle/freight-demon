@@ -12,8 +12,8 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 
 	protected def fromSession = {
 		case id: String => {
-			//db.getUser(_, id.toString).getOrElse(null)
-			User("", "", "")
+			db.getUser(id.toInt).getOrElse(null)
+			//User("", "", "")
 		}
 	}
 
