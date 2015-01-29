@@ -46,18 +46,21 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		contentType = "image/jpeg"
 		db.getImage(params("id").toInt, scentry.user.id.get).get.image
 	}
+
+	// Get images for that user
+	get("/image/get") {
+		contentType = formats("json")
+		db.getImages(scentry.user.id.get).map {
+			img => img.copy(image = null)
+		}
+	}
+
 	// Delete image
 	get("/image/delete/:id") {
 		db.deleteImage(params("id").toInt, scentry.user.id.get)
 	}
 
-	// Get images for that user
-	get("/image/list") {
-		contentType = formats("json")
-		db.getImages(scentry.user.id.get).map {
-			img => img.id.get
-		}
-	}
+
 
 
 	//****************************** OTHER *************************

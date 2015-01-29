@@ -1,13 +1,9 @@
 (function($){
 
-	var Image = Backbone.Model.extend({
-		defaults: {
-			url: '/resource/images/notfound.jpg',
-			name: ''
-		}
-	});
+	var Image = Backbone.Model.extend({});
 
 	var List = Backbone.Collection.extend({
+		url: '/image/get',
 		model: Image
 	});
 
@@ -18,7 +14,8 @@
 		},
 
 		render: function(){
-			$(this.el).html("<image src='" + this.model.get("url") + "'/>");
+			var url = this.model.url();
+			$(this.el).html("<image width='100' height='100' src='" + url + "'/>");
 			return this; // for chainable calls, like .render().el
 		},
 
@@ -27,13 +24,17 @@
 		}
 	});
 
+
 	// Because the new features (swap and delete) are intrinsic to each `Item`, there is no need to modify `ListView`.
 	var ImageListView = Backbone.View.extend({
-		el: $('#images'), // el attaches to existing element
+		el: '.images', // el attaches to existing element
+		tagName: 'ul',
+		self: this,
 
 		initialize: function(){
 			this.collection = new List();
 			this.collection.bind('add', this.appendImage); // collection event binder
+			this.collection.fetch();
 		},
 
 		render: function(){
@@ -42,15 +43,25 @@
 			_(this.collection.models).each(function(image){ // in case collection is not empty
 				self.appendImage(image);
 			}, this);
+			return this;
 		},
 
 		appendImage: function(image){
+			var self = this;
 			var imageView = new ImageView({
 				model: image
 			});
-			$('ul', this.el).append(imageView.render().el);
+			var x = $('.images');
+			x.append(imageView.render().el);
 		}
 	});
 
-	var imageListView = new ImageListView();
+	$(document).ready(function () {
+		var imageListView = new ImageListView();
+	});
+
+	
 })(jQuery);
+
+
+

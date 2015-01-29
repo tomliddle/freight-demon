@@ -5,17 +5,13 @@ HOMEPAGE
 
 <div class="row">
 	<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
-	<form method="post" action="/image/add" enctype="multipart/form-data">
-	<label for="image-file">Image to upload</label>
-	<input type="file" name="image-file" />
-		<input type="submit" />
+		<form method="post" action="/image/add" enctype="multipart/form-data">
+			<label for="image-file">Image to upload</label>
+			<input type="file" name="image-file" />
+			<input type="submit" />
 		</form>
 	</div>
 </div>
 
 
-
-<img src="/image/get/1"/>
-
-
-<div id="images"></div>
+<div class="images"></div>
