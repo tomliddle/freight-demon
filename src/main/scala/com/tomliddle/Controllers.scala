@@ -52,16 +52,13 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	}
 
 	// Get images for that user
-	get("/image/all") {
+	get("/image/list") {
 		contentType = formats("json")
 		db.getImages(scentry.user.id.get).map {
 			img => img.id.get
 		}
 	}
 
-	get("/image/list") {
-		db.getImageList(scentry.user.id.get)
-	}
 
 	//****************************** OTHER *************************
 	get("/") {
