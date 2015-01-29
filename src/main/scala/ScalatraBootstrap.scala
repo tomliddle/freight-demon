@@ -12,6 +12,7 @@ import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 
 import scala.slick.jdbc.JdbcBackend.Database
+import scala.slick.jdbc.meta.MTable
 
 class ScalatraBootstrap extends LifeCycle {
 
@@ -38,7 +39,13 @@ class ScalatraBootstrap extends LifeCycle {
 
 	private def createData() = {
 		database.withDynSession {
-			(users.ddl ++ images.ddl).create
+			if (!MTable.getTables.list.exists(_.name.name == "USERS")) {
+				(users.ddl).create
+			}
+			if (!MTable.getTables.list.exists(_.name.name == "IMAGES")) {
+				(images.ddl).create
+			}
+
 			users += User("tom", "tom@gmail.com", "password")
 		}
 	}

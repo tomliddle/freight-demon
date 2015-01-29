@@ -8,12 +8,13 @@ import Tables._
 import auth.AuthenticationSupport
 import org.json4s._
 import org.scalatra._
+import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 
 import scala.concurrent.ExecutionContext
 
 class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
-		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport {
+		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
@@ -31,34 +32,38 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	// Edit profile
 
 	//************** IMAGE HANDLING ******************************
-	put("/image/:name") {
-		val name = params("name")
+
+	// Add image
+	post("/image/add") {
+		val name = ""//params("name")
 		def file = fileParams("image-file")
 		// Return image id
-		db.addImage(Image(name, file.get, 1))
-
+		db.addImage(Image(name, file.get, scentry.user.id.get))
 	}
 
-/*	get("/image/:id") {
-			val imageId = params("id")
-			db withDynSession {
-				images.filter(_.id === imageId.toInt).firstOption
-			}
-		}
-
+	// Get image
+	get("/image/get/:id") {
+		contentType = "image/jpeg"
+		db.getImage(params("id").toInt, scentry.user.id.get).get.image
+	}
+	// Delete image
 	get("/image/delete/:id") {
-		val imageId = params("id")
-		db withDynSession {
-			images.filter(_.id === imageId.toInt).delete
+		db.deleteImage(params("id").toInt, scentry.user.id.get)
+	}
+
+	// Get images for that user
+	get("/image/all") {
+		contentType = formats("json")
+		db.getImages(scentry.user.id.get).map {
+			img => img.id.get
 		}
 	}
 
-	get("/images") {
-		db. withDynSession {
-			images.filter(_.userId === 1)
-		}
-	}*/
+	get("/image/list") {
+		db.getImageList(scentry.user.id.get)
+	}
 
+	//****************************** OTHER *************************
 	get("/") {
 		contentType = "text/html"
 		ssp("/home")
@@ -120,21 +125,3 @@ class SessionsController(protected val db: DatabaseSupport) extends ScalateServl
 
 class ResourceController extends ScalateServlet {
 }
-
-
-/*	protected def basicAuth() = {
-		val baReq = new BasicAuthStrategy.BasicAuthRequest(request)
-		if(!baReq.providesAuth) {
-			response.setHeader("WWW-Authenticate", "Basic realm=\"%s\"" format realm)
-			halt(401, "Unauthenticated")
-		}
-		if(!baReq.isBasicAuth) {
-			halt(400, "Bad Request")
-		}
-		scentry.authenticate("Basic")
-	}*/
-
-/*	override def unauthenticated() {
-		response.setHeader("WWW-Authenticate", challenge)
-		halt(401, "Unauthenticated")
-	}*/

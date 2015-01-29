@@ -51,6 +51,7 @@ class DatabaseSupport(db: Database) {
 
 	import Database.dynamicSession
 
+	//************************ USERS ***********************************
 	def getUser(id: Int): Option[User] = {
 		db.withDynSession {
 			users.filter(_.id === id).firstOption
@@ -74,11 +75,19 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
-	def getImage(id: Int): Option[Image] = {
+	//************************ IMAGES ***********************************
+	def getImage(id: Int, userId: Int): Option[Image] = {
 		db.withDynSession {
-			images.filter(_.id === id).firstOption
+			images.filter {user => user.id === id && user.userId === userId}.firstOption
 		}
 	}
+
+	def getImageList(userId: Int): List[Image] = {
+		db.withDynSession {
+			images.filter {user => user.userId === userId}.list
+		}
+	}
+
 	def getImages(userId: Int): List[Image] = {
 		db.withDynSession {
 			images.filter(_.userId === userId).list
@@ -88,6 +97,12 @@ class DatabaseSupport(db: Database) {
 	def addImage(image: Image) = {
 		db.withDynSession {
 			images += image
+		}
+	}
+
+	def deleteImage(id: Int, userId: Int) = {
+		db.withDynSession {
+			images.filter {user => user.id === id && user.userId === userId}.delete
 		}
 	}
 
