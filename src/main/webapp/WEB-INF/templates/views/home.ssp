@@ -1,17 +1,39 @@
 
 
-HOMEPAGE
-
-
 <div class="row">
-	<div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 ">
-		<form method="post" action="/image/add" enctype="multipart/form-data">
-			<label for="image-file">Image to upload</label>
-			<input type="file" name="image-file" />
-			<input type="submit" />
+	<div class="col-xs-8">
+		<form method="post" class="" action="/image" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" name="name" />
+			</div>
+			<div class="form-group">
+				<label for="image-file">Image to upload</label>
+				<input type="file" class="form-control" name="image-file" />
+			</div>
+			<div class="form-group">
+				<input class="btn btn-primary" type="submit" />
+			</div>
 		</form>
 	</div>
 </div>
 
 
-<div class="images"></div>
+<%--<script id="image-template" type="text/x-handlebars-template">
+	<img src="{{src}}" />
+</script>--%>
+
+<script id="image-list-template" type="text/x-handlebars-template">
+	<ul>
+	{{#each images}}
+		<li>
+			<div>Name: {{name}}</div>
+			<img height="100" width="100" src="/image/{{id}}"/>
+		</li>
+	{{/each}}
+	</ul>
+</script>
+
+
+<div id="images"></div>
+

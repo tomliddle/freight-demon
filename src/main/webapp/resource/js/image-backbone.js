@@ -1,29 +1,20 @@
 (function($){
 
+	var Templates = Templates || {
+		load: function () {
+			//this.imageTemplate= Handlebars.compile($("#image-template").html());
+			this.imageListTemplate= Handlebars.compile($("#image-list-template").html());
+		}
+	};
+
+	// Represents one image
 	var Image = Backbone.Model.extend({});
 
+	// Represents a list of images
 	var List = Backbone.Collection.extend({
-		url: '/image/get',
+		url: '/image',
 		model: Image
 	});
-
-	var ImageView = Backbone.View.extend({
-		tagName: 'li', // name of tag to be created
-
-		initialize: function(){
-		},
-
-		render: function(){
-			var url = this.model.url();
-			$(this.el).html("<image width='100' height='100' src='" + url + "'/>");
-			return this; // for chainable calls, like .render().el
-		},
-
-		unrender: function(){
-			$(this.el).remove();
-		}
-	});
-
 
 	// Because the new features (swap and delete) are intrinsic to each `Item`, there is no need to modify `ListView`.
 	var ImageListView = Backbone.View.extend({
@@ -32,30 +23,19 @@
 
 		initialize: function(){
 			this.collection = new List();
-			this.collection.bind('add', this.appendImage); // collection event binder
-			this.collection.fetch();
+			//this.listenTo(this.collection, "add", this.appendImage);
+			var that = this;
+			this.collection.fetch({success: function(){that.render()}});
 		},
 
 		render: function(){
-			var self = this;
-
-			_(this.collection.models).each(function(image){ // in case collection is not empty
-				self.appendImage(image);
-			}, this);
+			this.$el.html(Templates.imageListTemplate({images:this.collection.toJSON()}));
 			return this;
-		},
-
-		appendImage: function(image){
-			var self = this;
-			var imageView = new ImageView({
-				model: image
-			});
-			var x = $('.images');
-			x.append(imageView.render().el);
 		}
 	});
 
 	$(document).ready(function () {
+		Templates.load();
 		var imageListView = new ImageListView();
 	});
 
@@ -64,3 +44,10 @@
 
 
 
+// Represents An image
+/*	var ImageView = Backbone.View.extend({
+ render: function(){
+ this.$el.html(Templates.imageTemplate(this.model.toJSON()));
+ return this; // for chainable calls, like .render().el
+ }
+ });*/
