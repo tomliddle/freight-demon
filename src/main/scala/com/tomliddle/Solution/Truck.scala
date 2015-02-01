@@ -11,23 +11,22 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 				constraints: TruckConstraints = constraints):
 		Truck =	{ new Truck(name, depot, stops, constraints)}
 
-	lazy val totalWeight: Double = stops.foldLeft(0.0){(totalWeight: Double, city: Stop) => totalWeight + city.constraints.maxWeight}
-	lazy val cost: Double = {
-		distance * 1.2
-	}
-	lazy val distance: Double = {
+	def totalWeight: Double = stops.foldLeft(0.0){(totalWeight: Double, city: Stop) => totalWeight + city.constraints.maxWeight}
+	def cost: Double = distance * 1.2
+
+	def distance: Double = {
 		var dist1 = 0.0
 		if (stops.size > 0)
 			dist1 = depot.distancesAndTimes(stops(0))._1 + depot.distancesAndTimes(stops.last)._1
 
 		if (stops.size > 1)
 			dist1 += stops.sliding(2).map(
-				(currCities: List[Stop]) => currCities(0).distancesAndTimes(currCities(1))._1
+				(currCities: List[Stop]) => currCities(0).location.distancesAndTimes(currCities(1))._1
 			).foldLeft(0.0){(a : Double, b: Double) => a + b}
 		dist1
 	}
 
-	lazy val time: Int = {
+	def time: Int = {
 		var time = 0
 		if (stops.size > 0)
 			time = depot.distancesAndTimes(stops(0))._2 + depot.distancesAndTimes(stops.last)._2
@@ -35,7 +34,7 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 		if (stops.size > 1)
 			time += stops.sliding(2).map(
 				(currCities: List[Stop]) => {
-					val currTime = currCities(0).distancesAndTimes(currCities(1))._2
+					val currTime = currCities(0).location.distancesAndTimes(currCities(1))._2
 
 					currCities(1) match {
 						case stop: Stop => {
@@ -79,7 +78,7 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 		var currCity: Stop = nextStopToLoad(stops)
 		var notLoadedCities = List[Stop]()
 		var currTruck = this
-		stops.sortBy(_.distancesAndTimes(currCity)._1).foreach {
+		stops.sortBy(_.location.distancesAndTimes(currCity)._1).foreach {
 			city => {
 				currTruck.load(city) match {
 					case (truck, Some(cityNotLoaded)) => notLoadedCities =  cityNotLoaded :: notLoadedCities
@@ -91,7 +90,7 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 	}
 
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
-		if (stops.size > 0 && mean != 0.0)
+		if (stops.size > 0 && mean._1 != 0.0 && mean._2 != 0.0)
 			stops.minBy(stop => distanceTo(stop, mean))
 		else {
 			depot.findFurthest
@@ -99,12 +98,12 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 	}
 
 	private def distanceTo(stop: Stop, coords: (Double, Double)): Double = {
-		Math.sqrt(Math.pow(stop.y - coords._2, 2) + Math.pow(stop.x - coords._1, 2))
+		Math.sqrt(Math.pow(stop.location.y - coords._2, 2) + Math.pow(stop.location.x - coords._1, 2))
 	}
 
 	private lazy val mean: (Double, Double) =
-		(stops.foldLeft(0.0){(x: Double, stop: Stop) => x + stop.x} / stops.size,
-			stops.foldLeft(0.0){(y: Double, stop: Stop) => y + stop.y} / stops.size)
+		(stops.foldLeft(0.0){(x: Double, stop: Stop) => x + stop.location.x} / stops.size,
+			stops.foldLeft(0.0){(y: Double, stop: Stop) => y + stop.location.y} / stops.size)
 
 	// Shuffle algorithem
 	def shuffle : Truck = {
@@ -170,16 +169,16 @@ class Truck(val name: String, val depot: Point, val stops: List[Stop], constrain
 		List(newSolution, newSolution2).sortBy(_.cost).head
 	}
 
-	lazy val isValid: Boolean = {
+	def isValid: Boolean = {
 		weightValid &&
 		timeValid &&
 		specialCodesValid
 	}
 
-	lazy val weightValid: Boolean = totalWeight <= constraints.maxWeight
-	lazy val timeValid: Boolean = time < 5000
+	def weightValid: Boolean = totalWeight <= constraints.maxWeight
+	def timeValid: Boolean = time < 5000
 
-	lazy val specialCodesValid: Boolean = {
+	def specialCodesValid: Boolean = {
 		stops.foldLeft(true){
 			(valid: Boolean, stop: Stop) => {
 				if (stop.constraints.specialCodes.size > 0 && !stop.constraints.specialCodes.contains(name))

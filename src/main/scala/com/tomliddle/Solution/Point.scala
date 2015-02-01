@@ -8,12 +8,9 @@ class Point(val name: String, val x: Double, val y: Double, val postcode: String
 	override lazy val toString = name + " " + x + "," + y
 }
 
-class Stop(override val name: String,
-		   override val x: Double,
-		   override val y: Double,
-		   override val postcode: String,
-		   val constraints: StopConstraints) extends Point(name, x, y, postcode) {
-}
+case class Depot(location: Point)
+
+case class Stop(location: Point, val constraints: StopConstraints)
 
 class StopConstraints(val startTime: Int, val endTime: Int, val maxWeight: Double, val specialCodes: List[String])
 

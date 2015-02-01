@@ -1,9 +1,6 @@
 package com.tomliddle.Solution
 
-class Solution(val depot: Point, val stopsToLoad: List[Stop], val trucks: List[Truck]) {
-
-	def copyWith(depot: Point = depot, stopsToLoad: List[Stop] = stopsToLoad, trucks: List[Truck] = trucks): Solution =
-		new Solution(depot, stopsToLoad, trucks)
+case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck]) {
 
 	def isValid: Boolean = {
 		loadedCities.size == loadedCities.distinct.size &&
@@ -12,17 +9,17 @@ class Solution(val depot: Point, val stopsToLoad: List[Stop], val trucks: List[T
 		loadedCities.distinct.size == loadedCities.size
 	}
 
-	lazy val distance = trucks.foldLeft(0.0){(a : Double, b: Truck) => a + b.distance}
+	def distance = trucks.foldLeft(0.0){(a : Double, b: Truck) => a + b.distance}
 
-	lazy val getTotalLoaded = loadedCities.size
+	def getTotalLoaded = loadedCities.size
 
-	lazy val loadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
+	def loadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
-	lazy val maxSolutionSwapSize = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.maxSwapSize}
+	def maxSolutionSwapSize = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.maxSwapSize}
 
 	private def getTotalCost(trucks: List[Truck]): Double = trucks.foldLeft(0.0){(a : Double, b: Truck) => a + b.cost}
 
-	lazy val getCost: Double = getTotalCost(trucks)
+	def getCost: Double = getTotalCost(trucks)
 
 	override lazy val toString = {
 		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + distance + "\n" +
@@ -38,7 +35,7 @@ class Solution(val depot: Point, val stopsToLoad: List[Stop], val trucks: List[T
 				truckResult._1
 			}
 		}
-		copyWith(trucks = newTrucks, stopsToLoad = unloadedStops)
+		copy(trucks = newTrucks, stopsToLoad = unloadedStops)
 	}
 
 	def preload: Solution = {
@@ -52,12 +49,12 @@ class Solution(val depot: Point, val stopsToLoad: List[Stop], val trucks: List[T
 				truckRes._1
 			}
 		}
-		copyWith(trucks = truckSol, stopsToLoad = unloadedCities)
+		copy(trucks = truckSol, stopsToLoad = unloadedCities)
 	}
 
 	def shuffle : Solution = {
 		val truckSol = trucks.map { truck => truck.shuffle }
-		copyWith(trucks = truckSol)
+		copy(trucks = truckSol)
 	}
 
 	def swapBetweenTrucks: Solution = {
@@ -128,7 +125,7 @@ class Solution(val depot: Point, val stopsToLoad: List[Stop], val trucks: List[T
 			}.sortBy(getTotalCost(_)).head
 		}
 
-		copyWith(trucks = swapAllToAll(trucks))
+		copy(trucks = swapAllToAll(trucks))
 	}
 
 }
