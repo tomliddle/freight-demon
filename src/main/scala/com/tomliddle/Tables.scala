@@ -4,11 +4,8 @@ import java.util.UUID
 
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
-import org.scalatra.auth.ScentryStrategy
-import org.scalatra.{CookieSupport, ScalatraBase}
 import Tables._
 
-//token: String = UUID.randomUUID().toString,
 case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None) {
 
 	def forgetMe = {
@@ -41,6 +38,8 @@ class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 	//def supplier: ForeignKeyQuery[Suppliers, (Int, String, String, String, String, String)] =
 	foreignKey("USER_FK", userId, TableQuery[Users])(_.id)
 }
+
+
 
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]

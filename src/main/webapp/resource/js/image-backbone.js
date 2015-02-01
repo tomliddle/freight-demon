@@ -29,7 +29,6 @@
 	var ImageListView = Backbone.View.extend({
 		el: '.images', // el attaches to existing element
 		tagName: 'ul',
-		self: this,
 
 		initialize: function(){
 			this.collection = new List();
