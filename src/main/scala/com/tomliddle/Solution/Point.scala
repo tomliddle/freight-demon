@@ -2,18 +2,115 @@ package com.tomliddle.Solution
 
 import org.joda.time.{Duration, DateTime}
 
+class DistanceTime(val distance: BigDecimal, val time: Duration)
+
 class Point(val name: String, val x: Double, val y: Double, val postcode: String) {
-	// Maps each stop to a distance
-	var distancesAndTimes = Map[Stop, (Double, Duration)]()
-	private def sortedDistances = distancesAndTimes.toList.sortBy(_._2._1)
-	def findFurthest = sortedDistances.last._1
-	def findNearest = sortedDistances.head._1
 	override def toString = name + " " + x + "," + y
 }
 
 case class Depot(location: Point, id: Option[Int] = None)
 
-case class Stop(location: Point, val startTime: DateTime, val endTime: DateTime, val maxWeight: Double, val specialCodes: List[String], id: Option[Int] = None)
+case class Stop(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)
+
+class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
+
+/*
+	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] =
+		stops.map {
+			stop1: Stop => {
+				//var stopToDistanceTime = Map[Stop, DistanceTime]
+
+			}
+		}.toMap
+*/
+
+	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] = {
+		stops.map {
+			stop1 => {
+				// Map of [Stop, DistanceTime]
+				stops.map {
+					stop2: Stop =>
+						stop2 -> getDistanceTime(stop1.location, stop2.location)
+				}//.toMap[Stop, DistanceTime]
+			}
+		}.toMap[Stop, Map[Stop, DistanceTime]]
+	}
+
+	private val depotDistancesAndTimes: Map[Depot, Map[Stop, DistanceTime]] = {
+		depots.map {
+			depot => {
+				// Map of [Stop, DistanceTime]
+				stops.map {
+					stop: Stop =>
+						depot -> getDistanceTime(depot.location, stop.location)
+				}//.toMap[Stop, DistanceTime]
+			}
+		}.toMap[Depot, Map[Stop, DistanceTime]]
+	}
 
 
 
+/*
+	private def addStopDistances(stop: Stop): Stop = {
+		stop.location.distancesAndTimes = stopsLocations.map {
+			city2: Stop => {
+				val distance = getDistance(stop.location, city2.location)
+				//val time = timesAndDistances(city.postcode)(city2.postcode)
+				(city2, (distance, distance.toInt / 20))
+			}
+		}.toMap
+		stop
+	}
+*/
+
+	// Maps each stop to a distance
+
+
+	//private val sortedDistances = stopDistancesAndTimes.toList.sortBy(_._2.)
+
+
+	def findFurthest(depot: Depot): Stop  = depotDistancesAndTimes(depot).toList.sortBy(_._2.distance).last._1
+
+	def findNearest(stop: Stop): Stop = stopDistancesAndTimes(stop).toList.sortBy(_._2.distance).head._1
+
+	def distanceBetween(depot: Depot, stop: Stop): BigDecimal = depotDistancesAndTimes(depot)(stop).distance
+
+	def distanceBetween(stop1: Stop, stop2: Stop): BigDecimal = stopDistancesAndTimes(stop1)(stop2).distance
+
+	def timeBetween(depot: Depot, stop: Stop): Duration = depotDistancesAndTimes(depot)(stop).time
+
+	def timeBetween(stop1: Stop, stop2: Stop): Duration = stopDistancesAndTimes(stop1)(stop2).time
+}
+
+
+
+trait TimeAndDistCalc {
+
+	def getDistance(stop1: Point, stop2: Point): BigDecimal = {
+		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
+		var R = 6371 // km
+		var lat1 = stop1.y
+		var lat2 = stop2.y
+		var lon1 = stop1.x
+		var lon2 = stop2.x
+		var dLat = scala.math.toRadians(lat2 - lat1)
+		var dLon = scala.math.toRadians(lon2 - lon1)
+		lat1 = scala.math.toRadians(lat1)
+		lat2 = scala.math.toRadians(lat2)
+
+		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+		R * c
+	}
+
+	def getDuration(stop1: Point, stop2: Point): Duration = {
+		new Duration(0)
+	}
+
+	def getDistanceTime(stop1: Point, stop2: Point): DistanceTime = {
+		new DistanceTime(getDistance(stop1, stop2), getDuration(stop1, stop2))
+	}
+
+	//def getDistance(s) = Math.sqrt(Math.pow(depot.location.y - depot2.location.y, 2) + Math.pow(depot.location.x - depot2.location.x, 2))
+}

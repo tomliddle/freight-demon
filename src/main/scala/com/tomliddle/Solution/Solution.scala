@@ -2,6 +2,8 @@ package com.tomliddle.Solution
 
 case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck], id: Option[Int]) {
 
+	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
+
 	def isValid: Boolean = {
 		loadedCities.size == loadedCities.distinct.size &&
 		trucks.foldLeft(true)((valid: Boolean, truck: Truck) => valid && truck.isValid) &&
@@ -9,17 +11,15 @@ case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: L
 		loadedCities.distinct.size == loadedCities.size
 	}
 
-	def distance = trucks.foldLeft(0.0){(a : Double, b: Truck) => a + b.distance}
+	def distance: BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.distance}
 
-	def getTotalLoaded = loadedCities.size
+	def getTotalLoaded: Int = loadedCities.size
 
 	def loadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
-	def maxSolutionSwapSize = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.maxSwapSize}
+	def maxSolutionSwapSize: Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.maxSwapSize}
 
-	private def getTotalCost(trucks: List[Truck]): Double = trucks.foldLeft(0.0){(a : Double, b: Truck) => a + b.cost}
-
-	def getCost: Double = getTotalCost(trucks)
+	def getCost: BigDecimal = getTotalCost(trucks)
 
 	override def toString = {
 		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + distance + "\n" +

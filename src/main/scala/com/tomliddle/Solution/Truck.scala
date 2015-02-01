@@ -2,33 +2,35 @@ package com.tomliddle.Solution
 
 import org.joda.time.{Duration, DateTime}
 
-case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateTime, endTime: DateTime, maxWeight: Double, id: Option[Int] = None) {
+case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, locationMatrix: Option[LocationMatrix] = None, id: Option[Int] = None) {
+
+	private val lm = locationMatrix.get
 
 	def totalWeight: Double = stops.foldLeft(0.0) { (totalWeight: Double, city: Stop) => totalWeight + city.maxWeight}
 
-	def cost: Double = distance * 1.2
+	def cost: BigDecimal = distance * 1.2
 
-	def distance: Double = {
-		var dist1 = 0.0
+	def distance: BigDecimal = {
+		var dist1 = BigDecimal(0)
 		if (stops.size > 0)
-			dist1 = depot.location.distancesAndTimes(stops(0))._1 + depot.location.distancesAndTimes(stops.last)._1
+			dist1 = lm.distanceBetween(depot, stops(0)) + lm.distanceBetween(depot, stops.last)
 
 		if (stops.size > 1)
-			dist1 += stops.sliding(2).map(
-				(currCities: List[Stop]) => currCities(0).location.distancesAndTimes(currCities(1))._1
-			).foldLeft(0.0) { (a: Double, b: Double) => a + b}
-		dist1
+			stops.sliding(2).map(
+				(currCities: List[Stop]) => lm.distanceBetween(currCities(0), currCities(1))
+			).foldLeft(dist1) { (a: BigDecimal, b: BigDecimal) => a + b}
+		else dist1
 	}
 
 	def time: Duration = {
-		var time =
-			if (stops.size > 0) depot.location.distancesAndTimes(stops(0))._2.plus(depot.location.distancesAndTimes(stops.last)._2)
+		val time =
+			if (stops.size > 0) lm.timeBetween(stops(0), stops.last)
 			else new Duration(0)
 
 		if (stops.size > 1)
 			time.plus(stops.sliding(2).map(
 				(currCities: List[Stop]) => {
-					val currTime = currCities(0).location.distancesAndTimes(currCities(1))._2
+					val currTime = startTime.plus(lm.timeBetween(currCities(0), currCities(1)))
 
 					currCities(1) match {
 						case stop: Stop => {
@@ -37,7 +39,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 							else currTime
 						}
 					}
-				}).foldLeft(0) { (a: Int, b: Int) => a + b})
+				}).foldLeft(new Duration(0)) { (a: Duration, b: Duration) => a.plus(b)})
 		time
 	}
 
@@ -72,7 +74,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 		var currCity: Stop = nextStopToLoad(stops)
 		var notLoadedCities = List[Stop]()
 		var currTruck = this
-		stops.sortBy(_.location.distancesAndTimes(currCity)._1).foreach {
+		stops.sortBy( lm.distanceBetween(_, currCity)).foreach {
 			city => {
 				currTruck.load(city) match {
 					case (truck, Some(cityNotLoaded)) => notLoadedCities = cityNotLoaded :: notLoadedCities
@@ -87,7 +89,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 		if (stops.size > 0 && mean._1 != 0.0 && mean._2 != 0.0)
 			stops.minBy(stop => distanceTo(stop, mean))
 		else {
-			depot.location.findFurthest
+			lm.findFurthest(depot)
 		}
 	}
 

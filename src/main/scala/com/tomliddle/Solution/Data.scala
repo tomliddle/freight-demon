@@ -46,34 +46,9 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 	lazy val stops = stopsLocations.map(stop => addStopDistances(stop)).toList
 	lazy val depots: List[Depot] = depotsLocations.map(depot => addDepotDistances(depot)).toList
 
-	private def addStopDistances(stop: Stop): Stop = {
-		stop.location.distancesAndTimes = stopsLocations.map {
-			city2 => {
-				val distance = getDistance(stop, city2)
-				//val time = timesAndDistances(city.postcode)(city2.postcode)
-				(city2, (distance, distance.toInt / 20))
-			}
-		}.toMap
-		stop
-	}
 
-	private def getDistance(stop1: Stop, stop2: Stop): Double = {
-		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
-		var R = 6371 // km
-		var lat1 = stop1.location.y
-		var lat2 = stop2.location.y
-		var lon1 = stop1.location.x
-		var lon2 = stop2.location.x
-		var dLat = scala.math.toRadians(lat2 - lat1)
-		var dLon = scala.math.toRadians(lon2 - lon1)
-		lat1 = scala.math.toRadians(lat1)
-		lat2 = scala.math.toRadians(lat2)
 
-		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-		R * c
-	}
+
 
 	private def addDepotDistances(depot: Depot): Depot = {
 		depot.location.distancesAndTimes = stopsLocations.map {
