@@ -4,7 +4,7 @@ package com.tomliddle.Solution
 class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 
 	private lazy val stopsLocations: List[Stop] = stopLocations(stopsFile)
-	private lazy val depotsLocations: List[Point] = depotLocations(depotsFile)
+	private lazy val depotsLocations: List[Depot] = depotLocations(depotsFile)
 
 	private def stopLocations(fileName: String): List[Stop] = {
 		scala.io.Source.fromFile(fileName).getLines.drop(1).map(string => {
@@ -16,14 +16,14 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			if (geocodes == null) {}
 
 			val point = new Point(split(0), geocodes._2.toDouble, geocodes._3.toDouble, split(3))
-			new Stop(point, new StopConstraints(split(4).toInt, split(5).toInt, split(6).toDouble, specialCodes))
+			new Stop(point, split(4).toInt, split(5).toInt, split(6).toDouble, specialCodes)
 		})
 	}.toList
 
-	private def depotLocations(fileName: String): List[Point] = {
+	private def depotLocations(fileName: String): List[Depot] = {
 		scala.io.Source.fromFile(fileName).getLines.drop(1).map(string => {
 			val split = string.split("\t")
-			new Point(split(0), split(1).toDouble, split(2).toDouble, split(3))
+			new Depot(new Point(split(0), split(1).toDouble, split(2).toDouble, split(3)), Some(1))
 		})
 	}.toList
 
@@ -33,48 +33,27 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 		scala.io.Source.fromFile(trucksFile).getLines.drop(1).foreach(string => {
 			val split = string.split("\t")
 
-			depots.find(depot => depot.name == split(1)) match {
-				case Some(depot) => trucks ::= new Truck(split(0), depot, Nil,
-					new TruckConstraints(split(3).toInt, split(4).toInt, split(2).toDouble))
+			depots.find(depot => depot.location.name == split(1)) match {
+				case Some(depot) => trucks ::= new Truck(split(0), depot, Nil, split(3).toInt, split(4).toInt, split(2).toDouble)
 				case None => println("Cannot find depot " + split(1) + "for truck")
 			}
 		})
 		trucks
 	}
 
-	lazy val cities = stopsLocations.map(city => addDistances(city)).toList
-	lazy val depots: List[Point] = depotsLocations.map(city => addDepotDistances(city)).toList
+	lazy val stops = stopsLocations.map(stop => addStopDistances(stop)).toList
+	lazy val depots: List[Depot] = depotsLocations.map(depot => addDepotDistances(depot)).toList
 
-	/*	private lazy val timesAndDistances: Map[String, Map[String, (Double, Int)]] = {
-			val urlx = "http://maps.googleapis.com/maps/api/distancematrix/json?mode=driving&language=en-GB&sensor=false"
-			val addresses = (stopsLocations ++ depotsLocations).foldLeft(""){(addresses: String, point: Point) => addresses + point.postcode + "|"}.dropRight(1)
-			val origins="&origins=" + addresses
-			val destinations="&destinations=" + addresses
-
-			val json = urlx + origins + destinations
-			print(getJson(json))
-
-
-			def getJson(str: String): JValue = {
-				val url = new URL(str)
-				val content = scala.io.Source.fromInputStream(url.openStream).getLines.mkString("\n")
-		  parse(content)
-			}
-
-			Map[String, Map[String, (Double, Int)]]()
-		}*/
-
-	private def addDistances(city: Stop): Stop = {
-		city.location.distancesAndTimes = (stopsLocations).map {
+	private def addStopDistances(stop: Stop): Stop = {
+		stop.location.distancesAndTimes = stopsLocations.map {
 			city2 => {
-				val distance = getDistance(city, city2)
+				val distance = getDistance(stop, city2)
 				//val time = timesAndDistances(city.postcode)(city2.postcode)
 				(city2, (distance, distance.toInt / 20))
 			}
 		}.toMap
-		city
+		stop
 	}
-
 
 	private def getDistance(stop1: Stop, stop2: Stop): Double = {
 		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
@@ -94,14 +73,14 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 		R * c
 	}
 
-	private def addDepotDistances(city: Point): Point = {
-		city.distancesAndTimes = stopsLocations.map {
-			city2 => {
-				val distance = Math.sqrt(Math.pow(city.y - city2.location.y, 2) + Math.pow(city.x - city2.location.x, 2))
+	private def addDepotDistances(depot: Depot): Depot = {
+		depot.location.distancesAndTimes = stopsLocations.map {
+			depot2 => {
+				val distance = Math.sqrt(Math.pow(depot.location.y - depot2.location.y, 2) + Math.pow(depot.location.x - depot2.location.x, 2))
 				//val time = timesAndDistances[city.postcode][city2.postcode]
-				(city2, (distance, distance.toInt / 20))
+				(depot2, (distance, distance.toInt / 20))
 			}
 		}.toMap
-		city
+		depot
 	}
 }

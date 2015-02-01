@@ -2,16 +2,17 @@ package com.tomliddle
 
 import java.util.UUID
 
+import com.tomliddle.Solution.Depot
+import com.tomliddle.Solution.Stop
+
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
 import Tables._
 
 case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None) {
-
 	def forgetMe = {
 		//logger.info("User: this is where you'd invalidate the saved token in you User model")
 	}
-
 }
 
 class Users(tag: Tag) extends Table[User](tag, "USERS") {
@@ -37,6 +38,23 @@ class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 	// A reified foreign key relation that can be navigated to create a join
 	//def supplier: ForeignKeyQuery[Suppliers, (Int, String, String, String, String, String)] =
 	foreignKey("USER_FK", userId, TableQuery[Users])(_.id)
+}
+
+// ************************ TRUCK STUFF ***************************************
+
+class Trucks(tag: Tag) extends Table[User](tag, "TRUCKS") {
+	//val name: String, val depot: Depot, val stops: List[Stop], val startTime: Int, val endTime: Int, val maxWeight: Double, id: Option[Int] = None
+	def name: Column[String] = column[String]("name", O.NotNull)
+	def depot: Column[String] = column[String]("depot", O.NotNull)
+	def stops: Column[String] = column[String]("stops", O.NotNull)
+	def startTime: Column[String] = column[String]("startTime", O.NotNull)
+	def endTime: Column[String] = column[String]("password_hash", O.NotNull)
+	def maxWeight: Column[String] = column[String]("password_hash", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	// the * projection (e.g. select * ...) auto-transforms the tupled
+	// column values to / from a User
+	def * = (name, depot, stops, name, passwordHash, id.?) <>(User.tupled, User.unapply)
 }
 
 

@@ -1,6 +1,6 @@
 package com.tomliddle.Solution
 
-case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck]) {
+case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck], id: Option[Int]) {
 
 	def isValid: Boolean = {
 		loadedCities.size == loadedCities.distinct.size &&
@@ -21,7 +21,7 @@ case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: L
 
 	def getCost: Double = getTotalCost(trucks)
 
-	override lazy val toString = {
+	override def toString = {
 		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + distance + "\n" +
 		trucks.map(_.toString).toString
 	}
