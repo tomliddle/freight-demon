@@ -1,10 +1,8 @@
 package com.tomliddle.Solution
 
-import scala.collection.mutable.ListBuffer
+import org.joda.time.{Duration, DateTime}
 
-
-
-case class Truck(val name: String, val depot: Depot, val stops: List[Stop], val startTime: Int, val endTime: Int, val maxWeight: Double, id: Option[Int] = None) {
+case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateTime, endTime: DateTime, maxWeight: Double, id: Option[Int] = None) {
 
 	def totalWeight: Double = stops.foldLeft(0.0) { (totalWeight: Double, city: Stop) => totalWeight + city.maxWeight}
 
@@ -22,24 +20,24 @@ case class Truck(val name: String, val depot: Depot, val stops: List[Stop], val 
 		dist1
 	}
 
-	def time: Int = {
-		var time = 0
-		if (stops.size > 0)
-			time = depot.location.distancesAndTimes(stops(0))._2 + depot.location.distancesAndTimes(stops.last)._2
+	def time: Duration = {
+		var time =
+			if (stops.size > 0) depot.location.distancesAndTimes(stops(0))._2.plus(depot.location.distancesAndTimes(stops.last)._2)
+			else new Duration(0)
 
 		if (stops.size > 1)
-			time += stops.sliding(2).map(
+			time.plus(stops.sliding(2).map(
 				(currCities: List[Stop]) => {
 					val currTime = currCities(0).location.distancesAndTimes(currCities(1))._2
 
 					currCities(1) match {
 						case stop: Stop => {
-							if (stop.startTime > currTime)
+							if (stop.startTime.isAfter(currTime))
 								stop.startTime
 							else currTime
 						}
 					}
-				}).foldLeft(0) { (a: Int, b: Int) => a + b}
+				}).foldLeft(0) { (a: Int, b: Int) => a + b})
 		time
 	}
 
@@ -47,9 +45,9 @@ case class Truck(val name: String, val depot: Depot, val stops: List[Stop], val 
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
 		assert(position + size <= stops.size && position >= 0 && size > 0, "position:" + position + " size:" + size + " stops.size:" + stops.size)
-		var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
-		listBuffer.remove(position, size)
-		(copy(stops = listBuffer.toList), stops.slice(position, position + size))
+		//var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
+		val list = stops.take(position) ++ stops.drop(position + 1) //TODO check this
+		(copy(stops = list), stops.slice(position, position + size))
 	}
 
 	def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
@@ -133,13 +131,11 @@ case class Truck(val name: String, val depot: Depot, val stops: List[Stop], val 
 		def swap(groupSize: Int, invert: Boolean): Truck = {
 
 			def extractFromList(from: Int, to: Int, size: Int, invert: Boolean): List[Stop] = {
-				var toMove: List[Stop] = stops.slice(from, from + size)
-				if (invert)
-					toMove = toMove.reverse
-				var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
-				listBuffer.remove(from, size)
-				listBuffer.insertAll(to, toMove)
-				listBuffer.toList
+				val toMove =
+					if (invert) stops.slice(from, from + size).reverse
+					else stops.slice(from, from + size)
+
+				stops.take(from) ++ toMove ++ stops.drop(from + 1)
 			}
 
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Truck = {
@@ -169,7 +165,7 @@ case class Truck(val name: String, val depot: Depot, val stops: List[Stop], val 
 
 	def weightValid: Boolean = totalWeight <= maxWeight
 
-	def timeValid: Boolean = time < 5000
+	def timeValid: Boolean = time.isShorterThan(new Duration(5 * 1000 * 60 * 60))
 
 	def specialCodesValid: Boolean = {
 		stops.foldLeft(true) {

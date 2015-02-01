@@ -1,5 +1,7 @@
 package com.tomliddle.Solution
 
+import org.joda.time.DateTime
+
 
 class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 
@@ -16,7 +18,7 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			if (geocodes == null) {}
 
 			val point = new Point(split(0), geocodes._2.toDouble, geocodes._3.toDouble, split(3))
-			new Stop(point, split(4).toInt, split(5).toInt, split(6).toDouble, specialCodes)
+			new Stop(point, new DateTime(split(4).toInt), new DateTime(split(5).toInt), split(6).toDouble, specialCodes)
 		})
 	}.toList
 
@@ -34,7 +36,7 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			val split = string.split("\t")
 
 			depots.find(depot => depot.location.name == split(1)) match {
-				case Some(depot) => trucks ::= new Truck(split(0), depot, Nil, split(3).toInt, split(4).toInt, split(2).toDouble)
+				case Some(depot) => trucks ::= new Truck(split(0), depot, Nil, new DateTime(split(3).toInt), new DateTime(split(4).toInt), split(2).toDouble)
 				case None => println("Cannot find depot " + split(1) + "for truck")
 			}
 		})

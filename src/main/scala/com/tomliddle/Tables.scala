@@ -2,9 +2,8 @@ package com.tomliddle
 
 import java.util.UUID
 
-import com.tomliddle.Solution.Depot
-import com.tomliddle.Solution.Stop
-
+import Solution._
+import org.joda.time.DateTime
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
 import Tables._
@@ -45,16 +44,16 @@ class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 class Trucks(tag: Tag) extends Table[User](tag, "TRUCKS") {
 	//val name: String, val depot: Depot, val stops: List[Stop], val startTime: Int, val endTime: Int, val maxWeight: Double, id: Option[Int] = None
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def depot: Column[String] = column[String]("depot", O.NotNull)
-	def stops: Column[String] = column[String]("stops", O.NotNull)
-	def startTime: Column[String] = column[String]("startTime", O.NotNull)
-	def endTime: Column[String] = column[String]("password_hash", O.NotNull)
-	def maxWeight: Column[String] = column[String]("password_hash", O.NotNull)
+	def depot: Column[Depot] = column[Depot]("depot")
+	def stops: Column[List[Stops]] = column[List[Stops]]("stops")
+	def startTime: Column[DateTime] = column[DateTime]("startTime")
+	def endTime: Column[DateTime] = column[DateTime]("endTime")
+	def maxWeight: Column[String] = column[String]("maxWeight")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
 	// the * projection (e.g. select * ...) auto-transforms the tupled
 	// column values to / from a User
-	def * = (name, depot, stops, name, passwordHash, id.?) <>(User.tupled, User.unapply)
+	def * = (name, depot, stops, startTime, endTime, maxWeight, id.?) <>(Truck.tupled, Truck.unapply)
 }
 
 
