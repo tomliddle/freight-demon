@@ -1,4 +1,4 @@
-package com.tomliddle.Solution
+package com.tomliddle.solution
 
 case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck], id: Option[Int]) {
 

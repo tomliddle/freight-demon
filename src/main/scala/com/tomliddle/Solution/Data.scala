@@ -1,4 +1,4 @@
-package com.tomliddle.Solution
+package com.tomliddle.solution
 
 import org.joda.time.DateTime
 
@@ -16,15 +16,15 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			val geocodes: (String, String, String) = Geocoding.getCoordinates(split(3))
 			if (geocodes == null) {}
 
-			val point = new Point(split(0), geocodes._2.toDouble, geocodes._3.toDouble, split(3))
-			new Stop(point, new DateTime(split(4).toInt), new DateTime(split(5).toInt), split(6).toDouble, specialCodes)
+			val point = new Point(split(0), BigDecimal(geocodes._2), BigDecimal(geocodes._3), split(3))
+			new Stop("Stop", point, new DateTime(split(4)), new DateTime(split(5)), BigDecimal(split(6)), specialCodes)
 		})
 	}.toList
 
 	private def depotLocations(fileName: String): List[Depot] = {
 		scala.io.Source.fromFile(fileName).getLines.drop(1).map(string => {
 			val split = string.split("\t")
-			new Depot(new Point(split(0), split(1).toDouble, split(2).toDouble, split(3)), Some(1))
+			new Depot("Depot", new Point(split(0), BigDecimal(split(1)), BigDecimal(split(2)), split(3)), Some(1))
 		})
 	}.toList
 
@@ -35,7 +35,7 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			val split = string.split("\t")
 
 			depots.find(depot => depot.location.name == split(1)) match {
-				case Some(depot) => trucks ::= new Truck(split(0), depot, Nil, new DateTime(split(3).toInt), new DateTime(split(4).toInt), split(2).toDouble)
+				case Some(depot) => trucks ::= new Truck(split(0), new DateTime(split(3).toInt), new DateTime(split(4).toInt), split(2).toDouble)
 				case None => println("Cannot find depot " + split(1) + "for truck")
 			}
 		})

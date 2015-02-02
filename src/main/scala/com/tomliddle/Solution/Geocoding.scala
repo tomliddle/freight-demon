@@ -1,4 +1,4 @@
-package com.tomliddle.Solution
+package com.tomliddle.solution
 
 import java.io.{FileWriter, InputStream}
 

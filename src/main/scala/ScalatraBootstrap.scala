@@ -3,7 +3,9 @@ import javax.servlet.ServletContext
 import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
 import _root_.com.tomliddle.com.tomliddle.Worker
-import com.tomliddle._
+import com.tomliddle.solution.Truck
+import com.tomliddle.{User, DatabaseSupport}
+import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import org.scalatra._
 import _root_.com.tomliddle.Tables._
 import scala.slick.driver.H2Driver.simple._
@@ -42,9 +44,20 @@ class ScalatraBootstrap extends LifeCycle {
 			if (!MTable.getTables.list.exists(_.name.name == "USERS")) {
 				(users.ddl).create
 			}
+			if (!MTable.getTables.list.exists(_.name.name == "TRUCKS")) {
+				(trucks.ddl).create
+			}
+			if (!MTable.getTables.list.exists(_.name.name == "STOPS")) {
+				(stops.ddl).create
+			}
+			if (!MTable.getTables.list.exists(_.name.name == "DEPOTS")) {
+				(depots.ddl).create
+			}
 
 
 			users += User("tom", "tom@gmail.com", "password")
+
+			//trucks += Truck("truck1", )
 		}
 	}
 }

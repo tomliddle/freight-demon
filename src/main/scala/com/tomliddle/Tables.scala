@@ -2,11 +2,28 @@ package com.tomliddle
 
 import java.sql.Timestamp
 
-import Solution._
+import solution._
 import org.joda.time.DateTime
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
 import Tables._
+
+trait TypeConvert {
+	implicit def pointConvert = MappedColumnType.base[Point, String] (
+		dt => s"${dt.name},${dt.x},${dt.y},${dt.postcode}",
+		ts => {
+			val str = ts.split(",")
+			new Point(str(0), BigDecimal(str(1)), BigDecimal(str(2)), str(3))
+		}
+	)
+
+	implicit def dateTime = MappedColumnType.base[DateTime, Timestamp](dt => new Timestamp(dt.getMillis), ts => new DateTime(ts.getTime))
+
+	implicit def listToString = MappedColumnType.base[List[String], String](
+		dt => dt.foldLeft(""){(a, b) => s"$a,$b"},
+		ts => List("", "")
+	)
+}
 
 case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None) {
 	def forgetMe = {
@@ -29,41 +46,39 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 
 //case class DBTruck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
 
-class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") {
-
-	implicit def dateTime = MappedColumnType.base[DateTime, Timestamp](dt => new Timestamp(dt.getMillis), ts => new DateTime(ts.getTime))
-
+class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def startTime: Column[DateTime] = column[DateTime]("startTime")
 	def endTime: Column[DateTime] = column[DateTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	// the * projection (e.g. select * ...) auto-transforms the tupled
-	// column values to / from a User
 	def * = (name, startTime, endTime, maxWeight, id.?) <>(Truck.tupled, Truck.unapply)
 }
 
-case class DBDepot(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
+class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
+	def name: Column[String] = column[String]("name", O.NotNull)
+	def location: Column[Point] = column[Point]("location", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+	
+	def * = (name, location, id.?) <>(Depot.tupled, Depot.unapply)
+}
 
-class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") {
-
-	implicit def pointConvert = MappedColumnType.base[Point, String] (
-		dt => s"${dt.name},${dt.x},${dt.y},${dt.postcode}",
-		ts => {
-			val str = ts.split(",")
-			new Point(str(0), BigDecimal(str(1)), BigDecimal(str(2)), str(3))
-		}
-	)
-
-	def location: Column[String] = column[String]("location", O.NotNull)
+class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
+	
+	//(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)	def location: Column[String] = column[String]("location", O.NotNull)
+	def name: Column[String] = column[String]("name", O.NotNull)
+	def location: Column[Point] = column[Point]("location")
+	def startTime: Column[DateTime] = column[DateTime]("startTime")
+	def endTime: Column[DateTime] = column[DateTime]("endTime")
+	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
+	def specialCodes: Column[List[String]] = column[List[String]]("specialCodes")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
 	// the * projection (e.g. select * ...) auto-transforms the tupled
 	// column values to / from a User
-	def * = (location, id.?) <>(Depot.tupled, Depot.unapply)
+	def * = (name, location, startTime, endTime, maxWeight, specialCodes, id.?) <>(Stop.tupled, Stop.unapply)
 }
-
 
 
 object Tables {
@@ -108,7 +123,7 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
-	def getTruckList(userId: Int): List[Truck] = {
+	def getTrucks(userId: Int): List[Truck] = {
 		db.withDynSession {
 			trucks.list
 		}

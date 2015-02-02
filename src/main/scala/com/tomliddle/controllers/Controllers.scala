@@ -1,11 +1,13 @@
-package com.tomliddle
+package com.tomliddle.controllers
 
 import java.util.concurrent.TimeUnit
 
 import _root_.akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import Tables._
-import auth.AuthenticationSupport
+import com.tomliddle.solution.{LocationMatrix, Stop, Depot, Truck}
+import com.tomliddle.{User, ScalateServlet, DatabaseSupport}
+import com.tomliddle.auth.AuthenticationSupport
+import org.joda.time.DateTime
 import org.json4s._
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
@@ -28,36 +30,33 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		requireLogin()
 	}
 
-
-	// Edit profile
-
 	//************** IMAGE HANDLING ******************************
 
 	// Add image
-	post("/truck/add") {
-		val name = ""//params("name")
-		def file = fileParams("image-file")
-		// Return image id
-		db.addImage(Image(name, file.get, scentry.user.id.get))
+	post("/truck") {
+		val name = params("name")
+		val startTime = params("startTime")
+		val endTime = params("endTime")
+		val maxWeight = params("maxWeight")
+
+		db.addTruck(Truck(name, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight)))
 	}
 
 	// Get image
 	get("/truck/:id") {
-		contentType = "image/jpeg"
-		db.getImage(params("id").toInt, scentry.user.id.get).get.image
+		contentType = formats("json")
+		db.getTruck(params("id").toInt, scentry.user.id.get)
 	}
 
 	// Get images for that user
-	get("/image") {
+	get("/trucks") {
 		contentType = formats("json")
-		db.getImages(scentry.user.id.get).map {
-			img => img.copy(image = null)
-		}
+		db.getTrucks(scentry.user.id.get)
 	}
 
 	// Delete image
-	delete("/image/:id") {
-		db.deleteImage(params("id").toInt, scentry.user.id.get)
+	delete("/truck/:id") {
+		db.deleteTruck(params("id").toInt, scentry.user.id.get)
 	}
 
 

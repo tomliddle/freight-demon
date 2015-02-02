@@ -1,4 +1,4 @@
-package com.tomliddle.Solution
+package com.tomliddle.solution
 
 import org.joda.time.{Duration, DateTime}
 
@@ -8,9 +8,9 @@ class Point(val name: String, val x: BigDecimal, val y: BigDecimal, val postcode
 	override def toString = name + " " + x + "," + y
 }
 
-case class Depot(location: Point, id: Option[Int] = None)
+case class Depot(name: String, location: Point, id: Option[Int] = None)
 
-case class Stop(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)
+case class Stop(name: String, location: Point, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, specialCodes: List[String], id: Option[Int] = None)
 
 class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
 

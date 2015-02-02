@@ -1,13 +1,21 @@
-package com.tomliddle.Solution
+package com.tomliddle.solution
 
 import org.joda.time.{Duration, DateTime}
 import scala.util.control.TailCalls.TailRec
 
-case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, locationMatrix: Option[LocationMatrix] = None, id: Option[Int] = None) {
+case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None) {
 
-	private val lm = locationMatrix.getOrElse(new LocationMatrix(List(), List()))
+	var depot: Depot = null
+	var stops = List[Stop]()
+	var lm: LocationMatrix = null
+	
+	def copyWithStops(stops: List[Stop]): Truck = {
+		val truck = copy()
+		truck.stops = stops
+		truck
+	} 
 
-	def totalWeight: Double = stops.foldLeft(0.0) { (totalWeight: Double, stop: Stop) => totalWeight + stop.maxWeight}
+	def totalWeight: BigDecimal = stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
 
 	def cost: BigDecimal = distance * 1.2
 
@@ -79,8 +87,8 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
 		assert(position + size <= stops.size && position >= 0 && size > 0, "position:" + position + " size:" + size + " stops.size:" + stops.size)
 		//var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
-		val list = stops.take(position) ++ stops.drop(position + size) //TODO check this
-		(copy(stops = list), stops.slice(position, position + size))
+		val list: List[Stop] = stops.take(position) ++ stops.drop(position + size) //TODO check this
+		(copyWithStops(stops), stops.slice(position, position + size))
 	}
 
 	def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
@@ -90,7 +98,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 	}
 
 	def load(city: Stop): (Truck, Option[Stop]) = {
-		var truck: Truck = copy(stops = city :: stops).shuffleBySize(1)
+		var truck: Truck = copyWithStops(stops = city :: stops).shuffleBySize(1)
 		truck.isValid match {
 			case true => (truck, None)
 			case _ => (this, Some(city))
@@ -141,8 +149,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 	def shuffle: Truck = {
 		var bestSol: Truck = this
 		var currBest = bestSol.cost
-
-		@TailRec
+		
 		def doShuffle(start: Int, end: Int, solution: Truck): Truck = {
 			(start to end).foreach {
 				size => {
@@ -179,7 +186,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Truck = {
 				(0 to stops.size - groupSize).map {
-					to => copy(stops = extractFromList(from, to, groupSize, invert))
+					to => copyWithStops(stops = extractFromList(from, to, groupSize, invert))
 				}.toList.sortWith(_.cost < _.cost).head
 			}
 
