@@ -3,7 +3,7 @@ import javax.servlet.ServletContext
 import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
 import _root_.com.tomliddle.com.tomliddle.Worker
-import com.tomliddle.solution.Truck
+import com.tomliddle.solution.{Location, Depot, Truck}
 import com.tomliddle.{User, DatabaseSupport}
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import org.scalatra._
@@ -43,6 +43,7 @@ class ScalatraBootstrap extends LifeCycle {
 		database.withDynSession {
 			if (!MTable.getTables.list.exists(_.name.name == "USERS")) {
 				(users.ddl).create
+				users += User("tom", "tom@gmail.com", "password")
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "TRUCKS")) {
 				(trucks.ddl).create
@@ -52,10 +53,11 @@ class ScalatraBootstrap extends LifeCycle {
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "DEPOTS")) {
 				(depots.ddl).create
+				depots += Depot("depot", new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY"))
 			}
 
 
-			users += User("tom", "tom@gmail.com", "password")
+
 
 			//trucks += Truck("truck1", )
 		}

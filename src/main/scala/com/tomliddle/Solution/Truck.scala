@@ -132,12 +132,12 @@ case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight
 		}
 	}
 
-	private def distanceTo(point1: Point, point2: Point): BigDecimal = {
+	private def distanceTo(point1: Location, point2: Location): BigDecimal = {
 		BigDecimal(Math.sqrt(((point1.x - point2.x).pow(2) + (point1.y - point2.y).pow(2)).toDouble))
 	}
 
-	private def mean: Point = {
-		new Point(
+	private def mean: Location = {
+		new Location(
 			"",
 			stops.foldLeft(BigDecimal(0)) { (x: BigDecimal, stop: Stop) => x + stop.location.x} / stops.size,
 			stops.foldLeft(BigDecimal(0)) { (y: BigDecimal, stop: Stop) => y + stop.location.y} / stops.size,
@@ -149,7 +149,7 @@ case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight
 	def shuffle: Truck = {
 		var bestSol: Truck = this
 		var currBest = bestSol.cost
-		
+
 		def doShuffle(start: Int, end: Int, solution: Truck): Truck = {
 			(start to end).foreach {
 				size => {

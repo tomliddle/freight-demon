@@ -1,4 +1,4 @@
-package com.tomliddle
+package com.tomliddle.controllers
 
 import javax.servlet.http.HttpServletRequest
 

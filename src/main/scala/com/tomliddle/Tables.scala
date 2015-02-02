@@ -9,11 +9,11 @@ import scala.slick.lifted.TableQuery
 import Tables._
 
 trait TypeConvert {
-	implicit def pointConvert = MappedColumnType.base[Point, String] (
-		dt => s"${dt.name},${dt.x},${dt.y},${dt.postcode}",
+	implicit def pointConvert = MappedColumnType.base[Location, String] (
+		dt => s"${dt.x},${dt.y},${dt.postcode}",
 		ts => {
 			val str = ts.split(",")
-			new Point(str(0), BigDecimal(str(1)), BigDecimal(str(2)), str(3))
+			new Location(BigDecimal(str(0)), BigDecimal(str(1)), str(2))
 		}
 	)
 
@@ -42,6 +42,19 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def * = (email, name, passwordHash, id.?) <>(User.tupled, User.unapply)
 }
 
+//************************** POSTCODE *****************************************
+class Locations(tag: Tag) extends Table[Location](tag, "LOCATIONS") {
+	def x: Column[BigDecimal] = column[BigDecimal]("x", O.NotNull)
+	def y: Column[BigDecimal] = column[BigDecimal]("y", O.NotNull)
+	def postcode: Column[String] = column[String]("postcode", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	// the * projection (e.g. select * ...) auto-transforms the tupled
+	// column values to / from a User
+	def * = (x, y, postcode, id.?) <>(Location.tupled, Location.unapply)
+}
+
+
 // ************************ TRUCK STUFF ***************************************
 
 //case class DBTruck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
@@ -58,7 +71,7 @@ class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
 
 class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def location: Column[Point] = column[Point]("location", O.NotNull)
+	def location: Column[Location] = column[Location]("location", O.NotNull)
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 	
 	def * = (name, location, id.?) <>(Depot.tupled, Depot.unapply)
@@ -68,7 +81,7 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	
 	//(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)	def location: Column[String] = column[String]("location", O.NotNull)
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def location: Column[Point] = column[Point]("location")
+	def location: Column[Location] = column[Location]("location")
 	def startTime: Column[DateTime] = column[DateTime]("startTime")
 	def endTime: Column[DateTime] = column[DateTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
@@ -83,12 +96,13 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]
+	val locations: TableQuery[Locations] = TableQuery[Locations]
 	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
 	val depots: TableQuery[Depots] = TableQuery[Depots]
 	val stops: TableQuery[Stops] = TableQuery[Stops]
 }
 
-class DatabaseSupport(db: Database) {
+class DatabaseSupport(db: Database) extends Geocoding {
 
 	import Database.dynamicSession
 
@@ -116,6 +130,31 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
+	//************************ LOCATIONS ***********************************
+	def getLocation(postcode: String): Option[Location] = {
+		db.withDynSession {
+			locations.filter(_.postcode === postcode).firstOption match {
+				case Some(location) => Some(location)
+				case None => {
+					geocodeFromOnline(postcode) match {
+						case Some(location: Location) => {
+							locations += location
+							Some(location)
+						}
+						case None => None
+					}
+				}
+			}
+		}
+	}
+
+	def addLocation(location: Location): Unit = {
+		db.withDynSession {
+			if (getLocation(location.postcode).isEmpty)
+				locations += location
+		}
+	}
+
 	//************************ Trucks ***********************************
 	def getTruck(id: Int, userId: Int): Option[Truck] = {
 		db.withDynSession {
@@ -138,6 +177,31 @@ class DatabaseSupport(db: Database) {
 	def deleteTruck(id: Int, userId: Int) = {
 		db.withDynSession {
 			trucks.filter {truck => truck.id === id}.delete
+		}
+	}
+
+	//************************ Stops ***********************************
+	def getStop(id: Int, userId: Int): Option[Stop] = {
+		db.withDynSession {
+			stops.filter {stop => stop.id === id}.firstOption
+		}
+	}
+
+	def getStops(userId: Int): List[Stop] = {
+		db.withDynSession {
+			stops.list
+		}
+	}
+
+	def addStop(stop: Stop) = {
+		db.withDynSession {
+			stops += stop
+		}
+	}
+
+	def deleteStop(id: Int, userId: Int) = {
+		db.withDynSession {
+			stops.filter {stop => stop.id === id}.delete
 		}
 	}
 

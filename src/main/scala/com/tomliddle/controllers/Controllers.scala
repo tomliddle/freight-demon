@@ -4,8 +4,8 @@ import java.util.concurrent.TimeUnit
 
 import _root_.akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.tomliddle.solution.{LocationMatrix, Stop, Depot, Truck}
-import com.tomliddle.{User, ScalateServlet, DatabaseSupport}
+import com.tomliddle.solution._
+import com.tomliddle.{User, DatabaseSupport}
 import com.tomliddle.auth.AuthenticationSupport
 import org.joda.time.DateTime
 import org.json4s._
@@ -30,33 +30,66 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		requireLogin()
 	}
 
-	//************** IMAGE HANDLING ******************************
-
-	// Add image
+	//************** Truck HANDLING ******************************
+	// Add truck
 	post("/truck") {
 		val name = params("name")
 		val startTime = params("startTime")
 		val endTime = params("endTime")
 		val maxWeight = params("maxWeight")
 
-		db.addTruck(Truck(name, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight)))
+		val truck = Truck(name, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight))
+
+		db.addTruck(truck)
 	}
 
-	// Get image
+	// Get truck
 	get("/truck/:id") {
 		contentType = formats("json")
 		db.getTruck(params("id").toInt, scentry.user.id.get)
 	}
 
-	// Get images for that user
-	get("/trucks") {
+	// Get truck for that user
+	get("/truck") {
 		contentType = formats("json")
 		db.getTrucks(scentry.user.id.get)
 	}
 
-	// Delete image
+	// Delete truck
 	delete("/truck/:id") {
 		db.deleteTruck(params("id").toInt, scentry.user.id.get)
+	}
+
+	//************** Stop HANDLING ******************************
+	// Add stop
+	post("/stop") {
+		val name = params("name")
+		val startTime = params("startTime")
+		val endTime = params("endTime")
+		val maxWeight = params("maxWeight")
+		val postcode = params("postcode")
+
+
+		val stop = Stop(name, location, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight), List())
+
+		db.addStop(stop)
+	}
+
+	// Get stop
+	get("/stop/:id") {
+		contentType = formats("json")
+		db.getStop(params("id").toInt, scentry.user.id.get)
+	}
+
+	// Get stop for that user
+	get("/stop") {
+		contentType = formats("json")
+		db.getStops(scentry.user.id.get)
+	}
+
+	// Delete stop
+	delete("/stop/:id") {
+		db.deleteStop(params("id").toInt, scentry.user.id.get)
 	}
 
 
