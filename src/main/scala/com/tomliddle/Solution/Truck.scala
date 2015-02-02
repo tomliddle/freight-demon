@@ -4,7 +4,7 @@ import org.joda.time.{Duration, DateTime}
 
 case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, locationMatrix: Option[LocationMatrix] = None, id: Option[Int] = None) {
 
-	private val lm = locationMatrix.get
+	private val lm = locationMatrix.getOrElse(new LocationMatrix(List(), List()))
 
 	def totalWeight: Double = stops.foldLeft(0.0) { (totalWeight: Double, city: Stop) => totalWeight + city.maxWeight}
 
@@ -39,7 +39,7 @@ case class Truck(name: String, depot: Depot, stops: List[Stop], startTime: DateT
 							else currTime
 						}
 					}
-				}).foldLeft(new Duration(0)) { (a: Duration, b: Duration) => a.plus(b)})
+				}).foldLeft(new Duration(0)) { (a: Duration, b: DateTime) => a.plus(b)})
 		time
 	}
 

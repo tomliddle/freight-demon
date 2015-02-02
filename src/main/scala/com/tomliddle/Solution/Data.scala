@@ -2,11 +2,10 @@ package com.tomliddle.Solution
 
 import org.joda.time.DateTime
 
-
 class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 
-	private lazy val stopsLocations: List[Stop] = stopLocations(stopsFile)
-	private lazy val depotsLocations: List[Depot] = depotLocations(depotsFile)
+	val stops: List[Stop] = stopLocations(stopsFile)
+	val depots: List[Depot] = depotLocations(depotsFile)
 
 	private def stopLocations(fileName: String): List[Stop] = {
 		scala.io.Source.fromFile(fileName).getLines.drop(1).map(string => {
@@ -41,23 +40,5 @@ class Data(stopsFile: String, depotsFile: String, trucksFile: String) {
 			}
 		})
 		trucks
-	}
-
-	lazy val stops = stopsLocations.map(stop => addStopDistances(stop)).toList
-	lazy val depots: List[Depot] = depotsLocations.map(depot => addDepotDistances(depot)).toList
-
-
-
-
-
-	private def addDepotDistances(depot: Depot): Depot = {
-		depot.location.distancesAndTimes = stopsLocations.map {
-			depot2 => {
-				val distance = Math.sqrt(Math.pow(depot.location.y - depot2.location.y, 2) + Math.pow(depot.location.x - depot2.location.x, 2))
-				//val time = timesAndDistances[city.postcode][city2.postcode]
-				(depot2, (distance, distance.toInt / 20))
-			}
-		}.toMap
-		depot
 	}
 }

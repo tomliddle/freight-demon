@@ -1,6 +1,6 @@
 package com.tomliddle
 
-import java.util.UUID
+import java.sql.Timestamp
 
 import Solution._
 import org.joda.time.DateTime
@@ -41,11 +41,16 @@ class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
 
 // ************************ TRUCK STUFF ***************************************
 
-class Trucks(tag: Tag) extends Table[User](tag, "TRUCKS") {
+
+
+class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") {
+
+	implicit def dateTime = MappedColumnType.base[DateTime, Timestamp](dt => new Timestamp(dt.getMillis), ts => new DateTime(ts.getTime))
+
 	//val name: String, val depot: Depot, val stops: List[Stop], val startTime: Int, val endTime: Int, val maxWeight: Double, id: Option[Int] = None
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def depot: Column[Depot] = column[Depot]("depot")
-	def stops: Column[List[Stops]] = column[List[Stops]]("stops")
+	//def depot: Column[Depot] = column[Depot]("depot")
+	//def stops: Column[List[Stops]] = column[List[Stops]]("stops")
 	def startTime: Column[DateTime] = column[DateTime]("startTime")
 	def endTime: Column[DateTime] = column[DateTime]("endTime")
 	def maxWeight: Column[String] = column[String]("maxWeight")
@@ -53,7 +58,7 @@ class Trucks(tag: Tag) extends Table[User](tag, "TRUCKS") {
 
 	// the * projection (e.g. select * ...) auto-transforms the tupled
 	// column values to / from a User
-	def * = (name, depot, stops, startTime, endTime, maxWeight, id.?) <>(Truck.tupled, Truck.unapply)
+	def * = (name, null, null, startTime, endTime, maxWeight, None, id.?) <>(Truck.tupled, Truck.unapply)
 }
 
 

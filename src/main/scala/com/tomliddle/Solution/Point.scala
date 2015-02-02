@@ -14,59 +14,29 @@ case class Stop(location: Point, startTime: DateTime, endTime: DateTime, maxWeig
 
 class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
 
-/*
-	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] =
-		stops.map {
-			stop1: Stop => {
-				//var stopToDistanceTime = Map[Stop, DistanceTime]
-
-			}
-		}.toMap
-*/
-
 	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] = {
 		stops.map {
-			stop1 => {
+			stop1: Stop => {
 				// Map of [Stop, DistanceTime]
-				stops.map {
+				stop1 -> stops.map {
 					stop2: Stop =>
 						stop2 -> getDistanceTime(stop1.location, stop2.location)
-				}//.toMap[Stop, DistanceTime]
+				}.toMap[Stop, DistanceTime]
 			}
-		}.toMap[Stop, Map[Stop, DistanceTime]]
+		}.toMap
 	}
 
 	private val depotDistancesAndTimes: Map[Depot, Map[Stop, DistanceTime]] = {
 		depots.map {
-			depot => {
+			depot: Depot => {
 				// Map of [Stop, DistanceTime]
-				stops.map {
+				depot -> stops.map {
 					stop: Stop =>
-						depot -> getDistanceTime(depot.location, stop.location)
-				}//.toMap[Stop, DistanceTime]
-			}
-		}.toMap[Depot, Map[Stop, DistanceTime]]
-	}
-
-
-
-/*
-	private def addStopDistances(stop: Stop): Stop = {
-		stop.location.distancesAndTimes = stopsLocations.map {
-			city2: Stop => {
-				val distance = getDistance(stop.location, city2.location)
-				//val time = timesAndDistances(city.postcode)(city2.postcode)
-				(city2, (distance, distance.toInt / 20))
+						stop -> getDistanceTime(depot.location, stop.location)
+				}.toMap[Stop, DistanceTime]
 			}
 		}.toMap
-		stop
 	}
-*/
-
-	// Maps each stop to a distance
-
-
-	//private val sortedDistances = stopDistancesAndTimes.toList.sortBy(_._2.)
 
 
 	def findFurthest(depot: Depot): Stop  = depotDistancesAndTimes(depot).toList.sortBy(_._2.distance).last._1
