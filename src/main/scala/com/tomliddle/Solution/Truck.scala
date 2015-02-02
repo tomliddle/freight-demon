@@ -1,9 +1,9 @@
 package com.tomliddle.solution
 
-import org.joda.time.{Duration, DateTime}
-import scala.util.control.TailCalls.TailRec
+import org.joda.time.{LocalTime, Duration}
 
-case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None) {
+
+case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, id: Option[Int] = None) {
 
 	var depot: Depot = null
 	var stops = List[Stop]()
@@ -47,15 +47,15 @@ case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight
 	}
 
 	// TODO use this
-	private def calcNextDuration(stop1: Stop, stop2: Stop, currEarliestStart: DateTime, currLatestStart: DateTime, currJourneyTime: Duration) = {
+	private def calcNextDuration(stop1: Stop, stop2: Stop, currEarliestStart: LocalTime, currLatestStart: LocalTime, currJourneyTime: Duration) = {
 
-		var earliestStartTime = stop1.startTime.minus(currJourneyTime)
+		var earliestStartTime = stop1.startTime.minus(currJourneyTime.toPeriod)
 		if (earliestStartTime.isBefore(startTime))
 			earliestStartTime = startTime
 
-		var latestStartTime = stop2.endTime.minus((currJourneyTime))
+		var latestStartTime = stop2.endTime.minus((currJourneyTime.toPeriod))
 		if (latestStartTime.isAfter(endTime))
-			latestStartTime = endTime.minus(currJourneyTime)
+			latestStartTime = endTime.minus(currJourneyTime.toPeriod)
 
 
 	}
@@ -138,7 +138,6 @@ case class Truck(name: String, startTime: DateTime, endTime: DateTime, maxWeight
 
 	private def mean: Location = {
 		new Location(
-			"",
 			stops.foldLeft(BigDecimal(0)) { (x: BigDecimal, stop: Stop) => x + stop.location.x} / stops.size,
 			stops.foldLeft(BigDecimal(0)) { (y: BigDecimal, stop: Stop) => y + stop.location.y} / stops.size,
 			""

@@ -1,9 +1,9 @@
 package com.tomliddle
 
-import java.sql.Timestamp
+import java.sql.{Time, Timestamp}
 
 import solution._
-import org.joda.time.DateTime
+import org.joda.time.{LocalTime, DateTime}
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
 import Tables._
@@ -17,7 +17,7 @@ trait TypeConvert {
 		}
 	)
 
-	implicit def dateTime = MappedColumnType.base[DateTime, Timestamp](dt => new Timestamp(dt.getMillis), ts => new DateTime(ts.getTime))
+	implicit def localTime = MappedColumnType.base[LocalTime, Time](dt => new Time(dt.getMillisOfDay), ts => new LocalTime(ts.getTime))
 
 	implicit def listToString = MappedColumnType.base[List[String], String](
 		dt => dt.foldLeft(""){(a, b) => s"$a,$b"},
@@ -61,8 +61,8 @@ class Locations(tag: Tag) extends Table[Location](tag, "LOCATIONS") {
 
 class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def startTime: Column[DateTime] = column[DateTime]("startTime")
-	def endTime: Column[DateTime] = column[DateTime]("endTime")
+	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
+	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
@@ -82,8 +82,8 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	//(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)	def location: Column[String] = column[String]("location", O.NotNull)
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def location: Column[Location] = column[Location]("location")
-	def startTime: Column[DateTime] = column[DateTime]("startTime")
-	def endTime: Column[DateTime] = column[DateTime]("endTime")
+	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
+	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
 	def specialCodes: Column[List[String]] = column[List[String]]("specialCodes")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)

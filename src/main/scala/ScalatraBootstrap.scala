@@ -55,6 +55,9 @@ class ScalatraBootstrap extends LifeCycle {
 				(depots.ddl).create
 				depots += Depot("depot", new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY"))
 			}
+			if (!MTable.getTables.list.exists(_.name.name == "LOCATIONS")) {
+				(locations.ddl).create
+			}
 
 
 

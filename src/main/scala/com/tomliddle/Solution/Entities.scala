@@ -1,14 +1,14 @@
 package com.tomliddle.solution
 
-import org.joda.time.{Duration, DateTime}
+import org.joda.time.{LocalTime, Duration}
 
 class DistanceTime(val distance: BigDecimal, val time: Duration)
 
-case class Location(val x: BigDecimal, val y: BigDecimal, val postcode: String)
+case class Location(x: BigDecimal, y: BigDecimal, postcode: String, id: Option[Int] = None)
 
 case class Depot(name: String, location: Location, id: Option[Int] = None)
 
-case class Stop(name: String, location: Location, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, specialCodes: List[String], id: Option[Int] = None)
+case class Stop(name: String, location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], id: Option[Int] = None)
 
 class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
 

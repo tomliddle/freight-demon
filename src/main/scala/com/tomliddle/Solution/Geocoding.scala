@@ -12,7 +12,7 @@ trait Geocoding {
 			Some(Location(BigDecimal(str(1)), BigDecimal(str(0)), postcode))
 		}
 		catch {
-			case _ => None
+			case _: Exception => None
 		}
 	}
 

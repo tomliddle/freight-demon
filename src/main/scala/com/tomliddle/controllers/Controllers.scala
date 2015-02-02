@@ -7,7 +7,8 @@ import akka.util.Timeout
 import com.tomliddle.solution._
 import com.tomliddle.{User, DatabaseSupport}
 import com.tomliddle.auth.AuthenticationSupport
-import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.{LocalTime}
 import org.json4s._
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
@@ -19,6 +20,8 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
+
+	private final val formatter = DateTimeFormat.forPattern("HH:mm")
 
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
 	protected implicit val jsonFormats: Formats = DefaultFormats
@@ -38,7 +41,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val endTime = params("endTime")
 		val maxWeight = params("maxWeight")
 
-		val truck = Truck(name, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight))
+		val truck = Truck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight))
 
 		db.addTruck(truck)
 	}
@@ -69,10 +72,11 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val maxWeight = params("maxWeight")
 		val postcode = params("postcode")
 
-
-		val stop = Stop(name, location, new DateTime(startTime), new DateTime(endTime), BigDecimal(maxWeight), List())
-
-		db.addStop(stop)
+		db.getLocation(postcode).foreach {
+			location =>
+				val stop = Stop(name, location, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), List())
+				db.addStop(stop)
+		}
 	}
 
 	// Get stop
