@@ -4,7 +4,7 @@ import org.joda.time.{Duration, DateTime}
 
 class DistanceTime(val distance: BigDecimal, val time: Duration)
 
-class Point(val name: String, val x: Double, val y: Double, val postcode: String) {
+class Point(val name: String, val x: BigDecimal, val y: BigDecimal, val postcode: String) {
 	override def toString = name + " " + x + "," + y
 }
 
@@ -58,13 +58,13 @@ trait TimeAndDistCalc {
 
 	def getDistance(stop1: Point, stop2: Point): BigDecimal = {
 		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
-		var R = 6371 // km
-		var lat1 = stop1.y
-		var lat2 = stop2.y
-		var lon1 = stop1.x
-		var lon2 = stop2.x
-		var dLat = scala.math.toRadians(lat2 - lat1)
-		var dLon = scala.math.toRadians(lon2 - lon1)
+		val R = 6371 // km
+		var lat1 = stop1.y.toDouble
+		var lat2 = stop2.y.toDouble
+		val lon1 = stop1.x.toDouble
+		val lon2 = stop2.x.toDouble
+		val dLat = scala.math.toRadians(lat2 - lat1)
+		val dLon = scala.math.toRadians(lon2 - lon1)
 		lat1 = scala.math.toRadians(lat1)
 		lat2 = scala.math.toRadians(lat2)
 

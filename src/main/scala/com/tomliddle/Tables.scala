@@ -25,47 +25,52 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def * = (email, name, passwordHash, id.?) <>(User.tupled, User.unapply)
 }
 
-case class Image(name: String, image: Array[Byte], user_id: Int, id: Option[Int] = None)
-
-class Images(tag: Tag) extends Table[Image](tag, "IMAGES") {
-	def name: Column[String] = column[String]("NAME")
-	def image: Column[Array[Byte]] = column[Array[Byte]]("IMAGE")
-	def userId: Column[Int] = column[Int]("USER_ID")
-	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-	def * = (name, image, userId, id.?) <>(Image.tupled, Image.unapply)
-
-	// A reified foreign key relation that can be navigated to create a join
-	//def supplier: ForeignKeyQuery[Suppliers, (Int, String, String, String, String, String)] =
-	foreignKey("USER_FK", userId, TableQuery[Users])(_.id)
-}
-
 // ************************ TRUCK STUFF ***************************************
 
-
+//case class DBTruck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
 
 class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") {
 
 	implicit def dateTime = MappedColumnType.base[DateTime, Timestamp](dt => new Timestamp(dt.getMillis), ts => new DateTime(ts.getTime))
 
-	//val name: String, val depot: Depot, val stops: List[Stop], val startTime: Int, val endTime: Int, val maxWeight: Double, id: Option[Int] = None
 	def name: Column[String] = column[String]("name", O.NotNull)
-	//def depot: Column[Depot] = column[Depot]("depot")
-	//def stops: Column[List[Stops]] = column[List[Stops]]("stops")
 	def startTime: Column[DateTime] = column[DateTime]("startTime")
 	def endTime: Column[DateTime] = column[DateTime]("endTime")
-	def maxWeight: Column[String] = column[String]("maxWeight")
+	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
 	// the * projection (e.g. select * ...) auto-transforms the tupled
 	// column values to / from a User
-	def * = (name, null, null, startTime, endTime, maxWeight, None, id.?) <>(Truck.tupled, Truck.unapply)
+	def * = (name, startTime, endTime, maxWeight, id.?) <>(Truck.tupled, Truck.unapply)
+}
+
+case class DBDepot(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
+
+class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") {
+
+	implicit def pointConvert = MappedColumnType.base[Point, String] (
+		dt => s"${dt.name},${dt.x},${dt.y},${dt.postcode}",
+		ts => {
+			val str = ts.split(",")
+			new Point(str(0), BigDecimal(str(1)), BigDecimal(str(2)), str(3))
+		}
+	)
+
+	def location: Column[String] = column[String]("location", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	// the * projection (e.g. select * ...) auto-transforms the tupled
+	// column values to / from a User
+	def * = (location, id.?) <>(Depot.tupled, Depot.unapply)
 }
 
 
 
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]
-	val images: TableQuery[Images] = TableQuery[Images]
+	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
+	val depots: TableQuery[Depots] = TableQuery[Depots]
+	val stops: TableQuery[Stops] = TableQuery[Stops]
 }
 
 class DatabaseSupport(db: Database) {
@@ -96,34 +101,28 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
-	//************************ IMAGES ***********************************
-	def getImage(id: Int, userId: Int): Option[Image] = {
+	//************************ Trucks ***********************************
+	def getTruck(id: Int, userId: Int): Option[Truck] = {
 		db.withDynSession {
-			images.filter {user => user.id === id && user.userId === userId}.firstOption
+			trucks.filter {truck => truck.id === id}.firstOption
 		}
 	}
 
-	def getImageList(userId: Int): List[Image] = {
+	def getTruckList(userId: Int): List[Truck] = {
 		db.withDynSession {
-			images.filter {user => user.userId === userId}.list
+			trucks.list
 		}
 	}
 
-	def getImages(userId: Int): List[Image] = {
+	def addTruck(truck: Truck) = {
 		db.withDynSession {
-			images.filter(_.userId === userId).list
+			trucks += truck
 		}
 	}
 
-	def addImage(image: Image) = {
+	def deleteTruck(id: Int, userId: Int) = {
 		db.withDynSession {
-			images += image
-		}
-	}
-
-	def deleteImage(id: Int, userId: Int) = {
-		db.withDynSession {
-			images.filter {user => user.id === id && user.userId === userId}.delete
+			trucks.filter {truck => truck.id === id}.delete
 		}
 	}
 

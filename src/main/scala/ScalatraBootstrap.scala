@@ -42,9 +42,7 @@ class ScalatraBootstrap extends LifeCycle {
 			if (!MTable.getTables.list.exists(_.name.name == "USERS")) {
 				(users.ddl).create
 			}
-			if (!MTable.getTables.list.exists(_.name.name == "IMAGES")) {
-				(images.ddl).create
-			}
+
 
 			users += User("tom", "tom@gmail.com", "password")
 		}

@@ -34,7 +34,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	//************** IMAGE HANDLING ******************************
 
 	// Add image
-	post("/image/add") {
+	post("/truck/add") {
 		val name = ""//params("name")
 		def file = fileParams("image-file")
 		// Return image id
@@ -42,7 +42,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	}
 
 	// Get image
-	get("/image/get/:id") {
+	get("/truck/:id") {
 		contentType = "image/jpeg"
 		db.getImage(params("id").toInt, scentry.user.id.get).get.image
 	}
