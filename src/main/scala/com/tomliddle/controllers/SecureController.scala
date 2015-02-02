@@ -10,15 +10,12 @@ import com.tomliddle.solution.{Stop, Truck}
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import org.json4s.{Formats, DefaultFormats}
+import org.json4s.ext.JodaTimeSerializers
 import org.scalatra.{RequestEntityTooLarge, FutureSupport}
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.{SizeConstraintExceededException, FileUploadSupport, MultipartConfig}
-
 import scala.concurrent.ExecutionContext
 
-/**
- * Created by tom on 02/02/2015.
- */
 class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
@@ -27,7 +24,11 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	private final val formatter = DateTimeFormat.forPattern("HH:mm")
 
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-	protected implicit val jsonFormats: Formats = DefaultFormats
+	protected implicit val jsonFormats: Formats = {
+		DefaultFormats
+		//+ CustomSerializer
+		+ JodaTimeSerializers
+	}
 
 	protected implicit def executor: ExecutionContext = system.dispatcher
 

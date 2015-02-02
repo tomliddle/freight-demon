@@ -60,6 +60,9 @@ dependencies {
 	compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
 	compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
 	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
+    compile 'org.json4s:json4s-ext_2.10:3.2.11'
+
+    // compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.0'
 
     compile 'com.typesafe.slick:slick_2.10:2.1.0'
     compile 'com.h2database:h2:1.4.184'
