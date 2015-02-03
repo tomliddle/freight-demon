@@ -88,10 +88,39 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def specialCodes: Column[List[String]] = column[List[String]]("specialCodes")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	// the * projection (e.g. select * ...) auto-transforms the tupled
-	// column values to / from a User
 	def * = (name, location, startTime, endTime, maxWeight, specialCodes, id.?) <>(Stop.tupled, Stop.unapply)
 }
+
+
+class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
+
+	def name: Column[String] = column[String]("name", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	def * = (name, id.?) <>(Solution.tupled, Solution.unapply)
+}
+/*
+case class SolutionDepot(solutionId: Int, depotId: Int)
+
+class SolutionsDepots(tag: Tag) extends Table[SolutionDepot](tag, "SOLUTIONS_DEPOTS") with TypeConvert {
+
+	def solutionId: Column[Int] = column[Int]("solution_id", O.NotNull)
+	def depotId: Column[Int] = column[Int]("depot_id", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	def * = (solutionId, depotId, id.?) <>(SolutionDepot.tupled, SolutionDepot.unapply)
+}
+
+case class SolutionStops(solutionId: Int, depotId: Int)
+
+class SolutionsDepots(tag: Tag) extends Table[SolutionDepot](tag, "SOLUTIONS_DEPOTS") with TypeConvert {
+
+	def solutionId: Column[Int] = column[Int]("solution_id", O.NotNull)
+	def depotId: Column[Int] = column[Int]("depot_id", O.NotNull)
+	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
+
+	def * = (solutionId, depotId, id.?) <>(SolutionDepot.tupled, SolutionDepot.unapply)
+}*/
 
 
 object Tables {
@@ -100,6 +129,7 @@ object Tables {
 	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
 	val depots: TableQuery[Depots] = TableQuery[Depots]
 	val stops: TableQuery[Stops] = TableQuery[Stops]
+	val solutions: TableQuery[Solutions] = TableQuery[Solutions]
 }
 
 class DatabaseSupport(db: Database) extends Geocoding {
@@ -202,6 +232,31 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	def deleteStop(id: Int, userId: Int) = {
 		db.withDynSession {
 			stops.filter {stop => stop.id === id}.delete
+		}
+	}
+
+	//************************ Solution ***********************************
+	def getSolution(id: Int, userId: Int): Option[Solution] = {
+		db.withDynSession {
+			solutions.filter {solution => solution.id === id}.firstOption
+		}
+	}
+
+	def getSolutions(userId: Int): List[Solution] = {
+		db.withDynSession {
+			solutions.list
+		}
+	}
+
+	def addSolution(solution: Solution) = {
+		db.withDynSession {
+			solutions += solution
+		}
+	}
+
+	def deleteSolution(id: Int, userId: Int) = {
+		db.withDynSession {
+			solutions.filter {solution => solution.id === id}.delete
 		}
 	}
 

@@ -1,6 +1,10 @@
 package com.tomliddle.solution
 
-case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: List[Truck], id: Option[Int]) {
+case class Solution(name: String, id: Option[Int] = None) {
+
+	var depot: Depot = null
+	var stopsToLoad: List[Stop] = List[Stop]()
+	var trucks: List[Truck] = List[Truck]()
 
 	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
 
@@ -35,7 +39,10 @@ case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: L
 				truckResult._1
 			}
 		}
-		copy(trucks = newTrucks, stopsToLoad = unloadedStops)
+		val solution = copy()
+		solution.trucks = newTrucks
+		solution.stopsToLoad = unloadedStops
+		solution
 	}
 
 	def preload: Solution = {
@@ -49,12 +56,17 @@ case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: L
 				truckRes._1
 			}
 		}
-		copy(trucks = truckSol, stopsToLoad = unloadedCities)
+		val truck = copy()
+		truck.trucks = truckSol
+		truck.stopsToLoad = unloadedCities
+		truck
 	}
 
 	def shuffle : Solution = {
-		val truckSol = trucks.map { truck => truck.shuffle }
-		copy(trucks = truckSol)
+		val newTrucks = trucks.map { truck => truck.shuffle }
+		val truck = copy()
+		truck.trucks = newTrucks
+		truck
 	}
 
 	def swapBetweenTrucks: Solution = {
@@ -125,7 +137,8 @@ case class Solution(val depot: Depot, val stopsToLoad: List[Stop], val trucks: L
 			}.sortBy(getTotalCost(_)).head
 		}
 
-		copy(trucks = swapAllToAll(trucks))
+		val solution = copy()
+		solution.trucks = swapAllToAll(trucks)
+		solution
 	}
-
 }

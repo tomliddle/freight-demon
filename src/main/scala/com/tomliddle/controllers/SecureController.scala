@@ -27,7 +27,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	protected implicit val jsonFormats: Formats = {
 		DefaultFormats
 		//+ CustomSerializer
-		+ JodaTimeSerializers
+		//+ JodaTimeSerializers
 	}
 
 	protected implicit def executor: ExecutionContext = system.dispatcher
@@ -100,6 +100,28 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		db.deleteStop(params("id").toInt, scentry.user.id.get)
 	}
 
+
+	// ****************************** SOLUTION *********************
+
+	post("/solution") {
+		val name = params("name")
+	}
+
+	post("/solution/truck/:id") {
+
+	}
+
+	post("/solution/stop/:id") {
+
+	}
+
+	get("/solution") {
+
+	}
+
+	get("/solution/run") {
+
+	}
 
 
 

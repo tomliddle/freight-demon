@@ -58,6 +58,9 @@ class ScalatraBootstrap extends LifeCycle {
 			if (!MTable.getTables.list.exists(_.name.name == "LOCATIONS")) {
 				(locations.ddl).create
 			}
+			if (!MTable.getTables.list.exists(_.name.name == "SOLUTIONS")) {
+				(solutions.ddl).create
+			}
 
 
 
