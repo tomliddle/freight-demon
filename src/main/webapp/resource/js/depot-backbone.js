@@ -1,8 +1,6 @@
-	// Represents one
 	var Depot = Backbone.Model.extend({});
 
-	// Represents a list
-	var DepotList = Backbone.Collection.extend({
+	var DepotList = BaseCollection.extend({
 		url: '/depot',
 		model: Depot
 	});

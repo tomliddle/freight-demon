@@ -7,9 +7,19 @@
 		}
 	};
 
+	var BaseCollection = Backbone.Collection.extend({
+
+
+
+	})
+
 	var BaseView = Backbone.View.extend({
 
 		events: {'submit': 'save'},
+
+		initialize: function() {
+			//this.listenTo(this.collection, "add", )
+		},
 
 		close: function() {
 			this.$el.empty();
@@ -23,7 +33,7 @@
 				acc[field.name] = field.value;
 				return acc;
 			}, {});
-			this.model.save(data);
+			this.collection.add(data);
 			return false;
 		}
 
@@ -64,11 +74,6 @@
 			// Close the old view
 			this.view && this.view.close();
 			this.view = view;
-
-			//$("ul.nav li").removeClass("active");
-			//$("ul.nav a[href$='" + name + "']").closest("li").addClass("active");
-
-
 		}
 	});
 

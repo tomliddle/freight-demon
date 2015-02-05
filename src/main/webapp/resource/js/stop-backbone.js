@@ -1,8 +1,6 @@
-	// Represents one
 	var Stop = Backbone.Model.extend({});
 
-	// Represents a list
-	var StopList = Backbone.Collection.extend({
+	var StopList = BaseCollection.extend({
 		url: '/stop',
 		model: Stop
 	});
