@@ -188,7 +188,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	//************************ Trucks ***********************************
 	def getTruck(id: Int, userId: Int): Option[Truck] = {
 		db.withDynSession {
-			trucks.filter {truck => truck.id === id}.firstOption
+			trucks.filter {truck => truck.id === id}
 		}
 	}
 
@@ -211,15 +211,38 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	}
 
 	//************************ Stops ***********************************
+	private def joinLocation(sl: Option[(Stop, Location)]): Option[Stop] = {
+		sl match {
+			case Some(sl: (Stop, Location)) =>
+				sl._1.location = sl._2
+				Some(sl._1)
+			case None => None
+		}
+	}
+
 	def getStop(id: Int, userId: Int): Option[Stop] = {
 		db.withDynSession {
-			stops.filter {stop => stop.id === id}.firstOption
+			val explicitCrossJoin = for {
+				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
+			} yield (s, l)
+
+			joinLocation(explicitCrossJoin.firstOption)
 		}
 	}
 
 	def getStops(userId: Int): List[Stop] = {
 		db.withDynSession {
-			stops.list
+			val explicitCrossJoin = for {
+				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
+			} yield (s, l)
+
+			explicitCrossJoin.map {
+				(s: Stop, l: Location) => {
+					s.location = l
+					s
+				}
+			}.toList
+
 		}
 	}
 
