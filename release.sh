@@ -1,9 +1,9 @@
 #!/bin/bash
 
-username=tom
-projectPath=/home/tom/Server/HomeAutomationRest
-server=tomliddle.asuscomm.com
-port=40
+username=ubuntu
+projectPath=/home/ubuntu/Server/ScalatraWebProject
+server=amazon
+port=22
 startupScript=start.sh
 shutdownScript=stop.sh
 

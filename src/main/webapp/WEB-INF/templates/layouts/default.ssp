@@ -22,7 +22,11 @@
 	<script src="/resource/js/vendor/handlebars-v2.0.0.js"></script>
 	<script src="/resource/js/vendor/underscore-min.js"></script>
 	<script src="/resource/js/vendor/backbone-min.js"></script>
-	<script src="/resource/js/image-backbone.js"></script>
+	<script src="/resource/js/init.js"></script>
+	<script src="/resource/js/truck-backbone.js"></script>
+	<script src="/resource/js/stop-backbone.js"></script>
+	<script src="/resource/js/depot-backbone.js"></script>
+	<script src="/resource/js/solution-backbone.js"></script>
 </head>
 
 <body>
@@ -40,8 +44,10 @@
 	<div id="navbar" class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">
 			<li class="active"><a href="#">Home</a></li>
-			<li><a href="#about">About</a></li>
-			<li><a href="#contact">Contact</a></li>
+			<li><a href="#depots">Depots</a></li>
+			<li><a href="#trucks">Trucks</a></li>
+			<li><a href="#stops">Stops</a></li>
+			<li><a href="#solution">Solution</a></li>
 			<li><a href="/sessions/logout">Logout</a></li>
 		</ul>
 	</div><!--/.nav-collapse -->
