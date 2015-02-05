@@ -11,14 +11,15 @@
 
 
 
-	})
+	});
 
 	var BaseView = Backbone.View.extend({
 
 		events: {'submit': 'save'},
 
-		initialize: function() {
-			//this.listenTo(this.collection, "add", )
+		initialize: function(options) {
+			//this.collection = options.collection;
+			//this.listenTo(this.collection, "add", this.render);
 		},
 
 		close: function() {
