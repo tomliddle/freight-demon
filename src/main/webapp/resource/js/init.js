@@ -27,6 +27,31 @@
 			this.unbind();
 		},
 
+		serialiseForm = function() {
+			var arrayData, objectData;
+			arrayData = this.serializeArray();
+			objectData = {};
+
+			$.each(arrayData, function() {
+				var value;
+				if (this.value != null) {
+					value = this.value;
+				} else {
+					value = '';
+				}
+				if (objectData[this.name] != null) {
+					if (!objectData[this.name].push) {
+						objectData[this.name] = [objectData[this.name]];
+					}
+					objectData[this.name].push(value);
+				} else {
+					objectData[this.name] = value;
+				}
+			});
+			return objectData;
+		};
+
+
 		save: function(e) {
 			e.preventDefault();
 			var arr = this.$el.find("form").serializeArray();
@@ -34,7 +59,8 @@
 				acc[field.name] = field.value;
 				return acc;
 			}, {});
-			this.collection.add(data);
+
+			this.collection.create(data);
 			return false;
 		}
 

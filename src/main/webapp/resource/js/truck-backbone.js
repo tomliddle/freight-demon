@@ -11,7 +11,7 @@ var TruckListView = BaseView.extend({
 	el: '.content', // el attaches to existing element
 
 	initialize: function(){
-		//this.
+		this.collection = new TruckList();
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
 		this.collection.fetch({success: function(){that.render()}});
