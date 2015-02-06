@@ -64,21 +64,23 @@ class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
 	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
+	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, startTime, endTime, maxWeight, id.?) <>(Truck.tupled, Truck.unapply)
+	def * = (name, startTime, endTime, maxWeight, userId, id.?) <>(Truck.tupled, Truck.unapply)
 }
 
 class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def location: Column[Location] = column[Location]("location", O.NotNull)
+	def locationId: Column[Int] = column[Int]("locationId", O.NotNull)
+	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-	
-	def * = (name, location, id.?) <>(Depot.tupled, Depot.unapply)
+
+	def * = (name, locationId, userId, id.?) <>(Depot.tupled, Depot.unapply)
 }
 
 class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
-	
+
 	//(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)	def location: Column[String] = column[String]("location", O.NotNull)
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def location: Column[Location] = column[Location]("location")
@@ -86,15 +88,17 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
 	def specialCodes: Column[List[String]] = column[List[String]]("specialCodes")
+	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, location, startTime, endTime, maxWeight, specialCodes, id.?) <>(Stop.tupled, Stop.unapply)
+	def * = (name, locationId, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
 /*
 class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
+	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
 	def * = (name, id.?) <>(Solution.tupled, Solution.unapply)
@@ -166,13 +170,13 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	//************************ Trucks ***********************************
 	def getTruck(id: Int, userId: Int): Option[Truck] = {
 		db.withDynSession {
-			trucks.filter {truck => truck.id === id}.firstOption
+			trucks.filter {truck => truck.id === id && truck.userId === userId}.firstOption
 		}
 	}
 
 	def getTrucks(userId: Int): List[Truck] = {
 		db.withDynSession {
-			trucks.list
+			trucks.filter {truck => truck.userId === userId}.list
 		}
 	}
 
@@ -184,7 +188,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 	def deleteTruck(id: Int, userId: Int) = {
 		db.withDynSession {
-			trucks.filter {truck => truck.id === id}.delete
+			trucks.filter {truck => truck.id === id && truck.userId === userId}.delete
 		}
 	}
 
@@ -204,7 +208,14 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			joinLocation(explicitCrossJoin.firstOption)
+			val opt = explicitCrossJoin.filter { sl => sl._1.id === id && sl._1.userId === userId}.first
+
+				case Some(slFound: (Stop, Location)) => {
+					slFound._1.location = slFound._2
+					Some(slFound._1)
+				}
+				case None => None
+			}
 		}
 	}
 
@@ -214,7 +225,12 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			stops.list
+			explicitCrossJoin.list.map {
+				sl: (Stop, Location) => {
+					sl._1.location = sl._2
+					sl._1
+				}
+			}
 		}
 	}
 
@@ -226,7 +242,23 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 	def deleteStop(id: Int, userId: Int) = {
 		db.withDynSession {
-			stops.filter {stop => stop.id === id}.delete
+			stops.filter {stop => stop.id === id && stop.userId === userId}.delete
+		}
+	}
+
+	//************************ Depots ***********************************
+	def getDepots(userId: Int): List[Depot] = {
+		db.withDynSession {
+			val explicitCrossJoin = for {
+				(s, l) <- depots innerJoin locations on (_.locationId === _.id)
+			} yield (s, l)
+
+			explicitCrossJoin.list.map {
+				sl: (Depot, Location) => {
+					sl._1.location = sl._2
+					sl._1
+				}
+			}
 		}
 	}
 

@@ -3,7 +3,7 @@ package com.tomliddle.solution
 import org.joda.time.{LocalTime, Duration}
 
 
-case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, id: Option[Int] = None) {
+case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
 
 	var depot: Depot = null
 	var stops = List[Stop]()

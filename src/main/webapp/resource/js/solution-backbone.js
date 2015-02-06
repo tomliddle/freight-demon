@@ -11,6 +11,7 @@ var SolutionView = BaseView.extend({
 
 	initialize: function(){
 		this.collection = new SolutionList();
+		this.listenTo(this.collection, "add", this.render);
 		var that = this;
 		this.collection.fetch({success: function(){that.render()}});
 	},

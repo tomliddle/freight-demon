@@ -45,7 +45,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val endTime = params("endTime")
 		val maxWeight = params("maxWeight")
 
-		val truck = Truck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight))
+		val truck = Truck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), scentry.user.id.get)
 
 		db.addTruck(truck)
 	}
@@ -78,7 +78,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 		db.getLocation(postcode).foreach {
 			location =>
-				val stop = Stop(name, location, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), List())
+				val stop = Stop(name, location.id.get, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), List(), scentry.user.id.get)
 				db.addStop(stop)
 		}
 	}

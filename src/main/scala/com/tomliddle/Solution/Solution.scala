@@ -1,6 +1,6 @@
 package com.tomliddle.solution
 
-case class Solution(name: String, id: Option[Int] = None) {
+case class Solution(name: String, userId: Int, id: Option[Int] = None) {
 
 	var depot: Depot = null
 	var stopsToLoad: List[Stop] = List[Stop]()

@@ -53,10 +53,9 @@ class ScalatraBootstrap extends LifeCycle {
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "DEPOTS")) {
 				(depots.ddl).create
-				depots += Depot("depot", new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY"))
-			}
-			if (!MTable.getTables.list.exists(_.name.name == "LOCATIONS")) {
-				(locations.ddl).create
+				//val userId = (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
+				val locationId = (locations returning locations.map(_.id)) += new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY")
+				depots += Depot("depot", 1, locationId)
 			}
 			/*if (!MTable.getTables.list.exists(_.name.name == "SOLUTIONS")) {
 				(solutions.ddl).create

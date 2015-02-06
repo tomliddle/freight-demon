@@ -6,9 +6,13 @@ class DistanceTime(val distance: BigDecimal, val time: Duration)
 
 case class Location(x: BigDecimal, y: BigDecimal, postcode: String, id: Option[Int] = None)
 
-case class Depot(name: String, location: Location, id: Option[Int] = None)
+case class Depot(name: String, locationId: Int, userId: Int, id: Option[Int] = None) {
+	var location: Location = null
+}
 
-case class Stop(name: String, location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], id: Option[Int] = None)
+case class Stop(name: String, locationId: Int, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) {
+	var location: Location = null
+}
 
 class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
 

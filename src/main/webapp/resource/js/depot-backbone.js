@@ -10,6 +10,7 @@
 
 		initialize: function(){
 			this.collection = new DepotList();
+			this.listenTo(this.collection, "add", this.render);
 			var that = this;
 			this.collection.fetch({success: function(){that.render()}});
 		},
