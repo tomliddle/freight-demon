@@ -208,8 +208,9 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			val opt = explicitCrossJoin.filter { sl => sl._1.id === id && sl._1.userId === userId}.first
+			val opt = explicitCrossJoin.filter { sl => sl._1.id === id && sl._1.userId === userId}.firstOption
 
+			opt match {
 				case Some(slFound: (Stop, Location)) => {
 					slFound._1.location = slFound._2
 					Some(slFound._1)
