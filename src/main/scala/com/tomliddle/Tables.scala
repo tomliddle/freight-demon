@@ -193,14 +193,14 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	}
 
 	//************************ Stops ***********************************
-	private def joinLocation(sl: Option[(Stop, Location)]): Option[Stop] = {
+	/*private def joinLocation(sl: Option[(Stop, Location)]): Option[Stop] = {
 		sl match {
 			case Some(sl: (Stop, Location)) =>
 				sl._1.location = sl._2
 				Some(sl._1)
 			case None => None
 		}
-	}
+	}*/
 
 	def getStop(id: Int, userId: Int): Option[Stop] = {
 		db.withDynSession {

@@ -1,14 +1,11 @@
 package com.tomliddle.controllers
 
 import java.util.concurrent.TimeUnit
-
 import akka.actor.{ActorSystem, ActorRef}
 import akka.util.Timeout
 import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
-import com.tomliddle.solution.{Stop, Truck}
-import org.joda.time.LocalTime
-import org.joda.time.format.DateTimeFormat
+import com.tomliddle.form.{StopForm, TruckForm}
 import org.json4s.{Formats, DefaultFormats}
 import org.json4s.ext.JodaTimeSerializers
 import org.scalatra.{RequestEntityTooLarge, FutureSupport}
@@ -16,21 +13,19 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.{SizeConstraintExceededException, FileUploadSupport, MultipartConfig}
 import scala.concurrent.ExecutionContext
 
+
 class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
-	private final val formatter = DateTimeFormat.forPattern("HH:mm")
-
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-	protected implicit val jsonFormats: Formats = {
-		DefaultFormats
-		//+ CustomSerializer
-		//+ JodaTimeSerializers
-	}
+	protected implicit val jsonFormats: Formats = DefaultFormats ++ JodaTimeSerializers.all
 
 	protected implicit def executor: ExecutionContext = system.dispatcher
+
+	//private implicit def str2localdate(str: String) = LocalTime.parse(str, formatter)
+
 
 
 	before() {
@@ -40,14 +35,8 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	//************** Truck HANDLING ******************************
 	// Add truck
 	post("/truck") {
-		val name = params("name")
-		val startTime = params("startTime")
-		val endTime = params("endTime")
-		val maxWeight = params("maxWeight")
-
-		val truck = Truck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), scentry.user.id.get)
-
-		db.addTruck(truck)
+		var truckForm = parsedBody.extract[TruckForm]
+		db.addTruck(truckForm.getTruck(scentry.user.id.get))
 	}
 
 	// Get truck
@@ -70,15 +59,11 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	//************** Stop HANDLING ******************************
 	// Add stop
 	post("/stop") {
-		val name = params("name")
-		val startTime = params("startTime")
-		val endTime = params("endTime")
-		val maxWeight = params("maxWeight")
-		val postcode = params("postcode")
+		var stopForm = parsedBody.extract[StopForm]
 
-		db.getLocation(postcode).foreach {
+		db.getLocation(stopForm.postcode).foreach {
 			location =>
-				val stop = Stop(name, location.id.get, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime), BigDecimal(maxWeight), List(), scentry.user.id.get)
+				val stop = stopForm.getStop(scentry.user.id.get, location.id.get)
 				db.addStop(stop)
 		}
 	}
@@ -130,7 +115,6 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		contentType = "text/html"
 		ssp("/home")
 	}
-
 
 	error {
 		case e: SizeConstraintExceededException => RequestEntityTooLarge("file is too big")
