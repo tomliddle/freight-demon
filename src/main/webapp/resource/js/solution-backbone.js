@@ -1,4 +1,3 @@
-
 var Solution = Backbone.Model.extend({});
 
 var SolutionList = Backbone.Collection.extend({
@@ -7,17 +6,27 @@ var SolutionList = Backbone.Collection.extend({
 });
 
 var SolutionView = BaseView.extend({
-	el: '.content', // el attaches to existing element
+	el: '.content',
 
 	initialize: function(){
-		this.collection = new SolutionList();
-		this.listenTo(this.collection, "add", this.render);
+		//this.collection = new SolutionList();
+		//this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		this.collection.fetch({success: function(){that.render()}});
+		//this.collection.fetch({success: function(){that.render()}});
+		that.render();
 	},
 
 	render: function(){
-		this.$el.html(Templates.solutionTemplate({solution:this.collection.toJSON()}));
+		//this.$el.html(Templates.solutionTemplate({solution:this.collection.toJSON()}));
+
+		this.$el.html(Templates.solutionTemplate());
+
+		var map = L.map('map').setView([51.505, -0.09], 13);
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(map);
+
+
+
+		var marker = L.marker([51.5, -0.09]).addTo(map);
 		return this;
 	}
 });

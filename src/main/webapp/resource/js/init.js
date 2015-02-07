@@ -14,8 +14,11 @@ var BaseView = Backbone.View.extend({
 	events: {'submit': 'save'},
 
 	initialize: function(options) {
+	},
 
-
+	remove: function(id) {
+		this.collection.get(id).destroy();
+		this.render();
 	},
 
 	close: function() {

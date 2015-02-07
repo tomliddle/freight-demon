@@ -17,6 +17,12 @@ var StopListView = BaseView.extend({
 
 	render: function(){
 		this.$el.html(Templates.stopListTemplate({stops:this.collection.toJSON()}));
+		var that = this;
+		this.$el.find("input.remove").click(function (e) {
+			e.preventDefault();
+			var id = $(e.target).data("id");
+			that.remove(id);
+		});
 		return this;
 	}
 });

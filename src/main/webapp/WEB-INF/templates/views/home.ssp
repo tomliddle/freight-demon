@@ -45,27 +45,7 @@
 		</div>
 		<div class="form-group">
 			<label for="name">Weight (kg)</label>
-			<input type="text" class="form-control" name="maxWeight" />
-
-
-<div class="row">
-	<div class="col-xs-8">
-		<form method="post" class="" action="/truck" enctype="multipart/form-data">
-			<div class="form-group">
-				<label for="name">Name</label>
-				<input type="text" class="form-control" name="name" />
-			</div>
-			<div class="form-group">
-				<label for="name">Start Time</label>
-				<input type="time" class="form-control" name="startTime" />
-			</div>
-			<div class="form-group">
-				<label for="name">End Time</label>
-				<input type="time" class="form-control" name="endTime" />
-			</div>
-			<div class="form-group">
-				<label for="name">Max Weight (kgs)</label>
-				<input type="text" class="form-control" name="maxWeight" />
+			<input type="number" class="form-control" name="maxWeight" />
 			</div>
 			<div class="form-group">
 				<input class="btn btn-primary" type="submit" value="Add" />
@@ -80,6 +60,7 @@
 				<th>Start time</th>
 				<th>End time</th>
 				<th>Weight (kg)</th>
+				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -89,16 +70,12 @@
 				<td>{{startTime.hour}}:{{startTime.minute}}</td>
 				<td>{{endTime.hour}}:{{endTime.minute}}</td>
 				<td>{{maxWeight}}</td>
+				<td><input class="btn remove" name="remove" type="submit" data-id="{{id}}" value="Remove"/></td>
 			</tr>
 			{{/each}}
 		</tbody>
 	</table>
 </script>
-				<input class="btn btn-primary" type="submit" />
-			</div>
-		</form>
-	</div>
-</div>
 
 <script id="stop-list-template" type="text/x-handlebars-template">
 	<div class="row">
@@ -129,28 +106,6 @@
 		<div class="form-group">
 			<label for="name">Postcode</label>
 			<input type="text" class="form-control" name="postcode" />
-<div class="row">
-	<div class="col-xs-8">
-		<form method="post" class="" action="/stop" enctype="multipart/form-data">
-			<div class="form-group">
-				<label for="name">Name</label>
-				<input type="text" class="form-control" name="name" />
-			</div>
-			<div class="form-group">
-				<label for="name">Start Time</label>
-				<input type="time" class="form-control" name="startTime" />
-			</div>
-			<div class="form-group">
-				<label for="name">End Time</label>
-				<input type="time" class="form-control" name="endTime" />
-			</div>
-			<div class="form-group">
-				<label for="name">delivery weight (kgs)</label>
-				<input type="number"  class="form-control" name="maxWeight" />
-			</div>
-			<div class="form-group">
-				<label for="name">Postcode</label>
-				<input type="text" class="form-control" name="postcode" />
 			</div>
 			<div class="form-group">
 				<input class="btn btn-primary" type="submit" value="Add"/>
@@ -158,11 +113,6 @@
 	</form>
 		</div>
 	</div>
-				<input class="btn btn-primary" type="submit" />
-			</div>
-		</form>
-	</div>
-</div>
 
 	<table class="table table-striped">
 		<thead>
@@ -171,6 +121,7 @@
 				<th>Start time</th>
 				<th>End time</th>
 				<th>Weight (kg)</th>
+				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -180,48 +131,23 @@
 				<td>{{startTime.hour}}:{{startTime.minute}}</td>
 				<td>{{endTime.hour}}:{{endTime.minute}}</td>
 				<td>{{maxWeight}}</td>
+				<td><input class="btn remove" name="remove" type="submit" data-id="{{id}}" value="Remove"/></td>
 			</tr>
 			{{/each}}
 		</tbody>
 	</table>
 </script>
-<script id="depot-list-template" type="text/x-handlebars-template">
-<ul>
-	{{#each depots}}
-	<li>
-		<div>Name: {{name}}</div>
-	</li>
-	{{/each}}
-</ul>
-</script>
 
 <script id="solution-template" type="text/x-handlebars-template">
-<div class="row">
-	<div class="col-xs-4">
-		<h2>Solutions</h2>
+	<div class="row">
+		<div class="col-xs-4">
+			<h2>Solutions</h2>
+
+
+		</div>
 	</div>
-</div>
-<script id="truck-list-template" type="text/x-handlebars-template">
-	<ul>
-	{{#each trucks}}
-		<li>
-			<div>Name: {{name}}</div>
-			<img height="100" width="100" src="/image/{{id}}"/>
-		</li>
-	{{/each}}
-	</ul>
-</script>
 
-<script id="stop-list-template" type="text/x-handlebars-template">
-	<ul>
-	{{#each stops}}
-		<li>
-			<div>Name: {{name}}</div>
-		</li>
-	{{/each}}
-	</ul>
-</script>
-
+	<div id="map"></div>
 
 </script>
 
@@ -233,8 +159,4 @@
 
 
 <div class="content"></div>
-
-<div id="trucks"></div>
-
-<div id="stops"></div>
 

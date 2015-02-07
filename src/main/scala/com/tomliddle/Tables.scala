@@ -94,14 +94,14 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def * = (name, locationId, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
-/*
-class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
+
+/*class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, id.?) <>(Solution.tupled, Solution.unapply)
+	def * = (name, userId, id.?) <>(Solution.tupled, Solution.unapply)
 }*/
 
 

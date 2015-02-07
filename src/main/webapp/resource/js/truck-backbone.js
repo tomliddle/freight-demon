@@ -19,6 +19,12 @@ var TruckListView = BaseView.extend({
 
 	render: function(){
 		this.$el.html(Templates.truckListTemplate({trucks:this.collection.toJSON()}));
+		var that = this;
+		this.$el.find("input.remove").click(function (e) {
+			e.preventDefault();
+			var id = $(e.target).data("id");
+			that.remove(id);
+		});
 		return this;
 	}
 });

@@ -8,6 +8,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>ScalatraWeb</title>
 	<link href="/resource/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/resource/css/leaflet.css" rel="stylesheet">
+<link href="/resource/css/styles.css" rel="stylesheet">
 	<style>
 		body {
 		padding-top: 50px;
@@ -22,6 +24,9 @@
 	<script src="/resource/js/vendor/handlebars-v2.0.0.js"></script>
 	<script src="/resource/js/vendor/underscore-min.js"></script>
 	<script src="/resource/js/vendor/backbone-min.js"></script>
+	<script src="/resource/js/vendor/bootstrap.min.js"></script>
+	<script src="/resource/js/vendor/leaflet.js"></script>
+
 	<script src="/resource/js/init.js"></script>
 	<script src="/resource/js/truck-backbone.js"></script>
 	<script src="/resource/js/stop-backbone.js"></script>
