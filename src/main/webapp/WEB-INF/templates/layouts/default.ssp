@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>ScalatraWeb</title>
+	<title>FreightDemon</title>
 	<link href="/resource/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/resource/css/leaflet.css" rel="stylesheet">
 <link href="/resource/css/styles.css" rel="stylesheet">
@@ -44,7 +44,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="#">ScalatraWeb</a>
+		<a class="navbar-brand" href="#">FreightDemon</a>
 	</div>
 	<div id="navbar" class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">

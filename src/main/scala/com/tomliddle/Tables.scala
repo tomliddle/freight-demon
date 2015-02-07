@@ -226,7 +226,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			explicitCrossJoin.list.map {
+			explicitCrossJoin.list.filter{sl: (Stop, Location) => sl._1.userId == userId}.map {
 				sl: (Stop, Location) => {
 					sl._1.location = sl._2
 					sl._1
