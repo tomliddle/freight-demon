@@ -19,7 +19,7 @@ var SolutionView = BaseView.extend({
 	render: function(){
 		//this.$el.html(Templates.solutionTemplate({solution:this.collection.toJSON()}));
 
-		this.$el.html(Templates.solutionTemplate());
+		this.$el.html(Templates.solutionTemplate({}));
 
 		var map = L.map('map').setView([51.505, -0.09], 13);
 		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(map);

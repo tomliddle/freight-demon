@@ -2,8 +2,8 @@ var Templates = Templates || {
 	load: function () {
 		this.truckListTemplate = Handlebars.compile($("#truck-list-template").html());
 		this.stopListTemplate = Handlebars.compile($("#stop-list-template").html());
-		this.depotListTemplate= Handlebars.compile($("#depot-list-template").html());
-		this.solutionTemplate= Handlebars.compile($("#solution-template").html());
+		this.depotListTemplate = Handlebars.compile($("#depot-list-template").html());
+		this.solutionTemplate = Handlebars.compile($("#solution-template").html());
 	}
 };
 
@@ -16,7 +16,7 @@ var BaseView = Backbone.View.extend({
 	initialize: function(options) {
 	},
 
-	remove: function(id) {
+	removeItem: function(id) {
 		this.collection.get(id).destroy();
 		this.render();
 	},
@@ -56,26 +56,25 @@ var AppRouter = Backbone.Router.extend({
 	},
 
 	truckListView: function() {
-		this.switchView(new TruckListView(), "truckListView")
+		this.view && this.view.close();
+		this.view = new TruckListView();
 	},
 
 	depotListView: function() {
-		this.switchView(new DepotListView(), "depotListView")
+		this.view && this.view.close();
+		this.view = new DepotListView();
 	},
 
 	stopListView: function() {
-		this.switchView(new StopListView(), "stopListView")
+		this.view && this.view.close();
+		this.view = new StopListView();
 	},
 
 	solutionView: function() {
-		this.switchView(new SolutionView(), "solutionView")
-	},
-
-	switchView: function (view, name) {
-		// Close the old view
 		this.view && this.view.close();
-		this.view = view;
-	}
+		this.view = new SolutionView();
+
+	},
 });
 
 

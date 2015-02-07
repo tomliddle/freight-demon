@@ -21,7 +21,7 @@ var StopListView = BaseView.extend({
 		this.$el.find("input.remove").click(function (e) {
 			e.preventDefault();
 			var id = $(e.target).data("id");
-			that.remove(id);
+			that.removeItem(id);
 		});
 		return this;
 	}
