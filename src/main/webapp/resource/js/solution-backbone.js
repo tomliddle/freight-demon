@@ -5,29 +5,41 @@ var SolutionList = Backbone.Collection.extend({
 	model: Solution
 });
 
-var SolutionView = BaseView.extend({
-	el: '.content',
+var SolutionListView = BaseView.extend({
+
 
 	initialize: function(){
-		//this.collection = new SolutionList();
-		//this.listenTo(this.collection, "add", this.render);
+		this.collection = new SolutionList();
+		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		//this.collection.fetch({success: function(){that.render()}});
-		that.render();
+		this.collection.fetch({success: function(){that.render()}});
 	},
 
 	render: function(){
-		//this.$el.html(Templates.solutionTemplate({solution:this.collection.toJSON()}));
-
-		this.$el.html(Templates.solutionTemplate({}));
-
-		var map = L.map('map').setView([51.505, -0.09], 13);
-		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(map);
-
-
-
-		var marker = L.marker([51.5, -0.09]).addTo(map);
+		this.$el.html(Templates.solutionTemplate({solution:this.collection.toJSON()}));
 		return this;
 	}
 });
+
+
+
+
+
+var SolutionPageView = Backbone.View.extend{{
+	el: '.content',
+
+	initialize: function(){
+		var that = this;
+		//this.collection.fetch({success: function(){that.render()}});
+	},
+
+	render: function(){
+		this.$el.html(Templates.solutionPageTemplate({}));
+
+		this.$el.find(".solutionlist").html(templage...)
+
+		this.$el.html(Templates.eventViewTemplate());
+		return this;
+	}
+}};
 

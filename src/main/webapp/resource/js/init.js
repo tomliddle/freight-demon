@@ -3,7 +3,7 @@ var Templates = Templates || {
 		this.truckListTemplate = Handlebars.compile($("#truck-list-template").html());
 		this.stopListTemplate = Handlebars.compile($("#stop-list-template").html());
 		this.depotListTemplate = Handlebars.compile($("#depot-list-template").html());
-		this.solutionTemplate = Handlebars.compile($("#solution-template").html());
+		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
 	}
 };
 
@@ -47,7 +47,7 @@ var AppRouter = Backbone.Router.extend({
 		trucks: "truckListView",
 		depots: "depotListView",
 		stops: "stopListView",
-		solution: "solutionView",
+		solution: "solutionPageView",
 		"*actions": "defaultRoute" // Backbone will try to match the route above first
 	},
 
@@ -70,9 +70,9 @@ var AppRouter = Backbone.Router.extend({
 		this.view = new StopListView();
 	},
 
-	solutionView: function() {
+	solutionPageView: function() {
 		this.view && this.view.close();
-		this.view = new SolutionView();
+		this.view = new SolutionPageView();
 
 	},
 });

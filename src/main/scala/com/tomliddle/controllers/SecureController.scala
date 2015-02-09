@@ -6,6 +6,7 @@ import akka.util.Timeout
 import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
+import com.tomliddle.solution.Solution
 import org.json4s.{Formats, DefaultFormats}
 import org.json4s.ext.JodaTimeSerializers
 import org.scalatra.{RequestEntityTooLarge, FutureSupport}
@@ -92,6 +93,26 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val name = params("name")
 	}
 
+	get("/solution") {
+		contentType = formats("json")
+		val solution = db.getSolutions(scentry.user.id.get)
+
+	}
+
+	get("/solution/:id") {
+		contentType = formats("json")
+		val user = scentry.user.id.get
+		val solution = db.getSolution(params("id").toInt, user)
+		solution.map {
+			solution =>
+				solution.trucks = db.getTrucks(user)
+				solution.stopsToLoad = db.getStops(user)
+				solution.depot = db.getDepots(user).head
+		}
+	}
+
+	////////////////////
+
 	post("/solution/truck/:id") {
 
 	}
@@ -100,11 +121,8 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	}
 
-	get("/solution") {
-
-	}
-
 	get("/solution/run") {
+		contentType = formats("json")
 
 	}
 

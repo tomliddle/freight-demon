@@ -95,14 +95,14 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 }
 
 
-/*class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
+class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
 	def * = (name, userId, id.?) <>(Solution.tupled, Solution.unapply)
-}*/
+}
 
 
 object Tables {
@@ -111,7 +111,7 @@ object Tables {
 	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
 	val depots: TableQuery[Depots] = TableQuery[Depots]
 	val stops: TableQuery[Stops] = TableQuery[Stops]
-	//val solutions: TableQuery[Solutions] = TableQuery[Solutions]
+	val solutions: TableQuery[Solutions] = TableQuery[Solutions]
 }
 
 class DatabaseSupport(db: Database) extends Geocoding {
@@ -208,7 +208,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			val opt: Option[(Stop, Location)] = explicitCrossJoin.list.filter { sl: (Stop, Location)  => sl._1.id == id && sl._1.userId == userId }.headOption //sl => sl._1.id === id && sl._1.userId === userId
+			val opt: Option[(Stop, Location)] = explicitCrossJoin.list.filter { sl: (Stop, Location)  => sl._1.id.get == id && sl._1.userId == userId }.headOption //sl => sl._1.id === id && sl._1.userId === userId
 
 			opt match {
 				case Some(slFound: (Stop, Location)) => {
@@ -264,7 +264,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	}
 
 	//************************ Solution ***********************************
-	/*def getSolution(id: Int, userId: Int): Option[Solution] = {
+	def getSolution(id: Int, userId: Int): Option[Solution] = {
 		db.withDynSession {
 			solutions.filter {solution => solution.id === id}.firstOption
 		}
@@ -272,7 +272,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 	def getSolutions(userId: Int): List[Solution] = {
 		db.withDynSession {
-			solutions.list
+			solutions.filter {solution => solution.userId === userId}.list
 		}
 	}
 
@@ -284,9 +284,9 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 	def deleteSolution(id: Int, userId: Int) = {
 		db.withDynSession {
-			solutions.filter {solution => solution.id === id}.delete
+			solutions.filter {solution => solution.id === id && solution.userId === userId}.delete
 		}
-	}*/
+	}
 
 
 }

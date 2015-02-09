@@ -138,12 +138,27 @@
 	</table>
 </script>
 
-<script id="solution-template" type="text/x-handlebars-template">
+<script id="solution-page-template" type="text/x-handlebars-template">
 	<div class="row">
 		<div class="col-xs-4">
 			<h2>Solutions</h2>
 		</div>
 	</div>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Name</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each solution}}
+			<tr>
+				<td>{{name}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
 
 	<div id="map"></div>
 
