@@ -1,11 +1,11 @@
 var Solution = Backbone.Model.extend({});
 
-var SolutionList = Backbone.Collection.extend({
+var SolutionList = BaseCollection.extend({
 	url: '/solution',
 	model: Solution
 });
 
-var SolutionPageView = Backbone.View.extend({
+var SolutionPageView = BaseView.extend({
 	el: '.content',
 
 	initialize: function(){
@@ -50,7 +50,7 @@ var SolutionListView = BaseView.extend({
 });
 
 
-var SolutionMapView = Backbone.View.extend({
+var SolutionMapView = BaseView.extend({
 
 	initialize: function(options){
 		//this.listenTo()

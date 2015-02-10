@@ -11,7 +11,7 @@ import org.scalatra.servlet.ScalatraListener
 object JettyLauncher {
 	// this is my entry object as specified in sbt project definition
 	def main(args: Array[String]) {
-		val port = 8080
+		val port = 8081
 
 		val threadPool = new QueuedThreadPool
 		threadPool.setMaxThreads(20)

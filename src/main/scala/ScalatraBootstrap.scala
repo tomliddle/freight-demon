@@ -61,11 +61,6 @@ class ScalatraBootstrap extends LifeCycle {
 				(solutions.ddl).create
 				solutions += Solution("Solution" , 1, Some(1))
 			}
-
-
-
-
-			//trucks += Truck("truck1", )
 		}
 	}
 }

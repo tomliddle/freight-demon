@@ -76,8 +76,7 @@ var AppRouter = Backbone.Router.extend({
 	solutionPageView: function() {
 		this.view && this.view.close();
 		this.view = new SolutionPageView();
-
-	},
+	}
 });
 
 

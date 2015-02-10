@@ -27,11 +27,6 @@
 	<script src="/resource/js/vendor/bootstrap.min.js"></script>
 	<script src="/resource/js/vendor/leaflet.js"></script>
 
-	<script src="/resource/js/init.js"></script>
-	<script src="/resource/js/truck-backbone.js"></script>
-	<script src="/resource/js/stop-backbone.js"></script>
-	<script src="/resource/js/depot-backbone.js"></script>
-	<script src="/resource/js/solution-backbone.js"></script>
 </head>
 
 <body>
