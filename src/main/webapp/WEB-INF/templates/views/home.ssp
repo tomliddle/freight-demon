@@ -148,21 +148,32 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th>Select</th>
 				<th>Name</th>
 			</tr>
 		</thead>
-		<tbody>
-			{{#each solution}}
-			<tr>
-				<td>{{name}}</td>
-			</tr>
-			{{/each}}
+		<tbody class="solution-list">
+
 		</tbody>
 	</table>
 
 	<div id="map"></div>
-
 </script>
+
+<script id="solution-list-template" type="text/x-handlebars-template">
+	{{#each solution}}
+	<tr>
+		<td><input type="radio" class="solution-select" data-target="{{id}}"/></td>
+		<td>{{name}}</td>
+	</tr>
+	{{/each}}
+</script>
+
+<%--<script id="solution-map-template" type="text/x-handlebars-template">
+	<div id="map"></div>
+</script>--%>
+
+
 
 
 

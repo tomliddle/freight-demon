@@ -3,7 +3,10 @@ var Templates = Templates || {
 		this.truckListTemplate = Handlebars.compile($("#truck-list-template").html());
 		this.stopListTemplate = Handlebars.compile($("#stop-list-template").html());
 		this.depotListTemplate = Handlebars.compile($("#depot-list-template").html());
+
 		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
+		this.solutionListTemplate = Handlebars.compile($("#solution-list-template").html());
+		//this.solutionMapTemplate = Handlebars.compile($("#solution-map-template").html());
 	}
 };
 
