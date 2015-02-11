@@ -6,3 +6,10 @@
 src/.DS_Store
 .DS_Store
 /.idea
+/ScalatraWebProject.iml
+/backup
+/src/main/webapp/resource/js/depot-backbone.js
+/src/main/webapp/resource/js/init.js
+/src/main/webapp/resource/js/solution-backbone.js
+/src/main/webapp/resource/js/stop-backbone.js
+/src/main/webapp/resource/js/truck-backbone.js

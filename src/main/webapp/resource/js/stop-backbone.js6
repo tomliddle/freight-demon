@@ -1,22 +1,25 @@
+
 var Stop = Backbone.Model.extend({});
 
 var StopList = BaseCollection.extend({
-	url: '/stop',
+	url: "/stop",
 	model: Stop
 });
 
 var StopListView = BaseView.extend({
-	el: '.content',
+	el: ".content",
 
-	initialize: function(){
+	initialize: function () {
 		this.collection = new StopList();
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		this.collection.fetch({success: function(){that.render()}});
+		this.collection.fetch({ success: function () {
+				that.render();
+		}});
 	},
 
-	render: function(){
-		this.$el.html(Templates.stopListTemplate({stops:this.collection.toJSON()}));
+	render: function () {
+		this.$el.html(Templates.stopListTemplate({ stops: this.collection.toJSON() }));
 		var that = this;
 		this.$el.find("input.remove").click(function (e) {
 			e.preventDefault();
@@ -26,4 +29,3 @@ var StopListView = BaseView.extend({
 		return this;
 	}
 });
-

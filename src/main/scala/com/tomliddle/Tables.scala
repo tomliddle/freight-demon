@@ -9,13 +9,6 @@ import scala.slick.lifted.TableQuery
 import Tables._
 
 trait TypeConvert {
-	implicit def pointConvert = MappedColumnType.base[Location, String] (
-		dt => s"${dt.x},${dt.y},${dt.postcode}",
-		ts => {
-			val str = ts.split(",")
-			new Location(BigDecimal(str(0)), BigDecimal(str(1)), str(2))
-		}
-	)
 
 	implicit def localTime = MappedColumnType.base[LocalTime, Time](dt => new Time(dt.getMillisOfDay), ts => new LocalTime(ts.getTime))
 
@@ -49,8 +42,6 @@ class Locations(tag: Tag) extends Table[Location](tag, "LOCATIONS") {
 	def postcode: Column[String] = column[String]("postcode", O.NotNull)
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	// the * projection (e.g. select * ...) auto-transforms the tupled
-	// column values to / from a User
 	def * = (x, y, postcode, id.?) <>(Location.tupled, Location.unapply)
 }
 
@@ -81,9 +72,8 @@ class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
 
 class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 
-	//(location: Point, startTime: DateTime, endTime: DateTime, maxWeight: Double, specialCodes: List[String], id: Option[Int] = None)	def location: Column[String] = column[String]("location", O.NotNull)
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def location: Column[Location] = column[Location]("location")
+	def locationId: Column[Int] = column[Int]("locationId")
 	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
@@ -150,8 +140,8 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				case None => {
 					geocodeFromOnline(postcode) match {
 						case Some(location: Location) => {
-							locations += location
-							Some(location)
+							val locationId = (locations returning locations.map(_.id)) += location
+							Some(location.copy(id = Some(locationId)))
 						}
 						case None => None
 					}
@@ -266,27 +256,14 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	//************************ Solution ***********************************
 	def getSolution(id: Int, userId: Int): Option[Solution] = {
 		db.withDynSession {
-			solutions.filter {solution => solution.id === id}.firstOption match {
-				case Some(solution) =>
-					solution.trucks = trucks.list
-					solution.stopsToLoad = stops.list
-					solution.depot = depots.list.head
-					Some(solution)
-				case None => None
-			}
+			solutions.filter {solution => solution.id === id}.firstOption
 		}
 	}
 
 	def getSolutions(userId: Int): List[Solution] = {
 		db.withDynSession {
 			//solutions.filter {solution => solution.userId === userId}.list
-			solutions.list.map {
-				solution =>
-					solution.trucks = trucks.list
-					solution.stopsToLoad = stops.list
-					solution.depot = depots.list.head
-					solution
-			}
+			solutions.list
 		}
 	}
 

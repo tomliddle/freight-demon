@@ -75,12 +75,27 @@ task wrapper(type: Wrapper) {
 	gradleVersion = '2.2.1'
 }
 
+task sixToFive(type:Exec) {
+	//workingDir 'src/main/webapp/resource/js'
+	executable "bash"
+
+	args "-c", '6to5 src/main/webapp/resource/js/*.js6 --out-dir .'
+
+	//store the output instead of printing to the console:
+	standardOutput = new ByteArrayOutputStream()
+
+	//extension method stopTomcat.output() can be used to obtain the output:
+	ext.output = {
+		return standardOutput.toString()
+	}
+}
 
 task copyResourcesToLib(type: Copy) {
     into "$buildDir/libs/src/main/webapp"
     from {
         'src/main/webapp'
     }
+	dependsOn(sixToFive)
 }
 
 task copyToLib(type: Copy) {
@@ -100,6 +115,7 @@ task localDevelopment(type: Copy) {
         into "lib"
     }
     //from resources.srcDir 'src/main/webapp'
+	dependsOn(sixToFive)
 }
 
 task dist(type: Jar) {
