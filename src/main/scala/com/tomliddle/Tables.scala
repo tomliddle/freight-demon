@@ -266,13 +266,27 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	//************************ Solution ***********************************
 	def getSolution(id: Int, userId: Int): Option[Solution] = {
 		db.withDynSession {
-			solutions.filter {solution => solution.id === id}.firstOption
+			solutions.filter {solution => solution.id === id}.firstOption match {
+				case Some(solution) =>
+					solution.trucks = trucks.list
+					solution.stopsToLoad = stops.list
+					solution.depot = depots.list.head
+					Some(solution)
+				case None => None
+			}
 		}
 	}
 
 	def getSolutions(userId: Int): List[Solution] = {
 		db.withDynSession {
-			solutions.filter {solution => solution.userId === userId}.list
+			//solutions.filter {solution => solution.userId === userId}.list
+			solutions.list.map {
+				solution =>
+					solution.trucks = trucks.list
+					solution.stopsToLoad = stops.list
+					solution.depot = depots.list.head
+					solution
+			}
 		}
 	}
 

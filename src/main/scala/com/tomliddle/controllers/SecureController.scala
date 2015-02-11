@@ -95,20 +95,16 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	get("/solution") {
 		contentType = formats("json")
-		val solution = db.getSolutions(scentry.user.id.get)
+		val user = scentry.user.id.get
+		db.getSolutions(user)
 
 	}
 
 	get("/solution/:id") {
 		contentType = formats("json")
 		val user = scentry.user.id.get
-		val solution = db.getSolution(params("id").toInt, user)
-		solution.map {
-			solution =>
-				solution.trucks = db.getTrucks(user)
-				solution.stopsToLoad = db.getStops(user)
-				solution.depot = db.getDepots(user).head
-		}
+		db.getSolution(params("id").toInt, user)
+
 	}
 
 	////////////////////

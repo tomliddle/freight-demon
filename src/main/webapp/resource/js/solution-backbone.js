@@ -42,8 +42,10 @@ var SolutionListView = BaseView.extend({
 
 	render: function(){
 		this.$el.html(Templates.solutionListTemplate({solution:this.collection.toJSON()}));
-		this.$el.find("solution-select").click(function() {
-			this.mapView.drawSolution()
+		var sel = this.$el.find(".solution-select")
+		var that = this;
+		sel.click(function() {
+			that.mapView.drawSolution(that.collection.get(this.data("target")));
 		});
 		return this;
 	}
@@ -64,8 +66,10 @@ var SolutionMapView = BaseView.extend({
 
 	drawSolution: function(solution) {
 
-		for (var i = 0; i < trucks.size; i++) {
-
+		for (var i = 0; i < solution.trucks.size; i++) {
+			var x = trucks.location.x;
+			var y = trucks.location.y;
+			var marker = L.marker([y, x]).addTo(this.map);
 		}
 	}
 
