@@ -4,7 +4,7 @@ import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
 import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.solution.{Solution, Location, Depot, Truck}
-import com.tomliddle.{User, DatabaseSupport}
+import com.tomliddle.{DBSolution, User, DatabaseSupport}
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import org.scalatra._
 import _root_.com.tomliddle.Tables._
@@ -59,7 +59,7 @@ class ScalatraBootstrap extends LifeCycle {
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "SOLUTIONS")) {
 				(solutions.ddl).create
-				solutions += Solution("Solution" , 1, Some(1))
+				solutions += DBSolution("Solution" , 1, Some(1))
 			}
 		}
 	}

@@ -48,9 +48,14 @@ class Locations(tag: Tag) extends Table[Location](tag, "LOCATIONS") {
 
 // ************************ TRUCK STUFF ***************************************
 
-//case class DBTruck(name: String, startTime: DateTime, endTime: DateTime, maxWeight: BigDecimal, id: Option[Int] = None)
+case class DBTruck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
+	def toTruck(stops: List[Stop], depot: Depot, lm: LocationMatrix): Truck = {
+		Truck(name, startTime, endTime, maxWeight, depot, stops, lm, userId, id)
+	}
+}
+//Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None)
 
-class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
+class Trucks(tag: Tag) extends Table[DBTruck](tag, "TRUCKS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
@@ -58,8 +63,10 @@ class Trucks(tag: Tag) extends Table[Truck](tag, "TRUCKS") with TypeConvert {
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, startTime, endTime, maxWeight, userId, id.?) <>(Truck.tupled, Truck.unapply)
+	def * = (name, startTime, endTime, maxWeight, userId, id.?) <>(DBTruck.tupled, DBTruck.unapply)
 }
+
+//case class DBDepot(name: String, locationId: Int, userId: Int, id: Option[Int] = None)
 
 class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
@@ -84,14 +91,19 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def * = (name, locationId, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
+case class DBSolution(name: String, userId: Int, id: Option[Int] = None) {
+	def toSolution(depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck]) = {
+		Solution(name, depot, stopsToLoad, trucks, userId, id)
+	}
+}
 
-class Solutions(tag: Tag) extends Table[Solution](tag, "SOLUTIONS") with TypeConvert {
+class Solutions(tag: Tag) extends Table[DBSolution](tag, "SOLUTIONS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, userId, id.?) <>(Solution.tupled, Solution.unapply)
+	def * = (name, userId, id.?) <>(DBSolution.tupled, DBSolution.unapply)
 }
 
 
@@ -158,19 +170,19 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	}
 
 	//************************ Trucks ***********************************
-	def getTruck(id: Int, userId: Int): Option[Truck] = {
+	def getTruck(id: Int, userId: Int): Option[DBTruck] = {
 		db.withDynSession {
 			trucks.filter {truck => truck.id === id && truck.userId === userId}.firstOption
 		}
 	}
 
-	def getTrucks(userId: Int): List[Truck] = {
+	def getTrucks(userId: Int): List[DBTruck] = {
 		db.withDynSession {
 			trucks.filter {truck => truck.userId === userId}.list
 		}
 	}
 
-	def addTruck(truck: Truck) = {
+	def addTruck(truck: DBTruck) = {
 		db.withDynSession {
 			trucks += truck
 		}
@@ -254,20 +266,19 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	}
 
 	//************************ Solution ***********************************
-	def getSolution(id: Int, userId: Int): Option[Solution] = {
+	def getSolution(id: Int, userId: Int): Option[DBSolution] = {
 		db.withDynSession {
 			solutions.filter {solution => solution.id === id}.firstOption
 		}
 	}
 
-	def getSolutions(userId: Int): List[Solution] = {
+	def getSolutions(userId: Int): List[DBSolution] = {
 		db.withDynSession {
-			//solutions.filter {solution => solution.userId === userId}.list
-			solutions.list
+			solutions.filter {solution => solution.userId === userId}.list
 		}
 	}
 
-	def addSolution(solution: Solution) = {
+	def addSolution(solution: DBSolution) = {
 		db.withDynSession {
 			solutions += solution
 		}

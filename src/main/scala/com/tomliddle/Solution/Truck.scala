@@ -3,17 +3,7 @@ package com.tomliddle.solution
 import org.joda.time.{LocalTime, Duration}
 
 
-case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
-
-	var depot: Depot = null
-	var stops = List[Stop]()
-	var lm: LocationMatrix = null
-	
-	def copyWithStops(stops: List[Stop]): Truck = {
-		val truck = copy()
-		truck.stops = stops
-		truck
-	} 
+case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, depot: Depot, stops: List[Stop], lm: LocationMatrix, userId: Int, id: Option[Int] = None) {
 
 	def totalWeight: BigDecimal = stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
 
@@ -88,7 +78,7 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 		assert(position + size <= stops.size && position >= 0 && size > 0, "position:" + position + " size:" + size + " stops.size:" + stops.size)
 		//var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
 		val list: List[Stop] = stops.take(position) ++ stops.drop(position + size) //TODO check this
-		(copyWithStops(stops), stops.slice(position, position + size))
+		(copy(stops = stops), stops.slice(position, position + size))
 	}
 
 	def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
@@ -98,7 +88,7 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 	}
 
 	def load(city: Stop): (Truck, Option[Stop]) = {
-		var truck: Truck = copyWithStops(stops = city :: stops).shuffleBySize(1)
+		var truck: Truck = copy(stops = city :: stops).shuffleBySize(1)
 		truck.isValid match {
 			case true => (truck, None)
 			case _ => (this, Some(city))
@@ -185,7 +175,7 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Truck = {
 				(0 to stops.size - groupSize).map {
-					to => copyWithStops(stops = extractFromList(from, to, groupSize, invert))
+					to => copy(stops = extractFromList(from, to, groupSize, invert))
 				}.toList.sortWith(_.cost < _.cost).head
 			}
 

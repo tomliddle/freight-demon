@@ -1,10 +1,10 @@
 package com.tomliddle.solution
 
-case class Solution(name: String, userId: Int, id: Option[Int] = None) {
+case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, id: Option[Int] = None) {
 
-	var depot: Depot = null
-	var stopsToLoad: List[Stop] = List[Stop]()
-	var trucks: List[Truck] = List[Truck]()
+	//var depot: Depot = null
+	//var stopsToLoad: List[Stop] = List[Stop]()
+	//var trucks: List[Truck] = List[Truck]()
 
 	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
 
@@ -39,10 +39,7 @@ case class Solution(name: String, userId: Int, id: Option[Int] = None) {
 				truckResult._1
 			}
 		}
-		val solution = copy()
-		solution.trucks = newTrucks
-		solution.stopsToLoad = unloadedStops
-		solution
+		copy(trucks = newTrucks, stopsToLoad = unloadedStops)
 	}
 
 	def preload: Solution = {
@@ -56,17 +53,12 @@ case class Solution(name: String, userId: Int, id: Option[Int] = None) {
 				truckRes._1
 			}
 		}
-		val truck = copy()
-		truck.trucks = truckSol
-		truck.stopsToLoad = unloadedCities
-		truck
+		copy(trucks = truckSol, stopsToLoad = unloadedCities)
 	}
 
 	def shuffle : Solution = {
 		val newTrucks = trucks.map { truck => truck.shuffle }
-		val truck = copy()
-		truck.trucks = newTrucks
-		truck
+		copy(trucks = newTrucks)
 	}
 
 	def swapBetweenTrucks: Solution = {
@@ -137,8 +129,6 @@ case class Solution(name: String, userId: Int, id: Option[Int] = None) {
 			}.sortBy(getTotalCost(_)).head
 		}
 
-		val solution = copy()
-		solution.trucks = swapAllToAll(trucks)
-		solution
+		copy(trucks = swapAllToAll(trucks))
 	}
 }

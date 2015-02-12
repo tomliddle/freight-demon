@@ -6,7 +6,7 @@ import akka.util.Timeout
 import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.Solution
+import com.tomliddle.solution.{LocationMatrix, Depot, Stop, Solution}
 import org.json4s.{Formats, DefaultFormats}
 import org.json4s.ext.JodaTimeSerializers
 import org.scalatra.{RequestEntityTooLarge, FutureSupport}
@@ -96,7 +96,24 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	get("/solution") {
 		contentType = formats("json")
 		val user = scentry.user.id.get
-		db.getSolutions(user)
+		val dbSolutions = db.getSolutions(user)
+		val dbTrucks = db.getTrucks(user)
+		val stops = db.getStops(user)
+		val depots = db.getDepots(user)
+
+		val lm = new LocationMatrix(stops, depots)
+
+		val trucks = dbTrucks.map {
+			dbTruck =>
+				dbTruck.toTruck(List[Stop](), depots.head, lm: LocationMatrix)
+		}
+
+		dbSolutions.map {
+			dbSolution =>
+				//depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck]
+				dbSolution.toSolution(depots.head, stops, trucks)
+		}
+
 
 
 	}
