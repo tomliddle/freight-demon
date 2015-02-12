@@ -98,6 +98,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val user = scentry.user.id.get
 		db.getSolutions(user)
 
+
 	}
 
 	get("/solution/:id") {
