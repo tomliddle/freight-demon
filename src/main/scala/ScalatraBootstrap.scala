@@ -4,7 +4,7 @@ import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
 import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.solution.{Solution, Location, Depot, Truck}
-import com.tomliddle.{DBSolution, User, DatabaseSupport}
+import com.tomliddle.{DBDepot, DBSolution, User, DatabaseSupport}
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import org.scalatra._
 import _root_.com.tomliddle.Tables._
@@ -54,8 +54,9 @@ class ScalatraBootstrap extends LifeCycle {
 			if (!MTable.getTables.list.exists(_.name.name == "DEPOTS")) {
 				(depots.ddl).create
 				//val userId = (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
-				val locationId = (locations returning locations.map(_.id)) += new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY")
-				depots += Depot("depot", 1, locationId)
+				val location = new Location(BigDecimal(0), BigDecimal(51.48), "N4 2NY")
+				val locationId = (locations returning locations.map(_.id)) += location
+				depots += DBDepot("depot", locationId, locationId)
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "SOLUTIONS")) {
 				(solutions.ddl).create

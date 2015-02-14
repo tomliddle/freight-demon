@@ -103,8 +103,6 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 		val lm = new LocationMatrix(stops, depots)
 
-
-
 		val trucks = dbTrucks.map {
 			dbTruck =>
 				dbTruck.toTruck(stops, depots.head, lm: LocationMatrix)

@@ -66,18 +66,28 @@ class Trucks(tag: Tag) extends Table[DBTruck](tag, "TRUCKS") with TypeConvert {
 	def * = (name, startTime, endTime, maxWeight, userId, id.?) <>(DBTruck.tupled, DBTruck.unapply)
 }
 
-//case class DBDepot(name: String, locationId: Int, userId: Int, id: Option[Int] = None)
+case class DBDepot(name: String, locationId: Int, userId: Int, id: Option[Int] = None) {
+	def toDepot(location: Location) = {
+		Depot(name, location, userId, id)
+	}
+}
 
-class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
+class Depots(tag: Tag) extends Table[DBDepot](tag, "DEPOTS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def locationId: Column[Int] = column[Int]("locationId", O.NotNull)
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, locationId, userId, id.?) <>(Depot.tupled, Depot.unapply)
+	def * = (name, locationId, userId, id.?) <>(DBDepot.tupled, DBDepot.unapply)
 }
 
-class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
+case class DBStop(name: String, locationId: Int, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) {
+	def toStop(location: Location) = {
+		Stop(name, location, startTime, endTime, maxWeight, specialCodes, userId, id)
+	}
+}
+
+class Stops(tag: Tag) extends Table[DBStop](tag, "STOPS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
 	def locationId: Column[Int] = column[Int]("locationId")
@@ -88,7 +98,7 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, locationId, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
+	def * = (name, locationId, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(DBStop.tupled, DBStop.unapply)
 }
 
 case class DBSolution(name: String, userId: Int, id: Option[Int] = None) {
@@ -210,12 +220,11 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			val opt: Option[(Stop, Location)] = explicitCrossJoin.list.filter { sl: (Stop, Location)  => sl._1.id.get == id && sl._1.userId == userId }.headOption //sl => sl._1.id === id && sl._1.userId === userId
+			val opt: Option[(DBStop, Location)] = explicitCrossJoin.list.filter { sl: (DBStop, Location)  => sl._1.id.get == id && sl._1.userId == userId }.headOption //sl => sl._1.id === id && sl._1.userId === userId
 
 			opt match {
-				case Some(slFound: (Stop, Location)) => {
-					slFound._1.location = slFound._2
-					Some(slFound._1)
+				case Some(slFound: (DBStop, Location)) => {
+					Some(slFound._1.toStop(slFound._2))
 				}
 				case None => None
 			}
@@ -228,16 +237,15 @@ class DatabaseSupport(db: Database) extends Geocoding {
 				(s, l) <- stops innerJoin locations on (_.locationId === _.id)
 			} yield (s, l)
 
-			explicitCrossJoin.list.filter{sl: (Stop, Location) => sl._1.userId == userId}.map {
-				sl: (Stop, Location) => {
-					sl._1.location = sl._2
-					sl._1
+			explicitCrossJoin.list.filter{sl: (DBStop, Location) => sl._1.userId == userId}.map {
+				sl: (DBStop, Location) => {
+					sl._1.toStop(sl._2)
 				}
 			}
 		}
 	}
 
-	def addStop(stop: Stop) = {
+	def addStop(stop: DBStop) = {
 		db.withDynSession {
 			stops += stop
 		}
@@ -258,8 +266,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 			explicitCrossJoin.list.map {
 				sl => {
-					sl._1.location = sl._2
-					sl._1
+					sl._1.toDepot(sl._2)
 				}
 			}
 		}
