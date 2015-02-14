@@ -103,14 +103,15 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 		val lm = new LocationMatrix(stops, depots)
 
+
+
 		val trucks = dbTrucks.map {
 			dbTruck =>
-				dbTruck.toTruck(List[Stop](), depots.head, lm: LocationMatrix)
+				dbTruck.toTruck(stops, depots.head, lm: LocationMatrix)
 		}
 
 		dbSolutions.map {
 			dbSolution =>
-				//depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck]
 				dbSolution.toSolution(depots.head, stops, trucks)
 		}
 

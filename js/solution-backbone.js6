@@ -65,11 +65,12 @@ var SolutionMapView = BaseView.extend({
 	},
 
 	drawSolution: function(solution) {
+		var stopsToLoad = solution.get("stopsToLoad");
 
-		for (var i = 0; i < solution.trucks.size; i++) {
-			var x = trucks.location.x;
-			var y = trucks.location.y;
-			var marker = L.marker([y, x]).addTo(this.map);
+		for (var i = 0; i < stopsToLoad.length; i++) {
+			var x = stopsToLoad.y;
+			var y = stopsToLoad.y;
+			var marker = L.marker([y, y]).addTo(this.map);
 		}
 	}
 

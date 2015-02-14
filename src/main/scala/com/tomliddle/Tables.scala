@@ -257,7 +257,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 			} yield (s, l)
 
 			explicitCrossJoin.list.map {
-				sl: (Depot, Location) => {
+				sl => {
 					sl._1.location = sl._2
 					sl._1
 				}
