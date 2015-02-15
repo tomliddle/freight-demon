@@ -33,7 +33,6 @@ class SolutionPageView extends BaseView {
 
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
-
 		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
 		this.solutionMapView.render();
 		return this;
@@ -42,6 +41,10 @@ class SolutionPageView extends BaseView {
 
 class SolutionListView extends BaseView {
 	constructor(options) {
+		this.events = {
+			"submit form.solution": "runSolution",
+			"click input[type=radio]": "drawSolution"
+		}
 		super(options);
 	}
 
@@ -54,12 +57,17 @@ class SolutionListView extends BaseView {
 
 	render() {
 		this.$el.html(Templates.solutionListTemplate({solution:this.collection.toJSON()}));
-		var sel = this.$el.find(".solution-select")
-		var that = this;
-		sel.click(function() {
-			that.mapView.drawSolution(that.collection.get($(this).data("target")));
-		});
 		return this;
+	}
+
+	drawSolution(e) {
+		this.mapView.drawSolution(this.collection.get($(e.target).data("target")));
+	}
+
+	runSolution(e) {
+		e.preventDefault();
+		
+
 	}
 }
 

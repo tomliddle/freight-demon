@@ -17,7 +17,13 @@ class BaseCollection extends Backbone.Collection {
 
 class BaseView extends Backbone.View {
 	constructor(options) {
-		this.events = { "submit form.add": "save" }
+		if (this.events) {
+			this.events["submit form.add"] = "save";
+		}
+		else {
+			this.events = {"submit form.add": "save"}
+		}
+
 		super(options);
 	}
 

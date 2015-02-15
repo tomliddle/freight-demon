@@ -27,23 +27,17 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	private final val formatter = DateTimeFormat.forPattern("HH:mm")
 
-	case object LocalTimeSerialiser extends CustomSerializer[LocalTime](format => (
-		{
+	case object LocalTimeSerialiser extends CustomSerializer[LocalTime](format => ({
 			case JString(s) => LocalTime.parse(s, formatter)
 			case JNull => null
-		},
-		{case x: LocalTime => JString(x.toString(formatter))})
+		},{
+			case x: LocalTime => JString(x.toString(formatter))
+		})
 	)
 
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
 	protected implicit val jsonFormats: Formats = DefaultFormats +  LocalTimeSerialiser
-
 	protected implicit def executor: ExecutionContext = system.dispatcher
-
-
-	private implicit def str2localdate(str: String) = LocalTime.parse(str, formatter)
-	private implicit def localDateToString(localDate: LocalTime) = s"${localDate.getHourOfDay}:${localDate.getMinuteOfHour}"
-
 
 
 	before() {
