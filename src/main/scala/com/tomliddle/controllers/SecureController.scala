@@ -1,13 +1,18 @@
 package com.tomliddle.controllers
 
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import akka.actor.{ActorSystem, ActorRef}
 import akka.util.Timeout
-import com.tomliddle.DatabaseSupport
+import com.tomliddle.{DBStop, DBTruck, DatabaseSupport}
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{LocationMatrix, Depot, Stop, Solution}
-import org.json4s.{Formats, DefaultFormats}
+import com.tomliddle.solution.{LocationMatrix}
+import org.json4s.JsonAST.{JString, JObject}
+import org.json4s.JsonDSL.WithBigDecimal._
+import org.joda.time.{LocalDate, LocalTime}
+import org.joda.time.format.DateTimeFormat
+import org.json4s._
 import org.json4s.ext.JodaTimeSerializers
 import org.scalatra.{RequestEntityTooLarge, FutureSupport}
 import org.scalatra.json.JacksonJsonSupport
@@ -20,12 +25,24 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
+	private final val formatter = DateTimeFormat.forPattern("HH:mm")
+
+	case object LocalTimeSerialiser extends CustomSerializer[LocalTime](format => (
+		{
+			case JString(s) => LocalTime.parse(s, formatter)
+			case JNull => null
+		},
+		{case x: LocalTime => JString(x.toString(formatter))})
+	)
+
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-	protected implicit val jsonFormats: Formats = DefaultFormats ++ JodaTimeSerializers.all
+	protected implicit val jsonFormats: Formats = DefaultFormats +  LocalTimeSerialiser
 
 	protected implicit def executor: ExecutionContext = system.dispatcher
 
-	//private implicit def str2localdate(str: String) = LocalTime.parse(str, formatter)
+
+	private implicit def str2localdate(str: String) = LocalTime.parse(str, formatter)
+	private implicit def localDateToString(localDate: LocalTime) = s"${localDate.getHourOfDay}:${localDate.getMinuteOfHour}"
 
 
 

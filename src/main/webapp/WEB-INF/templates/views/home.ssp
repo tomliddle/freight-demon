@@ -72,8 +72,8 @@
 			{{#each trucks}}
 			<tr>
 				<td>{{name}}</td>
-				<td>{{startTime.hour}}:{{startTime.minute}}</td>
-				<td>{{endTime.hour}}:{{endTime.minute}}</td>
+				<td>{{startTime}}</td>
+				<td>{{endTime}}</td>
 				<td>{{maxWeight}}</td>
 				<td><input class="btn remove" name="remove" type="submit" data-id="{{id}}" value="Remove"/></td>
 			</tr>
@@ -133,8 +133,8 @@
 			{{#each stops}}
 			<tr>
 				<td>{{name}}</td>
-				<td>{{startTime.hour}}:{{startTime.minute}}</td>
-				<td>{{endTime.hour}}:{{endTime.minute}}</td>
+				<td>{{startTime}}</td>
+				<td>{{endTime}}</td>
 				<td>{{maxWeight}}</td>
 				<td><input class="btn remove" name="remove" type="submit" data-id="{{id}}" value="Remove"/></td>
 			</tr>

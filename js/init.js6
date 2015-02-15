@@ -6,7 +6,6 @@ var Templates = Templates || {
 
 		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
 		this.solutionListTemplate = Handlebars.compile($("#solution-list-template").html());
-		//this.solutionMapTemplate = Handlebars.compile($("#solution-map-template").html());
 	}
 };
 
@@ -18,23 +17,24 @@ class BaseCollection extends Backbone.Collection {
 
 class BaseView extends Backbone.View {
 	constructor(options) {
-		this.events = { submit: "save" }
+		this.events = { "submit form": "save" }
 		super(options);
 	}
 
 	removeItem (id) {
-		this.collection.get(id).destroy();
+		id && this.collection.get(id).destroy();
 		this.render();
 	}
 
 	close () {
-		this.$el.empty();
+		this.undelegateEvents();
 		this.unbind();
+		this.$el.empty();
 	}
 
 	save (e) {
 		e.preventDefault();
-		var arr = this.$el.find("form").serializeArray();
+		var arr = $(e.target).serializeArray();
 		var data = _(arr).reduce(function (acc, field) {
 			acc[field.name] = field.value;
 			return acc;
@@ -43,7 +43,6 @@ class BaseView extends Backbone.View {
 		this.collection.create(data);
 		return false;
 	}
-
 }
 
 

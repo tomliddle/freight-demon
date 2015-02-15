@@ -112,8 +112,8 @@ class SolutionMapView extends BaseView {
 
 		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
 
-        // zoom the map to the polyline
-        map.fitBounds(polyline.getBounds());
+		// zoom the map to the polyline
+		this.map.fitBounds(polyline.getBounds());
 	}
 
 	getLatLng(entity) {
