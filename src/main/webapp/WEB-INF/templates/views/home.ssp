@@ -29,31 +29,31 @@
 <script id="truck-list-template" type="text/x-handlebars-template">
 	<div class="row">
 		<div class="col-xs-4">
-			<h2>Trucks</h2>
+			<h2>Vehicles</h2>
 		</div>
 	</div>
 
 	<div class="row">
-	<div class="col-xs-12">
-	<form method="post" class="form-inline" action="/truck" enctype="multipart/form-data">
-	<div class="form-group">
-	<label for="name">Name</label>
-	<input type="text" class="form-control" name="name" />
-	</div>
-	<div class="form-group">
-	<label for="name">Start Time</label>
-	<input type="time" class="form-control" name="startTime" />
-	</div>
-	<div class="form-group">
-		<label for="name">End Time</label>
-		<input type="time" class="form-control" name="endTime" />
-		</div>
-		<div class="form-group">
-			<label for="name">Weight (kg)</label>
-			<input type="number" class="form-control" name="maxWeight" />
-			</div>
-			<div class="form-group">
-				<input class="btn btn-primary" type="submit" value="Add" />
+		<div class="col-xs-12">
+			<form method="post" class="form-inline" action="/truck" enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="name">Name</label>
+					<input type="text" class="form-control" name="name" />
+				</div>
+				<div class="form-group">
+				<label for="name">Start Time</label>
+				<input type="time" class="form-control" name="startTime" />
+				</div>
+				<div class="form-group">
+					<label for="name">End Time</label>
+					<input type="time" class="form-control" name="endTime" />
+				</div>
+				<div class="form-group">
+					<label for="name">Weight (kg)</label>
+					<input type="number" class="form-control" name="maxWeight" />
+				</div>
+				<div class="form-group">
+					<input class="btn btn-primary" type="submit" value="Add" />
 				</div>
 			</form>
 		</div>
@@ -90,16 +90,16 @@
 	</div>
 
 	<div class="row">
-	<div class="col-xs-12">
-	<form method="post" class="form-inline" action="/stop" enctype="multipart/form-data">
-		<div class="form-group">
-			<label for="name">Name</label>
-			<input type="text" class="form-control" name="name" />
-		</div>
-	<div class="form-group">
-	<label for="name">Start Time</label>
-	<input type="time" class="form-control" name="startTime" />
-	</div>
+		<div class="col-xs-12">
+		<form method="post" class="form-inline" action="/stop" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" name="name" />
+			</div>
+			<div class="form-group">
+				<label for="name">Start Time</label>
+				<input type="time" class="form-control" name="startTime" />
+			</div>
 	<div class="form-group">
 	<label for="name">End Time</label>
 	<input type="time" class="form-control" name="endTime" />
@@ -107,14 +107,14 @@
 	<div class="form-group">
 		<label for="name">Weight (kg)</label>
 		<input type="number"  class="form-control" name="maxWeight" />
-		</div>
+	</div>
 		<div class="form-group">
 			<label for="name">Postcode</label>
 			<input type="text" class="form-control" name="postcode" />
-			</div>
-			<div class="form-group">
-				<input class="btn btn-primary" type="submit" value="Add"/>
-				</div>
+		</div>
+		<div class="form-group">
+			<input class="btn btn-primary" type="submit" value="Add"/>
+		</div>
 	</form>
 		</div>
 	</div>
@@ -150,30 +150,39 @@
 		</div>
 	</div>
 
-	<table class="table table-striped solution-list">
-		<thead>
-			<tr>
-				<th>Select</th>
-				<th>Name</th>
-			</tr>
-		</thead>
-	</table>
+	<div class="solution-list"></div>
 
 	<div id="map"></div>
 </script>
 
 <script id="solution-list-template" type="text/x-handlebars-template">
-	{{#each solution}}
-	<tr>
-		<td><input type="radio" class="solution-select" data-target="{{id}}"/></td>
-		<td>{{name}}</td>
-	</tr>
-	{{/each}}
-</script>
 
-<%--<script id="solution-map-template" type="text/x-handlebars-template">
-	<div id="map"></div>
-</script>--%>
+	<form method="post" action="/solution/run" enctype="multipart/form-data">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Select</th>
+					<th>Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each solution}}
+				<tr>
+					<td><input type="radio" class="solution-select" data-target="{{id}}"/></td>
+					<td>{{name}}</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+
+		<div class="row">
+			<div class="col-xs-4">
+				<input class="btn btn-primary" name="run" type="submit" value="Run scheduler"/>
+			</div>
+		</div>
+	</form>
+
+</script>
 
 
 <div class="content"></div>

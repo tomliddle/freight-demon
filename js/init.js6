@@ -50,7 +50,7 @@ class BaseView extends Backbone.View {
 class AppRouter extends Backbone.Router {
 	constructor(options) {
 		this.routes = {
-			trucks: "truckListView",
+			vehicles: "truckListView",
 			depots: "depotListView",
 			stops: "stopListView",
 			solution: "solutionPageView",
