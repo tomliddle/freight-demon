@@ -1,24 +1,35 @@
-// Represents one
-var Truck = Backbone.Model.extend({});
+class Truck extends Backbone.Model{
+	constructor (args) {
+		super(args)
+	}
+}
 
 // Represents a list
-var TruckList = BaseCollection.extend({
-	url: '/truck',
-	model: Truck
-});
+class TruckList extends BaseCollection{
+	constructor(args) {
+		this.url = "/truck";
+		this.model = Truck;
+		super(args);
+	}
+}
 
-var TruckListView = BaseView.extend({
-	el: '.content', // el attaches to existing element
+class TruckListView extends BaseView {
+	constructor(options) {
+		this.el = ".content";
+		super(options);
+	}
 
-	initialize: function(){
+	initialize () {
 		this.collection = new TruckList();
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		this.collection.fetch({success: function(){that.render()}});
-	},
+		this.collection.fetch({ success: function () {
+				that.render();
+			} });
+	}
 
-	render: function(){
-		this.$el.html(Templates.truckListTemplate({trucks:this.collection.toJSON()}));
+	render () {
+		this.$el.html(Templates.truckListTemplate({ trucks: this.collection.toJSON() }));
 		var that = this;
 		this.$el.find("input.remove").click(function (e) {
 			e.preventDefault();
@@ -27,5 +38,4 @@ var TruckListView = BaseView.extend({
 		});
 		return this;
 	}
-});
-
+}

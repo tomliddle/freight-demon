@@ -10,29 +10,33 @@ var Templates = Templates || {
 	}
 };
 
-var BaseCollection = Backbone.Collection.extend({});
+class BaseCollection extends Backbone.Collection {
+	constructor(options) {
+		super(options);
+	}
+}
 
-var BaseView = Backbone.View.extend({
+class BaseView extends Backbone.View {
 
-	events: {'submit': 'save'},
+	constructor(options) {
+		this.events = { submit: "save" }
+		super(options);
+	}
 
-	initialize: function(options) {
-	},
-
-	removeItem: function(id) {
+	removeItem (id) {
 		this.collection.get(id).destroy();
 		this.render();
-	},
+	}
 
-	close: function() {
+	close () {
 		this.$el.empty();
 		this.unbind();
-	},
+	}
 
-	save: function(e) {
+	save (e) {
 		e.preventDefault();
 		var arr = this.$el.find("form").serializeArray();
-		var data = _(arr).reduce(function(acc, field) {
+		var data = _(arr).reduce(function (acc, field) {
 			acc[field.name] = field.value;
 			return acc;
 		}, {});
@@ -41,47 +45,48 @@ var BaseView = Backbone.View.extend({
 		return false;
 	}
 
-});
+}
 
 
 // ******************************* ROUTER **************************************
-var AppRouter = Backbone.Router.extend({
-	routes: {
-		trucks: "truckListView",
-		depots: "depotListView",
-		stops: "stopListView",
-		solution: "solutionPageView",
-		"*actions": "defaultRoute" // Backbone will try to match the route above first
-	},
+class AppRouter extends Backbone.Router {
+	constructor(options) {
+		this.routes = {
+			trucks: "truckListView",
+			depots: "depotListView",
+			stops: "stopListView",
+			solution: "solutionPageView",
+			"*actions": "defaultRoute" // Backbone will try to match the route above first
+		};
+		super(options);
+	}
 
-	defaultRoute: function() {
+	defaultRoute () {}
 
-	},
-
-	truckListView: function() {
+	truckListView () {
 		this.view && this.view.close();
 		this.view = new TruckListView();
-	},
+	}
 
-	depotListView: function() {
+	depotListView () {
 		this.view && this.view.close();
 		this.view = new DepotListView();
-	},
+	}
 
-	stopListView: function() {
+	stopListView () {
 		this.view && this.view.close();
 		this.view = new StopListView();
-	},
+	}
 
-	solutionPageView: function() {
+	solutionPageView () {
 		this.view && this.view.close();
 		this.view = new SolutionPageView();
 	}
-});
+}
 
 
 $(document).ready(function () {
 	Templates.load();
-	var app_router = new AppRouter;
+	var app_router = new AppRouter();
 	Backbone.history.start();
 });

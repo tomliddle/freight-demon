@@ -1,23 +1,34 @@
-var Depot = Backbone.Model.extend({});
+class Depot extends Backbone.Model {
+	constructor(options) {
+		super(options);
+	}
+}
 
-var DepotList = BaseCollection.extend({
-	url: '/depot',
-	model: Depot
-});
+class DepotList extends BaseCollection {
+	constructor(options) {
+		this.url = "/depot";
+		this.model = Depot;
+		super(options);
+	}
+}
 
-var DepotListView = BaseView.extend({
-	el: '.content',
+class DepotListView extends BaseView {
+	constructor(options) {
+		this.el = ".content";
+		super(options);
+	}
 
-	initialize: function(){
+	initialize () {
 		this.collection = new DepotList();
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		this.collection.fetch({success: function(){that.render()}});
-	},
+		this.collection.fetch({ success: function () {
+				that.render();
+			} });
+	}
 
-	render: function(){
-		this.$el.html(Templates.depotListTemplate({depots:this.collection.toJSON()}));
+	render () {
+		this.$el.html(Templates.depotListTemplate({ depots: this.collection.toJSON() }));
 		return this;
 	}
-});
-
+}

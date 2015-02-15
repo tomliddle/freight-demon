@@ -1,14 +1,25 @@
-var Solution = Backbone.Model.extend({});
+class Solution extends Backbone.Model {
+	constructor(options) {
+		super(options);
+	}
+}
 
-var SolutionList = BaseCollection.extend({
-	url: '/solution',
-	model: Solution
-});
+class SolutionList extends BaseCollection {
 
-var SolutionPageView = BaseView.extend({
-	el: '.content',
+	constructor(options) {
+		this.url = '/solution';
+		this.model = Solution;
+		super(options);
+	}
+}
 
-	initialize: function(){
+class SolutionPageView extends BaseView {
+	constructor(options) {
+		this.el = '.content';
+		super(options);
+	}
+
+	initialize(){
 		this.collection = new SolutionList();
 		this.solutionMapView = new SolutionMapView();
 		this.solutionListView = new SolutionListView({
@@ -19,28 +30,32 @@ var SolutionPageView = BaseView.extend({
 		var that = this;
 		this.collection.fetch({success: function(){that.render()}});
 
-	},
+	}
 
-	render: function(){
+	render(){
 		this.$el.html(Templates.solutionPageTemplate());
 
 		this.$el.find(".solution-list").html(this.solutionListView.render().el);
 		this.solutionMapView.render();
 		return this;
 	}
-});
+}
 
-var SolutionListView = BaseView.extend({
+class SolutionListView extends BaseView {
 
-	initialize: function(options){
+	constructor(options) {
+		super(options);
+	}
+
+	initialize(options){
 		this.collection = options.solutions;
 		this.mapView = options.mapView;
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
 		//this.collection.fetch({success: function(){that.render()}});
-	},
+	}
 
-	render: function(){
+	render() {
 		this.$el.html(Templates.solutionListTemplate({solution:this.collection.toJSON()}));
 		var sel = this.$el.find(".solution-select")
 		var that = this;
@@ -49,34 +64,42 @@ var SolutionListView = BaseView.extend({
 		});
 		return this;
 	}
-});
+}
 
 
-var SolutionMapView = BaseView.extend({
+class SolutionMapView extends BaseView {
 
-	initialize: function(options){
-		//this.listenTo()
-	},
+	constructor(options) {
+		super(options);
+	}
 
-	render: function(){
+	render(){
 		this.map = L.map('map').setView([51.505, -0.09], 13);
 		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(this.map);
 		return this;
-	},
+	}
 
-	drawSolution: function(solution) {
+	drawSolution(solution) {
 		var stopsToLoad = solution.get("stopsToLoad");
 
 		for (var i = 0; i < stopsToLoad.length; i++) {
-			var x = stopsToLoad[i].location.x;
-			var y = stopsToLoad[i].location.y;
-			var marker = L.marker([y, x]).addTo(this.map);
+			this.addToMap(stopsToLoad[i]);
 		}
+
+		var depot = solution.get("depot");
+		this.addToMap(depot);
+	}
+
+	addToMap(entity) {
+		var x = entity.location.x;
+		var y = entity.location.y;
+		var marker = L.marker([y, x]).addTo(this.map);
 	}
 
 
 
-});
+}
+//export {SolutionList, SolutionPageView, SolutionListView, SolutionMapView}
 
 
 
