@@ -150,16 +150,13 @@
 		</div>
 	</div>
 
-	<table class="table table-striped">
+	<table class="table table-striped solution-list">
 		<thead>
 			<tr>
 				<th>Select</th>
 				<th>Name</th>
 			</tr>
 		</thead>
-		<tbody class="solution-list">
-
-		</tbody>
 	</table>
 
 	<div id="map"></div>

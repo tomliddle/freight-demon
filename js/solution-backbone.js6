@@ -5,7 +5,6 @@ class Solution extends Backbone.Model {
 }
 
 class SolutionList extends BaseCollection {
-
 	constructor(options) {
 		this.url = '/solution';
 		this.model = Solution;
@@ -35,15 +34,15 @@ class SolutionPageView extends BaseView {
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
 
-		this.$el.find(".solution-list").html(this.solutionListView.render().el);
+		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
 		this.solutionMapView.render();
 		return this;
 	}
 }
 
 class SolutionListView extends BaseView {
-
 	constructor(options) {
+		this.tagName = "tbody";
 		super(options);
 	}
 
@@ -52,7 +51,6 @@ class SolutionListView extends BaseView {
 		this.mapView = options.mapView;
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		//this.collection.fetch({success: function(){that.render()}});
 	}
 
 	render() {
@@ -68,7 +66,6 @@ class SolutionListView extends BaseView {
 
 
 class SolutionMapView extends BaseView {
-
 	constructor(options) {
 		super(options);
 	}
@@ -88,19 +85,41 @@ class SolutionMapView extends BaseView {
 
 		var depot = solution.get("depot");
 		this.addToMap(depot);
+
+		var trucks = solution.get("trucks");
+
+		for (i = 0; i < trucks.length; i++) {
+			this.drawRoute(trucks[i], depot);
+		}
 	}
 
 	addToMap(entity) {
 		var x = entity.location.x;
 		var y = entity.location.y;
-		var marker = L.marker([y, x]).addTo(this.map);
+		var marker = L.marker([y, x])
+			.addTo(this.map)
+			.bindPopup(entity.name);
 	}
 
+	drawRoute(truck, depot) {
+		var latlngs  = [this.getLatLng(depot)];
 
+		var stops = truck.stops;
+		for (var i = 0; i < stops.length; i++) {
+			latlngs.push(this.getLatLng(stops[i]));
+		}
+		latlngs.push(this.getLatLng(depot));
 
+		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
+
+        // zoom the map to the polyline
+        map.fitBounds(polyline.getBounds());
+	}
+
+	getLatLng(entity) {
+		return L.latLng(entity.location.y, entity.location.x)
+	}
 }
-//export {SolutionList, SolutionPageView, SolutionListView, SolutionMapView}
-
 
 
 

@@ -20,12 +20,12 @@
 		}
 	</style>
 
-	<script src="/resource/js/vendor/jquery-2.1.3.min.js"></script>
-	<script src="/resource/js/vendor/handlebars-v2.0.0.js"></script>
-	<script src="/resource/js/vendor/underscore-min.js"></script>
-	<script src="/resource/js/vendor/backbone-min.js"></script>
-	<script src="/resource/js/vendor/bootstrap.min.js"></script>
-	<script src="/resource/js/vendor/leaflet.js"></script>
+	<script src="/resource/jsvendor/jquery-2.1.3.min.js"></script>
+	<script src="/resource/jsvendor/handlebars-v2.0.0.js"></script>
+	<script src="/resource/jsvendor/underscore-min.js"></script>
+	<script src="/resource/jsvendor/backbone-min.js"></script>
+	<script src="/resource/jsvendor/bootstrap.min.js"></script>
+	<script src="/resource/jsvendor/leaflet.js"></script>
 
 </head>
 
