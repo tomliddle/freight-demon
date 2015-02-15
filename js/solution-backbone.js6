@@ -42,7 +42,6 @@ class SolutionPageView extends BaseView {
 
 class SolutionListView extends BaseView {
 	constructor(options) {
-		this.tagName = "tbody";
 		super(options);
 	}
 
