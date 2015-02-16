@@ -74,6 +74,22 @@ task wrapper(type: Wrapper) {
 	gradleVersion = '2.2.1'
 }
 
+task watchSixToFive(type:Exec) {
+	//workingDir 'src/main/webapp/resource/js'
+	executable "bash"
+
+	//js/*.js6 --watch --out-dir src/main/webapp/resource
+	args "-c", '6to5 js/*.js6 --watch --out-dir src/main/webapp/resource'
+
+	//store the output instead of printing to the console:
+	standardOutput = new ByteArrayOutputStream()
+
+	//extension method stopTomcat.output() can be used to obtain the output:
+	ext.output = {
+		return standardOutput.toString()
+	}
+}
+
 task sixToFive(type:Exec) {
 	//workingDir 'src/main/webapp/resource/js'
 	executable "bash"

@@ -15,6 +15,9 @@ class SolutionList extends BaseCollection {
 class SolutionPageView extends BaseView {
 	constructor(options) {
 		this.el = '.content';
+		this.events = {
+			"submit form.solution": "runSolution"
+		}
 		super(options);
 	}
 
@@ -28,23 +31,37 @@ class SolutionPageView extends BaseView {
 
 		var that = this;
 		this.collection.fetch({success: function(){that.render()}});
-
 	}
 
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
 		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
+		// Map is rendered by external lib so we don't need to append
 		this.solutionMapView.render();
 		return this;
+	}
+
+	runSolution(e) {
+		e.preventDefault();
+		var selected = $(e.target).find("input[name='solution-select']:checked");
+		var y = selected.data("target");
+		var that = this;
+		$.ajax({
+			url: "/solution/run/" + y,
+			dataType: "json"
+		})
+			.done(function(solution) {
+				that.collection.set(solution);
+			})
+			.fail(function() {
+				alert( "error" );
+			});
 	}
 }
 
 class SolutionListView extends BaseView {
 	constructor(options) {
-		this.events = {
-			"submit form.solution": "runSolution",
-			"click input[type=radio]": "drawSolution"
-		}
+		this.tagName = "tbody";
 		super(options);
 	}
 
@@ -52,25 +69,42 @@ class SolutionListView extends BaseView {
 		this.collection = options.solutions;
 		this.mapView = options.mapView;
 		this.listenTo(this.collection, "add", this.render);
-		var that = this;
+		this.listenTo(this.collection, "change", this.change);
 	}
 
 	render() {
-		this.$el.html(Templates.solutionListTemplate({solution:this.collection.toJSON()}));
+		this.collection.forEach(function(solution) {
+			var solutionView = new SolutionView({model: solution, mapView: this.mapView});
+			this.$el.html(solutionView.render().$el);
+		}, this);
+		return this;
+	}
+
+	change() {
+		alert("update")
+	}
+}
+
+// Each row of the table
+class SolutionView extends BaseView {
+	constructor(options) {
+		this.mapView = options.mapView;
+		this.tagName = "tr";
+		this.events = {
+			"click input[type=radio]": "drawSolution"
+		}
+		super(options);
+	}
+
+	render() {
+		this.$el.html(Templates.solutionTemplate({solution: this.model.toJSON()}));
 		return this;
 	}
 
 	drawSolution(e) {
-		this.mapView.drawSolution(this.collection.get($(e.target).data("target")));
-	}
-
-	runSolution(e) {
-		e.preventDefault();
-		
-
+		this.mapView.drawSolution(this.model);
 	}
 }
-
 
 class SolutionMapView extends BaseView {
 	constructor(options) {
