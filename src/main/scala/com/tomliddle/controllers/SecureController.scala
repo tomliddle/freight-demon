@@ -124,9 +124,6 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 			dbSolution =>
 				dbSolution.toSolution(depots.head, stops, trucks)
 		}
-
-
-
 	}
 
 	get("/solution/:id") {

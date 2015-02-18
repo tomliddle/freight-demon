@@ -13,60 +13,74 @@ version = '1.0'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+ext {
+	lib = "lib"
+}
+
 configurations {
-    provided // provided scope
-    container // group for jetty container used to run webapp from ./gradlew jettyRun
+	provided // provided scope
+	container // group for jetty container used to run webapp from ./gradlew jettyRun
 }
 
 configurations.all {
-    // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	// check for updates every build
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 // add provided scope to source compilation
 sourceSets {
-    main { 
-        compileClasspath += configurations.provided 
-        runtimeClasspath += configurations.provided
+	main {
+		compileClasspath += configurations.provided
+		runtimeClasspath += configurations.provided
 		//resources.srcDir 'src/main/webapp'
-    }
-    test { 
-        compileClasspath += configurations.provided 
-        runtimeClasspath += configurations.provided
-    }
+	}
+	test {
+		compileClasspath += configurations.provided
+		runtimeClasspath += configurations.provided
+	}
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
 
-    compile 'ch.qos.logback:logback-classic:1.0.13'
-	compile 'com.typesafe.akka:akka-slf4j_2.10:2.3.8'
-	compile 'com.typesafe.akka:akka-actor_2.10:2.3.7'
+	compile 'ch.qos.logback:logback-classic:1.0.13'
 
-    compile group: 'org.scala-lang', name: 'scala-library', version: '2.10.4'
-	compile 'org.scala-lang:scala-reflect:2.10.4'
-	compile 'org.scala-lang:scala-compiler:2.10.4'
+	def akkaVersion = '2.3.9'
+	compile "com.typesafe.akka:akka-slf4j_2.10:$akkaVersion"
+	compile "com.typesafe.akka:akka-actor_2.10:$akkaVersion"
+
+	def scalaVersion = '2.10.4'
+	compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
+	compile "org.scala-lang:scala-reflect:$scalaVersion"
+	compile "org.scala-lang:scala-compiler:$scalaVersion"
 
 
 	compile 'org.eclipse.jetty:jetty-webapp:9.2.6.v20141205'
 
 	// scalatra deps
-    compile group: 'org.scalatra', name: 'scalatra_2.10', version: '2.3.0'
+	compile group: 'org.scalatra', name: 'scalatra_2.10', version: '2.3.0'
 	compile 'org.scalatra:scalatra-auth_2.10:2.3.0'
-
 	compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
+
+	// json4s
 	compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
 	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
 	compile 'org.json4s:json4s-ext_2.10:3.2.11'
-
 	// compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.0'
-
+	
 	compile 'com.typesafe.slick:slick_2.10:2.1.0'
 	compile 'com.h2database:h2:1.4.184'
 	compile 'c3p0:c3p0:0.9.1.2'
+
+	testCompile 'org.scalatest:scalatest_2.10:2.2.4'
+	//testCompile 'org.pegdown:pegdown:1.0.2'
+	testCompile 'org.mockito:mockito-core:1.10.19'
+	testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.10', version: akkaVersion
+	//testCompile group: 'io.spray', name: 'spray-testkit', version: sprayVersion
+
 }
 
 // manually specify gradle version for gradlew
@@ -106,10 +120,10 @@ task sixToFive(type:Exec) {
 }
 
 task copyResourcesToLib(type: Copy) {
-    into "$buildDir/libs/src/main/webapp"
-    from {
-        'src/main/webapp'
-    }
+	into "$buildDir/libs/src/main/webapp"
+	from {
+		'src/main/webapp'
+	}
 	dependsOn(sixToFive)
 }
 
@@ -121,15 +135,19 @@ task copyToLib(type: Copy) {
 	from {
 		'bin'
 	}
-    dependsOn(copyResourcesToLib)
+	dependsOn(copyResourcesToLib)
 }
 
 task localDevelopment(type: Copy) {
-	delete "lib"
-    from configurations.runtime {
-        into "lib"
-    }
-    //from resources.srcDir 'src/main/webapp'
+	delete lib
+	mkdir lib
+	copy {
+		// We want all the libs (test extends compile dependencies) minus provided (e.g. JSP API etc)
+		from configurations.testCompile - configurations.providedCompile
+		into lib
+	}
+
+	//from resources.srcDir 'src/main/webapp'
 	dependsOn(sixToFive)
 }
 
@@ -150,20 +168,20 @@ task dist(type: Jar) {
 }
 
 task release(type: Exec) {
-    executable "bash"
-    args "-c", "./release.sh"
+	executable "bash"
+	args "-c", "./release.sh"
 
-    dependsOn(dist)
+	dependsOn(dist)
 }
 
 
 
 idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-        scopes.PROVIDED.plus += [ configurations.provided ]
-    }
+	module {
+		downloadJavadoc = true
+		downloadSources = true
+		scopes.PROVIDED.plus += [ configurations.provided ]
+	}
 }
 
 //java -cp HomeAutomationRest-1.0-fatJar.jar:* com.tomliddle.JettyLauncher
