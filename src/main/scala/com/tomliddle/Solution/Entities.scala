@@ -2,9 +2,15 @@ package com.tomliddle.solution
 
 import org.joda.time.{LocalTime, Duration}
 
-class DistanceTime(val distance: BigDecimal, val time: Duration)
+class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration = new Duration(0)) {
 
-case class Location(x: BigDecimal, y: BigDecimal, postcode: String, id: Option[Int] = None)
+	def +(operand: DistanceTime): DistanceTime = {
+		new DistanceTime(this.distance + operand.distance, this.time.plus(operand.time))
+	}
+}
+
+case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None) {
+}
 
 case class Depot(name: String, location: Location, userId: Int, id: Option[Int] = None)
 
@@ -48,19 +54,23 @@ class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDist
 	def timeBetween(depot: Depot, stop: Stop): Duration = depotDistancesAndTimes(depot)(stop).time
 
 	def timeBetween(stop1: Stop, stop2: Stop): Duration = stopDistancesAndTimes(stop1)(stop2).time
+
+	def distanceTimeBetween(stop1: Stop, stop2: Stop): DistanceTime = stopDistancesAndTimes(stop1)(stop2)
+
+	def distanceTimeBetween(depot: Depot, stop: Stop): DistanceTime = depotDistancesAndTimes(depot)(stop)
 }
 
 
 
 trait TimeAndDistCalc {
 
-	def getDistance(stop1: Location, stop2: Location): BigDecimal = {
+	def getDistance(location1: Location, location2: Location): BigDecimal = {
 		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
 		val R = 6371 // km
-		var lat1 = stop1.y.toDouble
-		var lat2 = stop2.y.toDouble
-		val lon1 = stop1.x.toDouble
-		val lon2 = stop2.x.toDouble
+		var lat1 = location1.y.toDouble
+		var lat2 = location2.y.toDouble
+		val lon1 = location1.x.toDouble
+		val lon2 = location2.x.toDouble
 		val dLat = scala.math.toRadians(lat2 - lat1)
 		val dLon = scala.math.toRadians(lon2 - lon1)
 		lat1 = scala.math.toRadians(lat1)
@@ -80,5 +90,9 @@ trait TimeAndDistCalc {
 		new DistanceTime(getDistance(stop1, stop2), getDuration(stop1, stop2))
 	}
 
-	//def getDistance(s) = Math.sqrt(Math.pow(depot.location.y - depot2.location.y, 2) + Math.pow(depot.location.x - depot2.location.x, 2))
+	def getMean(locations: List[Location]): Location = {
+		locations.foldLeft(Location()) { (location1: Location, location2: Location) =>
+			Location(location1.x + location2.x, location1.y + location2.y, "")
+		}
+	}
 }

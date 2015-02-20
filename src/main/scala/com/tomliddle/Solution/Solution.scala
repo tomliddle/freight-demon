@@ -2,7 +2,7 @@ package com.tomliddle.solution
 
 case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, id: Option[Int] = None) {
 
-	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
+	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.getCost}
 
 	def isValid: Boolean = {
 		getLoadedCities.size == getLoadedCities.distinct.size &&
@@ -11,22 +11,22 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 		getLoadedCities.distinct.size == getLoadedCities.size
 	}
 
-	def getDistance: BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.distance}
+	def getDistanceTime(): DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + b.getDistanceTime()}
 
-	def getTotalLoaded: Int = getLoadedCities.size
+	def getTotalLoaded(): Int = getLoadedCities.size
 
-	def getLoadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
+	def getLoadedCities(): List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
-	def getMaxSolutionSwapSize: Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.maxSwapSize}
+	def getMaxSolutionSwapSize(): Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.getMaxSwapSize}
 
-	def getCost: BigDecimal = getTotalCost(trucks)
+	def getCost(): BigDecimal = getTotalCost(trucks)
 
-	override def toString = {
-		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + getDistance + "\n" +
+	override def toString() = {
+		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + getDistanceTime() + "\n" +
 		trucks.map(_.toString).toString
 	}
 
-	def loadSpecialCodes: Solution = {
+	/*def loadSpecialCodes: Solution = {
 		var unloadedStops = stopsToLoad
 		var newTrucks = trucks.map {
 			truck => {
@@ -36,7 +36,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 			}
 		}
 		copy(trucks = newTrucks, stopsToLoad = unloadedStops)
-	}
+	}*/
 
 	def preload: Solution = {
 		var unloadedCities = stopsToLoad
@@ -68,15 +68,15 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 					truck1Pos => {
 						(0 to truck2.stops.size - swapSize).foreach {
 							truck2Pos => {
-								var truck1Unloaded: (Truck, List[Stop]) = truck1.unload(truck1Pos, swapSize)
-								var truck2Unloaded: (Truck, List[Stop]) = truck2.unload(truck2Pos, swapSize)
-								var truck1Load: (Truck, List[Stop]) = truck1Unloaded._1.load(truck2Unloaded._2)
-								var truck2Load: (Truck, List[Stop]) = truck2Unloaded._1.load(truck1Unloaded._2)
+								val truck1Unloaded: (Truck, List[Stop]) = truck1.unload(truck1Pos, swapSize)
+								val truck2Unloaded: (Truck, List[Stop]) = truck2.unload(truck2Pos, swapSize)
+								val truck1Load: (Truck, List[Stop]) = truck1Unloaded._1.load(truck2Unloaded._2)
+								val truck2Load: (Truck, List[Stop]) = truck2Unloaded._1.load(truck1Unloaded._2)
 
 								// If trucks fully reloaded, check the cost.
 								if (truck1Load._2.size == 0 && truck2Load._2.size == 0 &&
-									truck1Load._1.cost + truck2Load._1.cost < truck1.cost + truck2.cost)
-									returnTrucks = Option(truck1Load._1, truck2Load._1)
+									truck1Load._1.getCost + truck2Load._1.getCost < truck1.getCost() + truck2.getCost())
+									returnTrucks = Some(truck1Load._1, truck2Load._1)
 							}
 						}
 					}
@@ -85,7 +85,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 			}
 
 			var bestSol: Option[(Truck, Truck)]  = None
-			(1 to truck1.maxSwapSize).foreach {
+			(1 to truck1.getMaxSwapSize).foreach {
 				swapSize => {
 					doSwapBetween(truck1, truck2, swapSize) match {
 						case Some(trucks) => bestSol = Some(trucks)

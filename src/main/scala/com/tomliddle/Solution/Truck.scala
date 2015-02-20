@@ -1,39 +1,37 @@
 package com.tomliddle.solution
 
 import org.joda.time.{LocalTime, Duration}
+import org.slf4j.LoggerFactory
 
 
-case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, depot: Depot, stops: List[Stop], lm: LocationMatrix, userId: Int, id: Option[Int] = None) {
+case class Truck(
+					name: String,
+					startTime: LocalTime,
+					endTime: LocalTime,
+					maxWeight: BigDecimal,
+					depot: Depot,
+					stops: List[Stop],
+					lm: LocationMatrix,
+					userId: Int, id: Option[Int] = None)
+	extends TimeAndDistCalc with SwapUtilities {
 
-	def totalWeight: BigDecimal = stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
+	private final val logger = LoggerFactory.getLogger(this.getClass)
 
-	def cost: BigDecimal = distance * 1.2
+	def getTotalWeight(): BigDecimal = stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
 
-	def distance: BigDecimal = {
-		var distToFirstStop =
-			if (stops.size > 0) lm.distanceBetween(depot, stops(0)) + lm.distanceBetween(depot, stops.last)
-			else BigDecimal(0)
+	def getCost(): BigDecimal = getDistanceTime().distance * 1.2
+
+	def getDistanceTime(): DistanceTime = {
+		var distTimeToFirstStop =
+			if (stops.size > 0) lm.distanceTimeBetween(depot, stops(0))
+			else new DistanceTime(BigDecimal(0), new Duration(0))
 
 		if (stops.size > 1)
 			stops.sliding(2).map {
-				(currCities: List[Stop]) => lm.distanceBetween(currCities(0), currCities(1))
-			}.foldLeft(distToFirstStop) { (a: BigDecimal, b: BigDecimal) => a + b}
-		else distToFirstStop
-	}
-
-	def time: Duration = {
-		// TODO this is wrong!
-		val timeToFirstStop =
-			if (stops.size > 0) lm.timeBetween(depot, stops.head)
-			else new Duration(0)
-
-		if (stops.size > 1) {
-			stops.sliding(2).map {
-				currStops: List[Stop] =>
-					lm.timeBetween(currStops(0), currStops(1))
-			}.foldLeft(timeToFirstStop) {(a: Duration, b: Duration) => a.plus(b)}
-		}
-		else timeToFirstStop
+				(currCities: List[Stop]) =>
+					lm.distanceTimeBetween(currCities(0), currCities(1))
+			}.foldLeft(distTimeToFirstStop) { (a: DistanceTime, b: DistanceTime) => a + b}
+		else distTimeToFirstStop
 	}
 
 	// TODO use this
@@ -46,46 +44,22 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 		var latestStartTime = stop2.endTime.minus((currJourneyTime.toPeriod))
 		if (latestStartTime.isAfter(endTime))
 			latestStartTime = endTime.minus(currJourneyTime.toPeriod)
-
-
 	}
 
-/*	def time: Duration = {
-		val time =
-			if (stops.size > 0) lm.timeBetween(depot, stops.head).plus(lm.timeBetween(depot, stops.last))
-			else new Duration(0)
 
-
-		if (stops.size > 1)
-			time.plus(stops.sliding(2).map(
-				(currCities: List[Stop]) => {
-					val currTime = time.plus(lm.timeBetween(currCities(0), currCities(1)))
-
-					currCities(1) match {
-						case stop: Stop => {
-							if (stop.startTime.isAfter(currTime))
-								stop.startTime
-							else currTime
-						}
-					}
-				}).foldLeft(new Duration(0)) { (a: Duration, b: DateTime) => a.plus(b)})
-		time
-	}*/
-
-	def maxSwapSize = this.stops.size / 2
+	def getMaxSwapSize() = this.stops.size / 2
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
 		assert(position + size <= stops.size && position >= 0 && size > 0, "position:" + position + " size:" + size + " stops.size:" + stops.size)
-		//var listBuffer: ListBuffer[Stop] = stops.to[ListBuffer]
 		val list: List[Stop] = stops.take(position) ++ stops.drop(position + size) //TODO check this
 		(copy(stops = stops), stops.slice(position, position + size))
 	}
 
-	def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
+	/*def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
 		val citiesToLoad: (List[Stop], List[Stop]) = cities.partition(stop => stop.specialCodes.contains(name))
 		var truckResult: (Truck, List[Stop]) = load(citiesToLoad._1)
 		(truckResult._1, citiesToLoad._2 ++ truckResult._2)
-	}
+	}*/
 
 	def load(city: Stop): (Truck, Option[Stop]) = {
 		var truck: Truck = copy(stops = city :: stops).shuffleBySize(1)
@@ -115,77 +89,57 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 	}
 
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
-		if (stops.size > 0 && mean.x != 0.0 && mean.y != 0.0)
-			stops.minBy(stop => distanceTo(stop.location, mean))
-		else {
-			lm.findFurthest(depot)
-		}
-	}
+		val mean = getMean(stops.map(stop => stop.location))
 
-	private def distanceTo(point1: Location, point2: Location): BigDecimal = {
-		BigDecimal(Math.sqrt(((point1.x - point2.x).pow(2) + (point1.y - point2.y).pow(2)).toDouble))
-	}
-
-	private def mean: Location = {
-		new Location(
-			stops.foldLeft(BigDecimal(0)) { (x: BigDecimal, stop: Stop) => x + stop.location.x} / stops.size,
-			stops.foldLeft(BigDecimal(0)) { (y: BigDecimal, stop: Stop) => y + stop.location.y} / stops.size,
-			""
-		)
+		if (stops.size > 0) stops.minBy(stop => lm.getDistance(stop.location, mean))
+		else lm.findFurthest(depot)
 	}
 
 	// Shuffle algorithem
-	def shuffle: Truck = {
+	def shuffle(): Truck = {
 		var bestSol: Truck = this
-		var currBest = bestSol.cost
+		var currBest = bestSol.getCost()
 
-		def doShuffle(start: Int, end: Int, solution: Truck): Truck = {
-			(start to end).foreach {
-				size => {
-					currBest = bestSol.cost
-					bestSol = bestSol.shuffleBySize(size)
-					if (bestSol.cost < currBest) {
-						println("New solution found: " + bestSol.cost)
-						doShuffle(0, maxSwapSize, bestSol)
+		def doShuffle(groupSizeMin: Int, groupSizeMax: Int, solution: Truck): Truck = {
+			require(groupSizeMax >= groupSizeMin)
+			require(groupSizeMin > 0)
+
+			(groupSizeMin to groupSizeMax).foreach {
+				groupSize => {
+					currBest = bestSol.getCost()
+					bestSol = bestSol.shuffleBySize(groupSize)
+					val x = bestSol.getCost
+
+					if (bestSol.getCost < currBest) {
+						logger.debug("New solution found: {}", bestSol.getCost())
+						doShuffle(1, getMaxSwapSize(), bestSol)
 					}
 				}
 			}
 			bestSol
 		}
 
-		if (stops.size > 1) {
-			bestSol = doShuffle(0, maxSwapSize, bestSol)
-			doShuffle(maxSwapSize, 1, bestSol)
-		}
-		else this
+		doShuffle(1, getMaxSwapSize(), bestSol)
 	}
 
 	// This could be more efficient
 	private def shuffleBySize(groupSize: Int): Truck = {
+		require(groupSize > 0, "groupsize is 0")
+		require(groupSize <= stops.size, "groupsize too big")
 
 		def swap(groupSize: Int, invert: Boolean): Truck = {
 
-			def extractFromList(from: Int, to: Int, size: Int, invert: Boolean): List[Stop] = {
-				val toMove =
-					if (invert) stops.slice(from, from + size).reverse
-					else stops.slice(from, from + size)
-
-				stops.take(from) ++ toMove ++ stops.drop(from + 1)
-			}
-
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Truck = {
 				(0 to stops.size - groupSize).map {
-					to => copy(stops = extractFromList(from, to, groupSize, invert))
-				}.toList.sortWith(_.cost < _.cost).head
+					to => copy(stops = extractFromList(stops, from, to, groupSize, invert))
+				}.toList.sortWith(_.getCost < _.getCost).head
 			}
 
 			// We add this on so head of list always has one solution
 			(this :: (0 to stops.size - groupSize).map {
 				from => doSwap(from, groupSize, invert, this)
-			}.toList.filter(city => city.isValid)).sortWith(_.cost < _.cost).head
+			}.toList.filter(city => city.isValid)).sortWith(_.getCost < _.getCost).head
 		}
-
-		assert(groupSize <= stops.size)
 
 		val newSolution: Truck = swap(groupSize, false)
 		val newSolution2: Truck = swap(groupSize, true)
@@ -193,16 +147,16 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 		assert(newSolution.stops.size == stops.size)
 		assert(newSolution2.stops.size == stops.size)
 
-		List(newSolution, newSolution2).sortBy(_.cost).head
+		List(newSolution, newSolution2).sortBy(_.getCost).head
 	}
 
-	def isValid: Boolean = weightValid && timeValid && specialCodesValid
+	def isValid(): Boolean = weightValid() && timeValid() //&& specialCodesValid()
 
-	def weightValid: Boolean = totalWeight <= maxWeight
+	def weightValid(): Boolean = getTotalWeight() <= maxWeight
 
-	def timeValid: Boolean = time.isShorterThan(new Duration(5 * 1000 * 60 * 60))
+	def timeValid(): Boolean = getDistanceTime().time.isShorterThan(new Duration(5 * 1000 * 60 * 60))
 
-	def specialCodesValid: Boolean = {
+	/*private def specialCodesValid(): Boolean = {
 		stops.foldLeft(true) {
 			(valid: Boolean, stop: Stop) => {
 				if (stop.specialCodes.size > 0 && !stop.specialCodes.contains(name))
@@ -211,15 +165,16 @@ case class Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeig
 					valid && true
 			}
 		}
-	}
+	}*/
 
-	override def toString =
+	override def toString() = {
+		val dt = getDistanceTime()
 		"Truck:" + name +
-		" Time: " + time +
-		" Distance: " + distance +
-		" Weight:" + totalWeight +
-		" " + stops.toString + "\n"
-
+			" Time: " + dt.time +
+			" Distance: " + dt.distance +
+			" Weight:" + getTotalWeight +
+			" " + stops.toString + "\n"
+	}
 
 }
 
