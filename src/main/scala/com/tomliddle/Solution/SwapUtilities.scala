@@ -5,12 +5,12 @@ package com.tomliddle.solution
  */
 trait SwapUtilities {
 
-	def extractFromList(stops: List[Stop], from: Int, to: Int, size: Int, invert: Boolean): List[Stop] = {
+	def extractFromList(stops: List[Stop], from: Int, to: Int, size: Int, invert: Boolean): (List[Stop], List[Stop]) = {
 		val toMove =
 			if (invert) stops.slice(from, from + size).reverse
 			else stops.slice(from, from + size)
 
-		stops.take(from) ++ toMove ++ stops.drop(from + 1)
+		(stops.take(from) ++ stops.drop(from + 1), toMove)
 	}
 
 }
