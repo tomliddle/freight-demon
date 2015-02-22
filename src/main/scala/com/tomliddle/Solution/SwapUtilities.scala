@@ -14,9 +14,20 @@ trait SwapUtilities {
 			if (invert) stops.slice(from, from + size).reverse
 			else stops.slice(from, from + size)
 
-		val toList = stops.slice(to, to + size - from)
-		val result = stops.patch(to, fromList, size)
-		result.patch(from, toList, toList.size)
+		val diff = math.abs(to - from)
+		val overlap =  size - diff
+		val toList = stops.slice(to + overlap, to + size)
+
+		val result = stops.patch(from, toList, toList.size)
+		result.patch(to, fromList, size)
+	}
+
+
+	def takeOff(stops: List[Stop], position: Int, size: Int): (List[Stop], List[Stop]) = {
+		require(position + size <= stops.size)
+		require(position >= 0 && size > 0)
+
+		(stops.take(position) ++ stops.drop(position + size), stops.slice(position, position + size)) //TODO check this
 	}
 
 

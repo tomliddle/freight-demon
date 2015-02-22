@@ -43,7 +43,7 @@ class SwapUtilitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 				result.size should equal (stopList.size)
 				result.size should equal (result.distinct.size)
 
-				stopList(0) should equal (result(4))
+				stopList(0) should equal (result(7))
 			}
 
 			"swap 4" in {
@@ -52,8 +52,39 @@ class SwapUtilitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 				result.size should equal (stopList.size)
 				result.size should equal (result.distinct.size)
 
-				stopList(0) should equal (result(5))
-				stopList(4) should equal (result(9))
+				stopList(0) should equal (result(9))
+				stopList(4) should equal (result(5))
+			}
+
+			"swap 5 from is after to" in {
+				val result = swapUtilities.swapStops(stopList, 6, 4, 2, false)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+
+				stopList(6) should equal (result(4))
+				stopList(7) should equal (result(5))
+			}
+
+			"swap move 4 on" in {
+				val result = swapUtilities.swapStops(stopList, 4, 5, 4, false)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+
+				stopList(6) should equal (result(7))
+				stopList(7) should equal (result(8))
+			}
+
+		}
+		"take off stops" should {
+
+			"swap 4" in {
+				val result = swapUtilities.takeOff(stopList, 0, 5)
+
+				result._1.size should equal (5)
+				result._2.size should equal (5)
+
 			}
 
 		}

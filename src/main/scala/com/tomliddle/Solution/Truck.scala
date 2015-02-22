@@ -50,9 +50,8 @@ case class Truck(
 	def getMaxSwapSize() = this.stops.size / 2
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
-		assert(position + size <= stops.size && position >= 0 && size > 0, "position:" + position + " size:" + size + " stops.size:" + stops.size)
-		val list: List[Stop] = stops.take(position) ++ stops.drop(position + size) //TODO check this
-		(copy(stops = stops), stops.slice(position, position + size))
+		val newStops = takeOff(stops, position, size)
+		(copy(stops = newStops._1), newStops._2)
 	}
 
 	/*def loadSpecialCodes(cities: List[Stop]): (Truck, List[Stop]) = {
@@ -139,7 +138,7 @@ case class Truck(
 			// We add this on so head of list always has one solution
 			(this :: (0 to stops.size - groupSize).map {
 				from => doSwap(from, groupSize, invert, this)
-			}.toList.filter(city => city.isValid)).sortWith(_.getCost < _.getCost).head
+			}.toList.filter(stop => stop.isValid)).sortWith(_.getCost < _.getCost).head
 		}
 
 		val newSolution: Truck = swap(groupSize, false)
