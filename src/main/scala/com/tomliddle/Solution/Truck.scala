@@ -132,8 +132,7 @@ case class Truck(
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Truck = {
 				(0 to stops.size - groupSize).map {
 					to =>
-						val removedList: (List[Stop], List[Stop]) = extractFromList(stops, from, to, groupSize, invert)
-						copy(stops = removedList._1) // TODO
+						copy(stops = swapStops(stops, from, to, groupSize, invert))
 				}.toList.sortWith(_.getCost < _.getCost).head
 			}
 

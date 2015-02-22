@@ -1,0 +1,62 @@
+package Solution
+
+import com.tomliddle.solution.{SwapUtilities, Location, Stop}
+import org.joda.time.{LocalTime, DateTime}
+import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+
+/**
+ * Created by tom on 20/02/2015.
+ */
+class SwapUtilitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
+
+	private val location = new Location(1, 1, "324234")
+	private val stop = Stop("1", location, time, time, BigDecimal(0), List(), 1)
+	private val time = new LocalTime(0)
+	private val stopList: List[Stop] = (0 to 9).map {id => stop.copy(id = Some(id))}.toList
+
+
+	private def swapUtilities = new Object with SwapUtilities
+
+
+
+	"swap utilities" when {
+
+		"swapping stops" should {
+
+			"swap 2" in {
+				val result = swapUtilities.swapStops(stopList, 0, 2, 1, false)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+			}
+
+			"swap 2 inverse" in {
+				val result = swapUtilities.swapStops(stopList, 0, 2, 1, true)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+			}
+
+			"swap 3" in {
+				val result = swapUtilities.swapStops(stopList, 0, 4, 4, true)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+
+				stopList(0) should equal (result(4))
+			}
+
+			"swap 4" in {
+				val result = swapUtilities.swapStops(stopList, 0, 5, 5, true)
+
+				result.size should equal (stopList.size)
+				result.size should equal (result.distinct.size)
+
+				stopList(0) should equal (result(5))
+				stopList(4) should equal (result(9))
+			}
+
+		}
+	}
+
+}
