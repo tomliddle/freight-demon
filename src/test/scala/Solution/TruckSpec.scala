@@ -1,24 +1,61 @@
 package com.bullionvault.bvbot.price
 
-import org.joda.time.DateTime
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.WordSpec
+import com.tomliddle.solution._
+import org.joda.time.{Duration, LocalTime}
 import org.scalatest.{Matchers, BeforeAndAfterEach, WordSpec}
 
 class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
-	val dateTime = DateTime.now
-	val tenMinutesAgo = DateTime.now.minusMinutes(10)
-	val tolerance = 0.001
+	private val location = Location(0, 0, "324234")
+	private val stop = Stop("1", location, time, time, BigDecimal(1), List(), 1)
+	private val time = new LocalTime(0)
 
-	"price history" when {
+	val locationList = List(
+		location.copy(x = 1, y = 5),
+		location.copy(x = 1, y = 1),
+		location.copy(x = 2, y = 3),
+		location.copy(x = 0, y = 4),
+		location.copy(x = 2, y = 4),
+		location.copy(x = 2, y = 2),
+		location.copy(x = 2, y = 2),
+		location.copy(x = 1, y = 0),
+		location.copy(x = 2, y = 0),
+		location.copy(x = 10, y = 10)
+	)
 
-		"adding new quotes" should {
+	private val stops: List[Stop] = (0 to 9).map {
+		id => stop.copy(id = Some(id), location = locationList(id))
+	}.toList
+	private val depot: Depot = Depot("Depot1", location, 1, Some(1))
+	private val lm = new LocationMatrix(stops, List(depot))
 
-			"calculate the correct price range confidence" in {
-				//ph.confidence.toDouble should be (0.287 +- tolerance)
-				//ph.confidence.toDouble should equal (0)
-				//ph.purge.confidence.toDouble should be (0.221 +- tolerance)
+	private val truck = Truck("Truck1", time, time, BigDecimal(100), depot, stops, lm, 1, Some(1))
+
+	"Truck" when {
+
+		"Getting parameters" should {
+
+			"get correct weight" in {
+				truck.getTotalWeight should equal (10)
+			}
+
+			"get correct cost" in {
+				// TODO check
+				truck.getCost() should equal (BigDecimal(4480.61))
+			}
+
+			"get correct ditance time" in {
+				val distanceTime = truck.getDistanceTime()
+				// TODO Wrong
+				truck.getDistanceTime() should equal (new DistanceTime(3671.32, new Duration(41488000)))
+			}
+
+			"get an optimised solution" in {
+				val shuffledTruck = truck.shuffle()
+
+				shuffledTruck.getCost() should be < (truck.getCost())
+
+				// tODO more checks
 			}
 
 		}

@@ -1,11 +1,28 @@
 package com.tomliddle.solution
 
+import java.math.MathContext
+
 import org.joda.time.{LocalTime, Duration}
+
+import scala.math.BigDecimal.RoundingMode
+
+
+
 
 class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration = new Duration(0)) {
 
 	def +(operand: DistanceTime): DistanceTime = {
 		new DistanceTime(this.distance + operand.distance, this.time.plus(operand.time))
+	}
+
+	def canEqual(other: Any): Boolean = other.isInstanceOf[DistanceTime]
+
+	override def equals(other: Any): Boolean = other match {
+		case that: DistanceTime =>
+			(that canEqual this) &&
+				distance == that.distance &&
+				time == that.time
+		case _ => false
 	}
 }
 
@@ -64,7 +81,7 @@ class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDist
 
 trait TimeAndDistCalc {
 
-	def getDistance(location1: Location, location2: Location): BigDecimal = {
+	def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
 		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
 		val R = 6371 // km
 		var lat1 = location1.y.toDouble
@@ -79,15 +96,16 @@ trait TimeAndDistCalc {
 		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 			Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
 		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-		R * c
+		BigDecimal(R * c).setScale(2, RoundingMode.HALF_UP)
 	}
 
 	def getDuration(stop1: Location, stop2: Location): Duration = {
-		new Duration(0)
+		// TODO 11.1111 m/s is 40kmph
+		new Duration(0)//new Duration((getMetresDistance(stop1, stop2) * 11.1111 * 1000).toLong)
 	}
 
 	def getDistanceTime(stop1: Location, stop2: Location): DistanceTime = {
-		new DistanceTime(getDistance(stop1, stop2), getDuration(stop1, stop2))
+		new DistanceTime(getMetresDistance(stop1, stop2), getDuration(stop1, stop2))
 	}
 
 	def getMean(locations: List[Location]): Location = {

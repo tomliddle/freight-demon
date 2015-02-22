@@ -3,6 +3,8 @@ package com.tomliddle.solution
 import org.joda.time.{LocalTime, Duration}
 import org.slf4j.LoggerFactory
 
+import scala.math.BigDecimal.RoundingMode
+
 
 case class Truck(
 					name: String,
@@ -17,14 +19,18 @@ case class Truck(
 
 	private final val logger = LoggerFactory.getLogger(this.getClass)
 
-	def getTotalWeight(): BigDecimal = stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
 
-	def getCost(): BigDecimal = getDistanceTime().distance * 1.2
+	def getTotalWeight(): BigDecimal = {
+		stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
+			.setScale(2, RoundingMode.HALF_UP)
+	}
+
+	def getCost(): BigDecimal = (getDistanceTime().distance * 1.2).setScale(2, RoundingMode.HALF_UP)
 
 	def getDistanceTime(): DistanceTime = {
 		var distTimeToFirstStop =
 			if (stops.size > 0) lm.distanceTimeBetween(depot, stops(0))
-			else new DistanceTime(BigDecimal(0), new Duration(0))
+			else new DistanceTime()
 
 		if (stops.size > 1)
 			stops.sliding(2).map {
@@ -90,7 +96,7 @@ case class Truck(
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
 		val mean = getMean(stops.map(stop => stop.location))
 
-		if (stops.size > 0) stops.minBy(stop => lm.getDistance(stop.location, mean))
+		if (stops.size > 0) stops.minBy(stop => lm.getMetresDistance(stop.location, mean))
 		else lm.findFurthest(depot)
 	}
 
