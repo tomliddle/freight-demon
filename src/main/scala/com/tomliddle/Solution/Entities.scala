@@ -1,7 +1,5 @@
 package com.tomliddle.solution
 
-import java.math.MathContext
-
 import org.joda.time.{LocalTime, Duration}
 
 import scala.math.BigDecimal.RoundingMode
@@ -26,14 +24,13 @@ class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration 
 	}
 }
 
-case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None) {
-}
+case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None)
 
 case class Depot(name: String, location: Location, userId: Int, id: Option[Int] = None)
 
 case class Stop(name: String, location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None)
 
-class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
+abstract class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
 
 	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] = {
 		stops.map {
@@ -79,11 +76,11 @@ class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDist
 
 
 
-trait TimeAndDistCalc {
+trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 
-	def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
+	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
 		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
-		val R = 6371 // km
+		val R = 6371000 // m
 		var lat1 = location1.y.toDouble
 		var lat2 = location2.y.toDouble
 		val lon1 = location1.x.toDouble
@@ -96,18 +93,40 @@ trait TimeAndDistCalc {
 		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 			Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
 		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-		BigDecimal(R * c).setScale(2, RoundingMode.HALF_UP)
+		BigDecimal(R * c)//.setScale(2, RoundingMode.HALF_UP)
 	}
 
-	def getDuration(stop1: Location, stop2: Location): Duration = {
+	override def getDuration(stop1: Location, stop2: Location): Duration = {
 		// TODO 11.1111 m/s is 40kmph
-		new Duration(0)//new Duration((getMetresDistance(stop1, stop2) * 11.1111 * 1000).toLong)
+		new Duration((getMetresDistance(stop1, stop2) * 11.1111 * 1000).toLong)
 	}
+
+}
+
+trait SimpleTimeAndDistCalc extends TimeAndDistCalc {
+
+	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
+		BigDecimal(math.sqrt(math.pow(math.abs(location1.x.doubleValue() - location2.x.doubleValue()),2) + math.pow(math.abs(location1.y.doubleValue() - location2.y.doubleValue()),2)))
+	}
+
+	override def getDuration(location1: Location, location2: Location): Duration = {
+		new Duration ((getMetresDistance(location1, location2) * 1000).toLong)
+	}
+}
+
+trait TimeAndDistCalc {
+
+	def getMetresDistance(location1: Location, location2: Location): BigDecimal
+
+	def getDuration(location1: Location, location2: Location): Duration
 
 	def getDistanceTime(stop1: Location, stop2: Location): DistanceTime = {
 		new DistanceTime(getMetresDistance(stop1, stop2), getDuration(stop1, stop2))
 	}
 
+}
+
+trait Mean {
 	def getMean(locations: List[Location]): Location = {
 		locations.foldLeft(Location()) { (location1: Location, location2: Location) =>
 			Location(location1.x + location2.x, location1.y + location2.y, "")

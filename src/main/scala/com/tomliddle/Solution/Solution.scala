@@ -13,8 +13,6 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 
 	def getDistanceTime(): DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + b.getDistanceTime()}
 
-	def getTotalLoaded(): Int = getLoadedCities.size
-
 	def getLoadedCities(): List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
 	def getMaxSolutionSwapSize(): Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.getMaxSwapSize}

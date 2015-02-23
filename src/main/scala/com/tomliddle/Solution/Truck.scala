@@ -1,10 +1,9 @@
 package com.tomliddle.solution
 
+
 import org.joda.time.{LocalTime, Duration}
 import org.slf4j.LoggerFactory
-
 import scala.math.BigDecimal.RoundingMode
-
 
 case class Truck(
 					name: String,
@@ -15,10 +14,9 @@ case class Truck(
 					stops: List[Stop],
 					lm: LocationMatrix,
 					userId: Int, id: Option[Int] = None)
-	extends TimeAndDistCalc with SwapUtilities {
+	extends SwapUtilities with Mean {
 
 	private final val logger = LoggerFactory.getLogger(this.getClass)
-
 
 	def getTotalWeight(): BigDecimal = {
 		stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
@@ -144,7 +142,7 @@ case class Truck(
 			// We add this on so head of list always has one solution
 			(this :: (0 to stops.size - groupSize).map {
 				from => doSwap(from, groupSize, invert, this)
-			}.toList.filter(stop => stop.isValid)).sortWith(_.getCost < _.getCost).head
+			}.toList.filter(truck => truck.isValid)).sortWith(_.getCost < _.getCost).head
 		}
 
 		val newSolution: Truck = swap(groupSize, false)

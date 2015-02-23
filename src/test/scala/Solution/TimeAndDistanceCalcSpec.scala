@@ -1,22 +1,23 @@
 package Solution
 
-import org.joda.time.DateTime
+import com.tomliddle.solution.{LatLongTimeAndDistCalc, Location}
+import org.joda.time.Duration
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
 class TimeAndDistanceCalcSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
-	val dateTime = DateTime.now
-	val tenMinutesAgo = DateTime.now.minusMinutes(10)
-	val tolerance = 0.001
+	val point1 = new Location(0, 52.1, "")
+	val point2 = new Location(1, 53, "")
+	val timeAndDistCalc = new Object with LatLongTimeAndDistCalc
 
-	"price history" when {
+	"TimeAndDistCalcSpec" when {
 
-		"adding new quotes" should {
+		"calculating getMetresDistance" should {
 
-			"calculate the correct price range confidence" in {
-				//ph.confidence.toDouble should be (0.287 +- tolerance)
-				//ph.confidence.toDouble should equal (0)
-				//ph.purge.confidence.toDouble should be (0.221 +- tolerance)
+			"calculate distance between " in {
+				val timeAndDist = timeAndDistCalc.getDistanceTime(point1, point2)
+				//timeAndDist.time should equal (new Duration(120694L))
+				timeAndDist.distance should be (BigDecimal(120694.02083914289) +- 100)
 			}
 
 		}

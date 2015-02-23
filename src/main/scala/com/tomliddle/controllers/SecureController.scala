@@ -7,7 +7,7 @@ import akka.util.Timeout
 import com.tomliddle.{DBStop, DBTruck, DatabaseSupport}
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{Solution, LocationMatrix}
+import com.tomliddle.solution.{LatLongTimeAndDistCalc, Solution, LocationMatrix}
 import org.json4s.JsonAST.{JString, JObject}
 import org.json4s.JsonDSL.WithBigDecimal._
 import org.joda.time.{LocalDate, LocalTime}
@@ -113,7 +113,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val stops = db.getStops(user)
 		val depots = db.getDepots(user)
 
-		val lm = new LocationMatrix(stops, depots)
+		val lm = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
 
 		val trucks = dbTrucks.map {
 			dbTruck =>
@@ -173,7 +173,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val stops = db.getStops(user)
 		val depots = db.getDepots(user)
 
-		val lm = new LocationMatrix(stops, depots)
+		val lm = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
 
 		val trucks = dbTrucks.map {
 			dbTruck =>
