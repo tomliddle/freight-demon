@@ -52,7 +52,7 @@ dependencies {
 	compile "com.typesafe.akka:akka-slf4j_2.10:$akkaVersion"
 	compile "com.typesafe.akka:akka-actor_2.10:$akkaVersion"
 
-	def scalaVersion = '2.10.4'
+	def scalaVersion = '2.11.5'
 	compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
 	compile "org.scala-lang:scala-reflect:$scalaVersion"
 	compile "org.scala-lang:scala-compiler:$scalaVersion"
@@ -61,24 +61,24 @@ dependencies {
 	compile 'org.eclipse.jetty:jetty-webapp:9.2.6.v20141205'
 
 	// scalatra deps
-	compile group: 'org.scalatra', name: 'scalatra_2.10', version: '2.3.0'
-	compile 'org.scalatra:scalatra-auth_2.10:2.3.0'
-	compile group: 'org.scalatra', name: 'scalatra-scalate_2.10', version: '2.3.0'
+	compile group: 'org.scalatra', name: 'scalatra_2.11', version: '2.3.0'
+	compile 'org.scalatra:scalatra-auth_2.11:2.3.0'
+	compile group: 'org.scalatra', name: 'scalatra-scalate_2.11', version: '2.3.0'
 
 	// json4s
-	compile 'org.scalatra:scalatra-json_2.10:2.4.0.M2'
-	compile 'org.json4s:json4s-jackson_2.10:3.2.11'
-	compile 'org.json4s:json4s-ext_2.10:3.2.11'
+	compile 'org.scalatra:scalatra-json_2.11:2.3.0'
+	compile 'org.json4s:json4s-jackson_2.11:3.2.11'
+	compile 'org.json4s:json4s-ext_2.11:3.2.11'
 	// compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.0'
 
-	compile 'com.typesafe.slick:slick_2.10:2.1.0'
+	compile 'com.typesafe.slick:slick_2.11:2.1.0'
 	compile 'com.h2database:h2:1.4.184'
 	compile 'c3p0:c3p0:0.9.1.2'
 
-	testCompile 'org.scalatest:scalatest_2.10:2.2.4'
+	testCompile 'org.scalatest:scalatest_2.11:2.2.4'
 	//testCompile 'org.pegdown:pegdown:1.0.2'
 	testCompile 'org.mockito:mockito-core:1.10.19'
-	testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.10', version: akkaVersion
+	testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: akkaVersion
 	//testCompile group: 'io.spray', name: 'spray-testkit', version: sprayVersion
 
 }

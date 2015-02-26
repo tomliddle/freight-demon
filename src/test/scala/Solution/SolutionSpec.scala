@@ -18,7 +18,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			}
 
 			"calculate the correct time " in {
-				solution.getDistanceTime().time should equal (truck.getDistanceTime().time.multipliedBy(3))
+				solution.getDistanceTime().time should equal (truck.getDistanceTime().time.plus(truck.getDistanceTime().time).plus(truck.getDistanceTime().time))
 			}
 
 			"calculate the correct shuffled cost" in {

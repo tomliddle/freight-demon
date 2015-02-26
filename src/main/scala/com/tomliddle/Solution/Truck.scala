@@ -5,6 +5,8 @@ import org.joda.time.{LocalTime, Duration}
 import org.slf4j.LoggerFactory
 import scala.math.BigDecimal.RoundingMode
 
+
+
 case class Truck(
 					name: String,
 					startTime: LocalTime,
@@ -14,9 +16,11 @@ case class Truck(
 					stops: List[Stop],
 					lm: LocationMatrix,
 					userId: Int, id: Option[Int] = None)
-	extends SwapUtilities with Mean {
+	extends SwapUtilities with Mean with TruckLinks {
 
-	private final val logger = LoggerFactory.getLogger(this.getClass)
+	protected final val logger = LoggerFactory.getLogger(this.getClass)
+	//protected implicit def ordering[Duration]: Ordering[Duration] = Ordering.by(_.toString)
+
 
 	def getTotalWeight(): BigDecimal = {
 		stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
@@ -38,20 +42,7 @@ case class Truck(
 		else distTimeToFirstStop
 	}
 
-	// TODO use this
-	private def calcNextDuration(stop1: Stop, stop2: Stop, currEarliestStart: LocalTime, currLatestStart: LocalTime, currJourneyTime: Duration) = {
-
-		var earliestStartTime = stop1.startTime.minus(currJourneyTime.toPeriod)
-		if (earliestStartTime.isBefore(startTime))
-			earliestStartTime = startTime
-
-		var latestStartTime = stop2.endTime.minus((currJourneyTime.toPeriod))
-		if (latestStartTime.isAfter(endTime))
-			latestStartTime = endTime.minus(currJourneyTime.toPeriod)
-	}
-
-
-	def getMaxSwapSize() = this.stops.size / 2
+	def getMaxSwapSize() = stops.size / 2
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
 		val newStops = takeOff(stops, position, size)
@@ -80,7 +71,7 @@ case class Truck(
 		var currCity: Stop = nextStopToLoad(stops)
 		var notLoadedCities = List[Stop]()
 		var currTruck = this
-		stops.sortBy( lm.distanceBetween(_, currCity)).foreach {
+		stops.sortBy(lm.distanceTimeBetween(_, currCity).distance).foreach {
 			city => {
 				currTruck.load(city) match {
 					case (truck, Some(cityNotLoaded)) => notLoadedCities = cityNotLoaded :: notLoadedCities
@@ -171,102 +162,90 @@ case class Truck(
 		}
 	}*/
 
-	override def toString() = {
-		val dt = getDistanceTime()
-		"Truck:" + name +
-			" Time: " + dt.time +
-			" Distance: " + dt.distance +
-			" Weight:" + getTotalWeight +
-			" " + stops.toString + "\n"
-	}
+
 
 }
 
+
+
+
 /*
-
-loadStopsWithSpecialCodes
-reduceTrucksUsed
-loadStopsWithSpecialCodes
-calculateSmallestAvailableStopCapacity
-loadNotloads
-
-truck
-calculateRouteMean
-specialCodesOk
-getCostPerMetre
-getCostPerTimeSpan
 
 //Helper method, calculates the opportunity cost and actual cost for the current stop and adds this on to total cost
 private bool addLinkTimeCostDistance(Stop previous, Stop current, ref TimeSpan tsRouteEarliestStart, ref TimeSpan tsRouteLatestStart, ref long lCurrRouteDistance, ref double dCurrRouteCost, ref TimeSpan tsRouteJourneyTime, bool bSetStopVars, int iOrder) {
 
-	//Time (added time, plus wait time)
-	TimeSpan tsAddedTime = new TimeSpan ();
-	tsAddedTime = previous.liTimes[current.ID];
-	tsRouteJourneyTime += tsAddedTime;
-	tsRouteJourneyTime += current.tsWaitTime; //-not sure about
+//Time (added time, plus wait time)
+TimeSpan tsAddedTime = new TimeSpan ();
+tsAddedTime = previous.liTimes[current.ID];
+tsRouteJourneyTime += tsAddedTime;
+tsRouteJourneyTime += current.tsWaitTime; //-not sure about
 
-	//Cost (cost per dist, and time, and wait time)
-	double dAddedCost = getCostPerMetre (previous.liDistances[current.ID]);
-	dAddedCost += getCostPerTimeSpan(tsAddedTime);
+//Cost (cost per dist, and time, and wait time)
+double dAddedCost = getCostPerMetre (previous.liDistances[current.ID]);
+dAddedCost += getCostPerTimeSpan(tsAddedTime);
 
-	//Current Earliest start = earliest start to make this stop, same with latest
-	TimeSpan currentEarliestStart = new TimeSpan (0,0,0);
-	TimeSpan currentLatestStart = new TimeSpan(0, 0, 0);
-	currentEarliestStart = current.tsEarlyTime - tsRouteJourneyTime;
-	currentLatestStart = current.tsLateTime - tsRouteJourneyTime;
-
-
-	//	  |  |							routeVars
-	//		| |__________________| |    current e/l starts
-	//		||							new routevars
-	//if the earliest time at the stop - journey time means the truck has to start later
-	//set the route earliest time to the later time.
-	if (currentEarliestStart > tsRouteEarliestStart) {
-		tsRouteEarliestStart = currentEarliestStart;
-	}
-
-	//		|	|						routeVars
-	//		| |__________________| |    current e/l starts
-	//		| |							new routevars
-	if (currentLatestStart < tsRouteLatestStart) {
-		tsRouteLatestStart = currentLatestStart;
-	}
-
-	//	  ||							routeVars
-	//		| |__________________| |    current e/l starts
-	//	   ||Wait Time					(new journeytime)
-	//	   | routeVars (e & l)
-	//If you need to wait before you get there...
-	if (currentEarliestStart > tsRouteLatestStart) {
-
-		//Time (add on the extra wait)
-		tsRouteJourneyTime += currentEarliestStart - tsRouteLatestStart;
-
-		//Cost (add on the extra cost of waiting)
-		dAddedCost += getCostPerTimeSpan(currentEarliestStart - tsRouteLatestStart);
-
-		//Set the earliest start to a bit later
-		tsRouteEarliestStart = tsRouteLatestStart;
-	}
-
-	printCurrentTimeWindows((Stop)current, currentEarliestStart, currentLatestStart);//only prints if on
+//Current Earliest start = earliest start to make this stop, same with latest
+TimeSpan currentEarliestStart = new TimeSpan (0,0,0);
+TimeSpan currentLatestStart = new TimeSpan(0, 0, 0);
+currentEarliestStart = current.tsEarlyTime - tsRouteJourneyTime;
+currentLatestStart = current.tsLateTime - tsRouteJourneyTime;
 
 
-	//			||						routeVars
-	//		| |__________________| |    current e/l starts
-	//Even getting there at the latest time, cannot leave early enough
-	if (tsRouteEarliestStart > currentLatestStart) {
-		bReturn = false;
-	}
+//	  |  |							routeVars
+//		| |__________________| |    current e/l starts
+//		||							new routevars
+//if the earliest time at the stop - journey time means the truck has to start later
+//set the route earliest time to the later time.
+if (currentEarliestStart > tsRouteEarliestStart) {
+	tsRouteEarliestStart = currentEarliestStart;
+}
+
+//		|	|						routeVars
+//		| |__________________| |    current e/l starts
+//		| |							new routevars
+if (currentLatestStart < tsRouteLatestStart) {
+	tsRouteLatestStart = currentLatestStart;
+}
+
+//	  ||							routeVars
+//		| |__________________| |    current e/l starts
+//	   ||Wait Time					(new journeytime)
+//	   | routeVars (e & l)
+//If you need to wait before you get there...
+if (currentEarliestStart > tsRouteLatestStart) {
+
+	//Time (add on the extra wait)
+	tsRouteJourneyTime += currentEarliestStart - tsRouteLatestStart;
+
+	//Cost (add on the extra cost of waiting)
+	dAddedCost += getCostPerTimeSpan(currentEarliestStart - tsRouteLatestStart);
+
+	//Set the earliest start to a bit later
+	tsRouteEarliestStart = tsRouteLatestStart;
+}
+
+printCurrentTimeWindows((Stop)current, currentEarliestStart, currentLatestStart);//only prints if on
 
 
-	//Must be valid so return
-	dCurrRouteCost += dAddedCost;
-	if (bSetStopVars) {
-		current.dCost = dAddedCost;
-		current.tsEarliestArrival = tsRouteEarliestStart + tsRouteJourneyTime;
-		current.tsLatestArrival = tsRouteLatestStart + tsRouteJourneyTime;
-		current.iOrder = iOrder;
-	}
-	return bReturn;
+//			||						routeVars
+//		| |__________________| |    current e/l starts
+//Even getting there at the latest time, cannot leave early enough
+if (tsRouteEarliestStart > currentLatestStart) {
+	bReturn = false;
+}
+
+
+//Must be valid so return
+dCurrRouteCost += dAddedCost;
+if (bSetStopVars) {
+	current.dCost = dAddedCost;
+	current.tsEarliestArrival = tsRouteEarliestStart + tsRouteJourneyTime;
+	current.tsLatestArrival = tsRouteLatestStart + tsRouteJourneyTime;
+	current.iOrder = iOrder;
+}
+return bReturn;
+}
+
+
+
 }*/

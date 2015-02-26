@@ -2,10 +2,6 @@ package com.tomliddle.solution
 
 import org.joda.time.{LocalTime, Duration}
 
-import scala.math.BigDecimal.RoundingMode
-
-
-
 
 class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration = new Duration(0)) {
 
@@ -22,6 +18,14 @@ class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration 
 				time == that.time
 		case _ => false
 	}
+}
+
+case class Link(waitTime: Duration = new Duration(0), travelDistanceTime: DistanceTime = new DistanceTime()) {
+	def +(operand: Link): Link = {
+		new Link(this.waitTime.plus(operand.waitTime), this.travelDistanceTime + operand.travelDistanceTime)
+	}
+
+	def elapsedTime: Duration = travelDistanceTime.time.plus(waitTime)
 }
 
 case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None)
@@ -61,13 +65,13 @@ abstract class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends Ti
 
 	def findNearest(stop: Stop): Stop = stopDistancesAndTimes(stop).toList.sortBy(_._2.distance).head._1
 
-	def distanceBetween(depot: Depot, stop: Stop): BigDecimal = depotDistancesAndTimes(depot)(stop).distance
+	//def distanceBetween(depot: Depot, stop: Stop): BigDecimal = depotDistancesAndTimes(depot)(stop).distance
 
-	def distanceBetween(stop1: Stop, stop2: Stop): BigDecimal = stopDistancesAndTimes(stop1)(stop2).distance
+	//def distanceBetween(stop1: Stop, stop2: Stop): BigDecimal = stopDistancesAndTimes(stop1)(stop2).distance
 
-	def timeBetween(depot: Depot, stop: Stop): Duration = depotDistancesAndTimes(depot)(stop).time
+	//def timeBetween(depot: Depot, stop: Stop): Duration = depotDistancesAndTimes(depot)(stop).time
 
-	def timeBetween(stop1: Stop, stop2: Stop): Duration = stopDistancesAndTimes(stop1)(stop2).time
+	//def timeBetween(stop1: Stop, stop2: Stop): Duration = stopDistancesAndTimes(stop1)(stop2).time
 
 	def distanceTimeBetween(stop1: Stop, stop2: Stop): DistanceTime = stopDistancesAndTimes(stop1)(stop2)
 
@@ -79,7 +83,6 @@ abstract class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends Ti
 trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 
 	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
-		// Math.sqrt(Math.pow(city.y - city2.y, 2) + Math.pow(city.x - city2.x, 2))
 		val R = 6371000 // m
 		var lat1 = location1.y.toDouble
 		var lat2 = location2.y.toDouble
@@ -106,11 +109,15 @@ trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 trait SimpleTimeAndDistCalc extends TimeAndDistCalc {
 
 	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
-		BigDecimal(math.sqrt(math.pow(math.abs(location1.x.doubleValue() - location2.x.doubleValue()),2) + math.pow(math.abs(location1.y.doubleValue() - location2.y.doubleValue()),2)))
+		val xdiff = location1.x.doubleValue() - location2.x.doubleValue()
+		val ydiff = location1.y.doubleValue() - location2.y.doubleValue()
+		val ans = math.hypot(xdiff, ydiff)
+		BigDecimal(ans)
 	}
 
 	override def getDuration(location1: Location, location2: Location): Duration = {
-		new Duration ((getMetresDistance(location1, location2) * 1000).toLong)
+		// 10=m/s = 36kmph
+		new Duration ((getMetresDistance(location1, location2) * 100).toLong)
 	}
 }
 
