@@ -21,26 +21,19 @@ case class Truck(
 	protected final val logger = LoggerFactory.getLogger(this.getClass)
 	//protected implicit def ordering[Duration]: Ordering[Duration] = Ordering.by(_.toString)
 
-
-	def getTotalWeight(): BigDecimal = {
+	lazy val totalWeight: BigDecimal = {
 		stops.foldLeft(BigDecimal(0)) { (totalWeight: BigDecimal, stop: Stop) => totalWeight + stop.maxWeight}
 			.setScale(2, RoundingMode.HALF_UP)
 	}
 
-	def getCost(): BigDecimal = (getDistanceTime().distance * 1.2).setScale(2, RoundingMode.HALF_UP)
+	lazy val cost: BigDecimal = (distance * 1.2).setScale(2, RoundingMode.HALF_UP)
 
-	def getDistanceTime(): DistanceTime = {
-		var distTimeToFirstStop =
-			if (stops.size > 0) lm.distanceTimeBetween(depot, stops(0))
-			else new DistanceTime()
+	lazy val distance = links.foldLeft(BigDecimal(0)) {(a: BigDecimal, b: Link) => a + b.travelDistanceTime.distance}
 
-		if (stops.size > 1)
-			stops.sliding(2).map {
-				(currCities: List[Stop]) =>
-					lm.distanceTimeBetween(currCities(0), currCities(1))
-			}.foldLeft(distTimeToFirstStop) { (a: DistanceTime, b: DistanceTime) => a + b}
-		else distTimeToFirstStop
-	}
+	lazy val time = links.foldLeft(new Duration(0)) {(a: Duration, b: Link) => a.plus(b.travelDistanceTime.time).plus(b.waitTime) }
+
+	lazy val links = getLinks()
+
 
 	def getMaxSwapSize() = stops.size / 2
 
@@ -82,17 +75,18 @@ case class Truck(
 		(currTruck, notLoadedCities)
 	}
 
-	private def nextStopToLoad(stops: List[Stop]): Stop = {
-		val mean = getMean(stops.map(stop => stop.location))
+	private lazy val mean = getMean(stops.map(stop => stop.location))
 
+	private def nextStopToLoad(stops: List[Stop]): Stop = {
 		if (stops.size > 0) stops.minBy(stop => lm.getMetresDistance(stop.location, mean))
-		else lm.findFurthest(depot)
+		else lm.findFurthest(depot).asInstanceOf[Stop]
 	}
 
 	// Shuffle algorithem
 	def shuffle(): Truck = {
+		logger.debug("Shuffling ------------------")
 		var bestSol: Truck = this
-		var currBest = bestSol.getCost()
+		var currBest = bestSol.cost
 
 		def doShuffle(groupSizeMin: Int, groupSizeMax: Int, solution: Truck): Truck = {
 			require(groupSizeMax >= groupSizeMin)
@@ -100,12 +94,11 @@ case class Truck(
 
 			(groupSizeMin to groupSizeMax).foreach {
 				groupSize => {
-					currBest = bestSol.getCost()
+					currBest = bestSol.cost
 					bestSol = bestSol.shuffleBySize(groupSize)
-					val x = bestSol.getCost
 
-					if (bestSol.getCost < currBest) {
-						logger.debug("New solution found: {}", bestSol.getCost())
+					if (bestSol.cost < currBest) {
+						logger.debug("New solution found: {}", bestSol.cost)
 						doShuffle(1, getMaxSwapSize(), bestSol)
 					}
 				}
@@ -127,13 +120,13 @@ case class Truck(
 				(0 to stops.size - groupSize).map {
 					to =>
 						copy(stops = swapStops(stops, from, to, groupSize, invert))
-				}.toList.sortWith(_.getCost < _.getCost).head
+				}.toList.sortWith(_.cost < _.cost).head
 			}
 
 			// We add this on so head of list always has one solution
 			(this :: (0 to stops.size - groupSize).map {
 				from => doSwap(from, groupSize, invert, this)
-			}.toList.filter(truck => truck.isValid)).sortWith(_.getCost < _.getCost).head
+			}.toList.filter(truck => truck.isValid)).sortWith(_.cost < _.cost).head
 		}
 
 		val newSolution: Truck = swap(groupSize, false)
@@ -142,14 +135,14 @@ case class Truck(
 		assert(newSolution.stops.size == stops.size)
 		assert(newSolution2.stops.size == stops.size)
 
-		List(newSolution, newSolution2).sortBy(_.getCost).head
+		List(newSolution, newSolution2).sortBy(_.cost).head
 	}
 
 	def isValid(): Boolean = weightValid() && timeValid() //&& specialCodesValid()
 
-	def weightValid(): Boolean = getTotalWeight() <= maxWeight
+	def weightValid(): Boolean = totalWeight <= maxWeight
 
-	def timeValid(): Boolean = getDistanceTime().time.isShorterThan(new Duration(5 * 1000 * 60 * 60))
+	def timeValid(): Boolean = time.isShorterThan(new Duration(5 * 1000 * 60 * 60))
 
 	/*private def specialCodesValid(): Boolean = {
 		stops.foldLeft(true) {
@@ -165,87 +158,3 @@ case class Truck(
 
 
 }
-
-
-
-
-/*
-
-//Helper method, calculates the opportunity cost and actual cost for the current stop and adds this on to total cost
-private bool addLinkTimeCostDistance(Stop previous, Stop current, ref TimeSpan tsRouteEarliestStart, ref TimeSpan tsRouteLatestStart, ref long lCurrRouteDistance, ref double dCurrRouteCost, ref TimeSpan tsRouteJourneyTime, bool bSetStopVars, int iOrder) {
-
-//Time (added time, plus wait time)
-TimeSpan tsAddedTime = new TimeSpan ();
-tsAddedTime = previous.liTimes[current.ID];
-tsRouteJourneyTime += tsAddedTime;
-tsRouteJourneyTime += current.tsWaitTime; //-not sure about
-
-//Cost (cost per dist, and time, and wait time)
-double dAddedCost = getCostPerMetre (previous.liDistances[current.ID]);
-dAddedCost += getCostPerTimeSpan(tsAddedTime);
-
-//Current Earliest start = earliest start to make this stop, same with latest
-TimeSpan currentEarliestStart = new TimeSpan (0,0,0);
-TimeSpan currentLatestStart = new TimeSpan(0, 0, 0);
-currentEarliestStart = current.tsEarlyTime - tsRouteJourneyTime;
-currentLatestStart = current.tsLateTime - tsRouteJourneyTime;
-
-
-//	  |  |							routeVars
-//		| |__________________| |    current e/l starts
-//		||							new routevars
-//if the earliest time at the stop - journey time means the truck has to start later
-//set the route earliest time to the later time.
-if (currentEarliestStart > tsRouteEarliestStart) {
-	tsRouteEarliestStart = currentEarliestStart;
-}
-
-//		|	|						routeVars
-//		| |__________________| |    current e/l starts
-//		| |							new routevars
-if (currentLatestStart < tsRouteLatestStart) {
-	tsRouteLatestStart = currentLatestStart;
-}
-
-//	  ||							routeVars
-//		| |__________________| |    current e/l starts
-//	   ||Wait Time					(new journeytime)
-//	   | routeVars (e & l)
-//If you need to wait before you get there...
-if (currentEarliestStart > tsRouteLatestStart) {
-
-	//Time (add on the extra wait)
-	tsRouteJourneyTime += currentEarliestStart - tsRouteLatestStart;
-
-	//Cost (add on the extra cost of waiting)
-	dAddedCost += getCostPerTimeSpan(currentEarliestStart - tsRouteLatestStart);
-
-	//Set the earliest start to a bit later
-	tsRouteEarliestStart = tsRouteLatestStart;
-}
-
-printCurrentTimeWindows((Stop)current, currentEarliestStart, currentLatestStart);//only prints if on
-
-
-//			||						routeVars
-//		| |__________________| |    current e/l starts
-//Even getting there at the latest time, cannot leave early enough
-if (tsRouteEarliestStart > currentLatestStart) {
-	bReturn = false;
-}
-
-
-//Must be valid so return
-dCurrRouteCost += dAddedCost;
-if (bSetStopVars) {
-	current.dCost = dAddedCost;
-	current.tsEarliestArrival = tsRouteEarliestStart + tsRouteJourneyTime;
-	current.tsLatestArrival = tsRouteLatestStart + tsRouteJourneyTime;
-	current.iOrder = iOrder;
-}
-return bReturn;
-}
-
-
-
-}*/

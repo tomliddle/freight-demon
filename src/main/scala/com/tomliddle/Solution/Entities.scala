@@ -30,52 +30,46 @@ case class Link(waitTime: Duration = new Duration(0), travelDistanceTime: Distan
 
 case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None)
 
-case class Depot(name: String, location: Location, userId: Int, id: Option[Int] = None)
+class Point(val name: String, val location: Location)
 
-case class Stop(name: String, location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None)
+case class Depot(override val name: String, override val location: Location, userId: Int, id: Option[Int] = None) extends Point(name, location)
 
-abstract class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends TimeAndDistCalc {
+case class Stop(override val name: String, override val location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) extends Point(name, location)
 
-	private val stopDistancesAndTimes: Map[Stop, Map[Stop, DistanceTime]] = {
+abstract class LocationMatrix(stops: List[Point], depots: List[Point]) extends TimeAndDistCalc {
+
+	private val distancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
 		stops.map {
-			stop1: Stop => {
+			stop1: Point => {
 				// Map of [Stop, DistanceTime]
 				stop1 -> stops.map {
-					stop2: Stop =>
+					stop2: Point =>
 						stop2 -> getDistanceTime(stop1.location, stop2.location)
-				}.toMap[Stop, DistanceTime]
+				}.toMap[Point, DistanceTime]
 			}
 		}.toMap
 	}
 
-	private val depotDistancesAndTimes: Map[Depot, Map[Stop, DistanceTime]] = {
+	private val depotDistancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
 		depots.map {
-			depot: Depot => {
+			depot: Point => {
 				// Map of [Stop, DistanceTime]
 				depot -> stops.map {
-					stop: Stop =>
+					stop: Point =>
 						stop -> getDistanceTime(depot.location, stop.location)
-				}.toMap[Stop, DistanceTime]
+				}.toMap[Point, DistanceTime]
 			}
 		}.toMap
 	}
 
 
-	def findFurthest(depot: Depot): Stop  = depotDistancesAndTimes(depot).toList.sortBy(_._2.distance).last._1
+	def findFurthest(depot: Point): Point  = depotDistancesAndTimes(depot).toList.sortBy(_._2.distance).last._1
 
-	def findNearest(stop: Stop): Stop = stopDistancesAndTimes(stop).toList.sortBy(_._2.distance).head._1
+	def findNearest(stop: Point): Point = distancesAndTimes(stop).toList.sortBy(_._2.distance).head._1
 
-	//def distanceBetween(depot: Depot, stop: Stop): BigDecimal = depotDistancesAndTimes(depot)(stop).distance
+	def distanceTimeBetween(stop1: Point, stop2: Point): DistanceTime = distancesAndTimes(stop1)(stop2)
 
-	//def distanceBetween(stop1: Stop, stop2: Stop): BigDecimal = stopDistancesAndTimes(stop1)(stop2).distance
-
-	//def timeBetween(depot: Depot, stop: Stop): Duration = depotDistancesAndTimes(depot)(stop).time
-
-	//def timeBetween(stop1: Stop, stop2: Stop): Duration = stopDistancesAndTimes(stop1)(stop2).time
-
-	def distanceTimeBetween(stop1: Stop, stop2: Stop): DistanceTime = stopDistancesAndTimes(stop1)(stop2)
-
-	def distanceTimeBetween(depot: Depot, stop: Stop): DistanceTime = depotDistancesAndTimes(depot)(stop)
+	def distanceTimeBetween(depot: Depot, stop: Point): DistanceTime = depotDistancesAndTimes(depot)(stop)
 }
 
 

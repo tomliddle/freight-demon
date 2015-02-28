@@ -40,7 +40,22 @@ class TruckLinksSpec extends WordSpec with Matchers with BeforeAndAfterEach with
 				linkDistanceTime.travelDistanceTime.time should equal (new Duration(20 * 1000 * 1000))
 
 				// TODO check value
-				linkDistanceTime.elapsedTime should equal (new Duration(30 * 1000 * 1000))
+				linkDistanceTime.elapsedTime should equal (new Duration(37200 * 1000))
+			}
+
+			"throw exception with an invalid route" in {
+
+				try {
+					val links = invalidTruck.getLinks()
+					fail("Should have thrown an exception")
+				}
+				catch {
+					case _: RouteInvalidException => // Expected, so continue
+				}
+
+
+
+
 			}
 
 		}

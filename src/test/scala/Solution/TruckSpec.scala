@@ -16,26 +16,25 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 		"Getting parameters" should {
 
 			"get correct weight" in {
-				truck.getTotalWeight should equal (10)
+				truck.totalWeight should equal (10)
 			}
 
 			"get correct cost" in {
 				// TODO check
-				truck.getCost() should equal (BigDecimal(21.26))
+				truck.cost should equal (BigDecimal(21.26))
 			}
 
 			"get correct distance time" in {
-				val distanceTime = truck.getDistanceTime()
 				// TODO check
-				distanceTime.distance.setScale(2, BigDecimal.RoundingMode.HALF_UP) should equal (BigDecimal(17.72))
-				distanceTime.time should equal (new Duration((17715).toLong))
+				truck.distance.setScale(2, BigDecimal.RoundingMode.HALF_UP) should equal (BigDecimal(17.72))
+				truck.time should equal (new Duration((17715).toLong))
 
 			}
 
 			"get an optimised solution" in {
 				val shuffledTruck = truck.shuffle()
 
-				shuffledTruck.getCost() should be < (truck.getCost())
+				shuffledTruck.cost should be < (truck.cost)
 
 				// tODO more checks
 			}

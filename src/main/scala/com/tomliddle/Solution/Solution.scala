@@ -2,25 +2,25 @@ package com.tomliddle.solution
 
 case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, id: Option[Int] = None) {
 
-	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.getCost}
+	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
 
 	def isValid: Boolean = {
-		getLoadedCities.size == getLoadedCities.distinct.size &&
+		loadedCities.size == loadedCities.distinct.size &&
 		trucks.foldLeft(true)((valid: Boolean, truck: Truck) => valid && truck.isValid) &&
 		stopsToLoad.distinct.size == stopsToLoad.size &&
-		getLoadedCities.distinct.size == getLoadedCities.size
+			loadedCities.distinct.size == loadedCities.size
 	}
 
-	def getDistanceTime(): DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + b.getDistanceTime()}
+	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + new DistanceTime(b.distance, b.time)}
 
-	def getLoadedCities(): List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
+	lazy val loadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
-	def getMaxSolutionSwapSize(): Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.getMaxSwapSize}
+	lazy val maxSolutionSwapSize: Int = trucks.foldLeft(0){(size: Int, truck: Truck) => size max truck.getMaxSwapSize}
 
-	def getCost(): BigDecimal = getTotalCost(trucks)
+	lazy val cost: BigDecimal = getTotalCost(trucks)
 
 	override def toString() = {
-		"Valid:" + isValid + " Cost:" + getCost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + getDistanceTime() + "\n" +
+		"Valid:" + isValid + " Cost:" + cost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + distanceTime + "\n" +
 		trucks.map(_.toString).toString
 	}
 
@@ -73,7 +73,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 
 								// If trucks fully reloaded, check the cost.
 								if (truck1Load._2.size == 0 && truck2Load._2.size == 0 &&
-									truck1Load._1.getCost + truck2Load._1.getCost < truck1.getCost() + truck2.getCost())
+									truck1Load._1.cost + truck2Load._1.cost < truck1.cost + truck2.cost)
 									returnTrucks = Some(truck1Load._1, truck2Load._1)
 							}
 						}

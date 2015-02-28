@@ -74,5 +74,20 @@ trait TestObjects {
 		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
 	}
 
+	// With delivery times to test start and end times
+	val invalidTruck: Truck = {
+		val stops2: List[Stop] = (0 to straightLineLocations.size - 1).map {
+			id => stop.copy(
+				id = Some(id),
+				location = straightLineLocations(id),
+				startTime = new LocalTime(0).withHourOfDay(11),
+				endTime = new LocalTime(0).withHourOfDay(11)
+			)
+		}.toList
+
+		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
+		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
+	}
+
 	val solution = Solution("Solution", depot, truck.stops, List(truck, truck, truck), 1)
 }
