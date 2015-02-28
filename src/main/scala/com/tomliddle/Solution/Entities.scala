@@ -39,7 +39,7 @@ case class Stop(override val name: String, override val location: Location, star
 abstract class LocationMatrix(stops: List[Point], depots: List[Point]) extends TimeAndDistCalc {
 
 	private val distancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
-		stops.map {
+		(stops ++ depots).map {
 			stop1: Point => {
 				// Map of [Stop, DistanceTime]
 				stop1 -> stops.map {
@@ -50,26 +50,10 @@ abstract class LocationMatrix(stops: List[Point], depots: List[Point]) extends T
 		}.toMap
 	}
 
-	private val depotDistancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
-		depots.map {
-			depot: Point => {
-				// Map of [Stop, DistanceTime]
-				depot -> stops.map {
-					stop: Point =>
-						stop -> getDistanceTime(depot.location, stop.location)
-				}.toMap[Point, DistanceTime]
-			}
-		}.toMap
-	}
-
-
-	def findFurthest(depot: Point): Point  = depotDistancesAndTimes(depot).toList.sortBy(_._2.distance).last._1
-
-	def findNearest(stop: Point): Point = distancesAndTimes(stop).toList.sortBy(_._2.distance).head._1
+	def findFurthestStop(point: Point): Point  = distancesAndTimes(point).toList.filter(_._1.isInstanceOf[Stop]).sortBy(_._2.distance).last._1
 
 	def distanceTimeBetween(stop1: Point, stop2: Point): DistanceTime = distancesAndTimes(stop1)(stop2)
 
-	def distanceTimeBetween(depot: Depot, stop: Point): DistanceTime = depotDistancesAndTimes(depot)(stop)
 }
 
 

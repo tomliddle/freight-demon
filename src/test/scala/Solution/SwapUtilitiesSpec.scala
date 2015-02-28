@@ -10,8 +10,8 @@ import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 class SwapUtilitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
 	private val location = new Location(1, 1, "324234")
-	private val stop = Stop("1", location, time, time, BigDecimal(0), List(), 1)
 	private val time = new LocalTime(0)
+	private val stop = Stop("1", location, time, time, BigDecimal(0), List(), 1)
 	private val stopList: List[Stop] = (0 to 9).map {id => stop.copy(id = Some(id))}.toList
 
 

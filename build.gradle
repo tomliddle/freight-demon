@@ -49,8 +49,8 @@ dependencies {
 	compile 'ch.qos.logback:logback-classic:1.0.13'
 
 	def akkaVersion = '2.3.9'
-	compile "com.typesafe.akka:akka-slf4j_2.10:$akkaVersion"
-	compile "com.typesafe.akka:akka-actor_2.10:$akkaVersion"
+	compile "com.typesafe.akka:akka-slf4j_2.11:$akkaVersion"
+	compile "com.typesafe.akka:akka-actor_2.11:$akkaVersion"
 
 	def scalaVersion = '2.11.5'
 	compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion

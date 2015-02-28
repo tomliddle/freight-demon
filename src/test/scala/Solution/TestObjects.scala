@@ -40,11 +40,11 @@ trait TestObjects {
 		location.copy(x = 100000, y = 0)
 	)
 
-	val truck: Truck = {
-		val stops: List[Stop] = (0 to locationList.size - 1).map {
-			id => stop.copy(id = Some(id), location = locationList(id))
-		}.toList
+	val stops: List[Stop] = (0 to locationList.size - 1).map {
+		id => stop.copy(id = Some(id), location = locationList(id))
+	}.toList
 
+	val truck: Truck = {
 		val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
 		Truck("Truck1", startTime, endTime, BigDecimal(100), depot, stops, lm, 1, Some(1))
 	}

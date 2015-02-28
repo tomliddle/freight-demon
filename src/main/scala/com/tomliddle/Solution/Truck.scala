@@ -79,7 +79,7 @@ case class Truck(
 
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
 		if (stops.size > 0) stops.minBy(stop => lm.getMetresDistance(stop.location, mean))
-		else lm.findFurthest(depot).asInstanceOf[Stop]
+		else lm.findFurthestStop(depot).asInstanceOf[Stop]
 	}
 
 	// Shuffle algorithem

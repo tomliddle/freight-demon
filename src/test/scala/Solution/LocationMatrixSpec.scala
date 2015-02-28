@@ -3,7 +3,7 @@ package Solution
 import org.joda.time.{Duration, DateTime}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
-class LocaitonMatrixSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
+class LocationMatrixSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
 
 	"LocationMatrix" when {
 
@@ -15,7 +15,23 @@ class LocaitonMatrixSpec extends WordSpec with Matchers with BeforeAndAfterEach 
 				distTime.distance should equal (BigDecimal(4))
 				distTime.time should equal (new Duration(400))
 			}
+		}
 
+		"getting the furthest stop" should  {
+
+			"get the furthest stop" in {
+
+				val stop = truck.lm.findFurthestStop(depot)
+
+				stop.location should equal(locationList.last)
+			}
+
+			"not get a depot and get the furthest stop" in {
+
+				val stop = truck.lm.findFurthestStop(stops.last)
+
+				stop should equal(stops(7))
+			}
 		}
 	}
 }
