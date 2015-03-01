@@ -1,22 +1,22 @@
 package com.tomliddle.controllers
 
-import java.text.SimpleDateFormat
+
 import java.util.concurrent.TimeUnit
-import akka.actor.{ActorSystem, ActorRef}
+
+import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.tomliddle.{DBStop, DBTruck, DatabaseSupport}
+import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{LatLongTimeAndDistCalc, Solution, LocationMatrix}
-import org.json4s.JsonAST.{JString, JObject}
-import org.json4s.JsonDSL.WithBigDecimal._
-import org.joda.time.{LocalDate, LocalTime}
+import com.tomliddle.solution.{LatLongTimeAndDistCalc, LocationMatrix, Solution}
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
+import org.json4s.JsonAST.JString
 import org.json4s._
-import org.json4s.ext.JodaTimeSerializers
-import org.scalatra.{RequestEntityTooLarge, FutureSupport}
 import org.scalatra.json.JacksonJsonSupport
-import org.scalatra.servlet.{SizeConstraintExceededException, FileUploadSupport, MultipartConfig}
+import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+import org.scalatra.{FutureSupport, RequestEntityTooLarge}
+
 import scala.concurrent.ExecutionContext
 
 case class Status(status: String)
@@ -113,7 +113,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val stops = db.getStops(user)
 		val depots = db.getDepots(user)
 
-		val lm = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
+		val lm = new LocationMatrix(stops, depots)
 
 		val trucks = dbTrucks.map {
 			dbTruck =>
@@ -122,8 +122,9 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 		dbSolutions.map {
 			dbSolution =>
-				dbSolution.toSolution(depots.head, stops, trucks)
+				dbSolution.toSolution(depots.head, stops, trucks).shuffle
 		}
+
 	}
 
 	get("/solution/:id") {
@@ -173,11 +174,11 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		val stops = db.getStops(user)
 		val depots = db.getDepots(user)
 
-		val lm = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
+		val lm: LocationMatrix = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
 
 		val trucks = dbTrucks.map {
 			dbTruck =>
-				dbTruck.toTruck(stops, depots.head, lm: LocationMatrix)
+				dbTruck.toTruck(stops, depots.head, lm)
 		}
 
 		val solution = db.getSolution(id, user)

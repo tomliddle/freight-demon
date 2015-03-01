@@ -160,11 +160,11 @@
 			</thead>
 		</table>
 
-		<div class="row">
+		<%--<div class="row">
 			<div class="col-xs-4">
 				<input class="btn btn-primary" name="run" type="submit" value="Run scheduler"/>
 			</div>
-		</div>
+		</div>--%>
 	</form>
 
 	<div id="map"></div>

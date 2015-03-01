@@ -36,12 +36,11 @@ case class Depot(override val name: String, override val location: Location, use
 
 case class Stop(override val name: String, override val location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) extends Point(name, location)
 
-abstract class LocationMatrix(stops: List[Point], depots: List[Point]) extends TimeAndDistCalc {
+ class LocationMatrix(stops: List[Point], depots: List[Point]) extends LatLongTimeAndDistCalc {
 
 	private val distancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
 		(stops ++ depots).map {
 			stop1: Point => {
-				// Map of [Stop, DistanceTime]
 				stop1 -> stops.map {
 					stop2: Point =>
 						stop2 -> getDistanceTime(stop1.location, stop2.location)
@@ -78,8 +77,8 @@ trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 	}
 
 	override def getDuration(stop1: Location, stop2: Location): Duration = {
-		// TODO 11.1111 m/s is 40kmph
-		new Duration((getMetresDistance(stop1, stop2) * 11.1111 * 1000).toLong)
+		// 50 is 20 m/s which is 72kmph
+		new Duration((getMetresDistance(stop1, stop2) * 50).toLong)
 	}
 
 }
