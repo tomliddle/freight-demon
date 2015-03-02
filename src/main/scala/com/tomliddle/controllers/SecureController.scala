@@ -130,7 +130,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	get("/solution/:id") {
 		contentType = formats("json")
 		val user = scentry.user.id.get
-		getSolution(params("id").toInt)
+		db.getSolution(params("id").toInt, user)
 
 	}
 
@@ -147,7 +147,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	get("/solution/run/:id") {
 		contentType = formats("json")
 
-		getSolution(params("id").toInt).map {
+		db.getSolution(params("id").toInt, scentry.user.id.get).map {
 			solution =>
 				solution.shuffle
 		}
@@ -165,28 +165,6 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	error {
 		case e: SizeConstraintExceededException => RequestEntityTooLarge("file is too big")
-	}
-
-	private def getSolution(id: Int): Option[Solution] = {
-		val user = scentry.user.id.get
-		//val dbSolutions = db.getSolutions(user)
-		val dbTrucks = db.getTrucks(user)
-		val stops = db.getStops(user)
-		val depots = db.getDepots(user)
-
-		val lm: LocationMatrix = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
-
-		val trucks = dbTrucks.map {
-			dbTruck =>
-				dbTruck.toTruck(stops, depots.head, lm)
-		}
-
-		val solution = db.getSolution(id, user)
-
-		solution.map {
-			solution =>
-				solution.toSolution(depots.head, stops, trucks)
-		}
 	}
 
 }

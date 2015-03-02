@@ -137,7 +137,7 @@ class SolutionMapView extends BaseView {
 	addToMap(entity) {
 		var x = entity.location.x;
 		var y = entity.location.y;
-		var marker = L.marker([y, x])
+		L.marker([y, x])
 			.addTo(this.map)
 			.bindPopup(entity.name);
 	}
@@ -146,7 +146,9 @@ class SolutionMapView extends BaseView {
 		var latlngs  = [this.getLatLng(depot)];
 
 		var stops = truck.stops;
+
 		for (var i = 0; i < stops.length; i++) {
+			alert(this.getLatLng(stops[i]));
 			latlngs.push(this.getLatLng(stops[i]));
 		}
 		latlngs.push(this.getLatLng(depot));
