@@ -1,11 +1,15 @@
 package com.tomliddle
 
-import java.sql.{Time}
+import java.sql.Time
+
+import Tables._
+import solution.Geocoding
 import solution._
-import org.joda.time.{LocalTime, DateTime}
+
+import org.joda.time.LocalTime
+
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
-import Tables._
 
 trait TypeConvert {
 
@@ -65,35 +69,24 @@ class Trucks(tag: Tag) extends Table[DBTruck](tag, "TRUCKS") with TypeConvert {
 	def * = (name, startTime, endTime, maxWeight, userId, id.?) <>(DBTruck.tupled, DBTruck.unapply)
 }
 
-case class DBDepot(name: String, x: Int, y: Int, address: String, userId: Int, id: Option[Int] = None) {
-	def toDepot(location: Location) = {
-		Depot(name, location, userId, id)
-	}
-}
-
-class Depots(tag: Tag) extends Table[DBDepot](tag, "DEPOTS") with TypeConvert {
+class Depots(tag: Tag) extends Table[Depot](tag, "DEPOTS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def x: Column[Int] = column[Int]("x")
-	def y: Column[Int] = column[Int]("y")
-	def address: Column[Int] = column[Int]("address")
+	def x: Column[BigDecimal] = column[BigDecimal]("x")
+	def y: Column[BigDecimal] = column[BigDecimal]("y")
+	def address: Column[String] = column[String]("address")
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, x, y, address, userId, id.?) <>(DBDepot.tupled, DBDepot.unapply)
+	def * = (name, x, y, address, userId, id.?) <>(Depot.tupled, Depot.unapply)
 }
 
-case class DBStop(name: String, x: Int, y: Int, address: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) {
-	def toStop(location: Location) = {
-		Stop(name, location, startTime, endTime, maxWeight, specialCodes, userId, id)
-	}
-}
 
-class Stops(tag: Tag) extends Table[DBStop](tag, "STOPS") with TypeConvert {
+class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 
 	def name: Column[String] = column[String]("name", O.NotNull)
-	def x: Column[Int] = column[Int]("x")
-	def y: Column[Int] = column[Int]("y")
-	def address: Column[Int] = column[Int]("address")
+	def x: Column[BigDecimal] = column[BigDecimal]("x")
+	def y: Column[BigDecimal] = column[BigDecimal]("y")
+	def address: Column[String] = column[String]("address")
 	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
@@ -101,7 +94,7 @@ class Stops(tag: Tag) extends Table[DBStop](tag, "STOPS") with TypeConvert {
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, x, y, address, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(DBStop.tupled, DBStop.unapply)
+	def * = (name, x, y, address, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
 case class DBSolution(name: String, userId: Int, id: Option[Int] = None) {
@@ -192,11 +185,11 @@ class DatabaseSupport(db: Database) extends Geocoding {
 
 	def getStops(userId: Int): List[Stop] = {
 		db.withDynSession {
-			stops.filter {stop => stop.userId === userId}.firstOption
+			stops.filter {stop => stop.userId === userId}.list
 		}
 	}
 
-	def addStop(stop: DBStop) = {
+	def addStop(stop: Stop) = {
 		db.withDynSession {
 			stops += stop
 		}
@@ -211,7 +204,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 	//************************ Depots ***********************************
 	def getDepots(userId: Int): List[Depot] = {
 		db.withDynSession {
-			depots.filter {depot => depot.userId === userId}.firstOption
+			depots.filter {depot => depot.userId === userId}.list
 		}
 	}
 

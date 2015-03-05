@@ -8,7 +8,7 @@ import akka.util.Timeout
 import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{LatLongTimeAndDistCalc, LocationMatrix, Solution}
+import com.tomliddle.solution.{Geocoding, LocationMatrix}
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import org.json4s.JsonAST.JString
@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext
 case class Status(status: String)
 
 class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
-		extends ScalateServlet with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
+		extends ScalateServlet with Geocoding with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
@@ -37,7 +37,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	)
 
 	protected implicit val timeout = Timeout(5, TimeUnit.SECONDS)
-	protected implicit val jsonFormats: Formats = DefaultFormats +  LocalTimeSerialiser
+	protected implicit val jsonFormats: Formats = DefaultFormats + LocalTimeSerialiser
 	protected implicit def executor: ExecutionContext = system.dispatcher
 
 
@@ -74,10 +74,12 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	post("/stop") {
 		var stopForm = parsedBody.extract[StopForm]
 
-		db.getLocation(stopForm.postcode).foreach {
-			location =>
-				val stop = stopForm.getStop(scentry.user.id.get, location.id.get)
+		geocodeFromOnline(stopForm.address) match {
+			case Some(xy) =>
+				val stop = stopForm.getStop(scentry.user.id.get, xy._1, xy._2)
 				db.addStop(stop)
+			case None => None
+
 		}
 	}
 

@@ -1,6 +1,6 @@
 package Solution
 
-import com.tomliddle.solution.{SwapUtilities, Location, Stop}
+import com.tomliddle.solution.{Point, SwapUtilities, Stop}
 import org.joda.time.{LocalTime, DateTime}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
@@ -9,9 +9,8 @@ import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
  */
 class SwapUtilitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
-	private val location = new Location(1, 1, "324234")
 	private val time = new LocalTime(0)
-	private val stop = Stop("1", location, time, time, BigDecimal(0), List(), 1)
+	private val stop = Stop("1", 1, 1, "23242234", time, time, BigDecimal(0), List(), 1)
 	private val stopList: List[Stop] = (0 to 9).map {id => stop.copy(id = Some(id))}.toList
 
 

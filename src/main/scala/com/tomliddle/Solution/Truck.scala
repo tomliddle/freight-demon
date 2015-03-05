@@ -1,11 +1,9 @@
 package com.tomliddle.solution
 
 
-import org.joda.time.{LocalTime, Duration}
+import org.joda.time.{Duration, LocalTime}
 import org.slf4j.LoggerFactory
 import scala.math.BigDecimal.RoundingMode
-
-
 
 case class Truck(
 					name: String,
@@ -75,10 +73,10 @@ case class Truck(
 		(currTruck, notLoadedCities)
 	}
 
-	private lazy val mean = getMean(stops.map(stop => stop.location))
+	private lazy val mean = getMean(stops)
 
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
-		if (stops.size > 0) stops.minBy(stop => lm.getMetresDistance(stop.location, mean))
+		if (stops.size > 0) stops.minBy(stop => lm.getMetresDistance(stop, mean))
 		else lm.findFurthestStop(depot).asInstanceOf[Stop]
 	}
 

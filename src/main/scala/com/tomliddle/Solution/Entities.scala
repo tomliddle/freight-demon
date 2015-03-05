@@ -1,6 +1,6 @@
 package com.tomliddle.solution
 
-import org.joda.time.{LocalTime, Duration}
+import org.joda.time.{Duration, LocalTime}
 
 
 class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration = new Duration(0)) {
@@ -28,13 +28,20 @@ case class Link(waitTime: Duration = new Duration(0), travelDistanceTime: Distan
 	def elapsedTime: Duration = travelDistanceTime.time.plus(waitTime)
 }
 
-case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None)
+//case class Location(x: BigDecimal = BigDecimal(0), y: BigDecimal = BigDecimal(0), postcode: String = "", id: Option[Int] = None)
 
-class Point(val name: String, val location: Location)
+class Point(val x: BigDecimal, val y: BigDecimal, val address: String) {
+	def +(operand: Point): Point = {
+		new Point(this.x + operand.x, this.y + operand.y, "")
+	}
+	def /(operand: Int): Point = {
+		new Point(this.x / operand, this.y / operand, this.address)
+	}
+}
 
-case class Depot(override val name: String, override val location: Location, userId: Int, id: Option[Int] = None) extends Point(name, location)
+case class Depot(name: String, override val x: BigDecimal,  override val y: BigDecimal, override val address: String, userId: Int, id: Option[Int] = None) extends Point(x, y, address)
 
-case class Stop(override val name: String, override val location: Location, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) extends Point(name, location)
+case class Stop(name: String, override val x: BigDecimal, override val y: BigDecimal, override val address: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) extends Point(x, y, address)
 
  class LocationMatrix(stops: List[Point], depots: List[Point]) extends LatLongTimeAndDistCalc {
 
@@ -43,7 +50,7 @@ case class Stop(override val name: String, override val location: Location, star
 			stop1: Point => {
 				stop1 -> stops.map {
 					stop2: Point =>
-						stop2 -> getDistanceTime(stop1.location, stop2.location)
+						stop2 -> getDistanceTime(stop1, stop2)
 				}.toMap[Point, DistanceTime]
 			}
 		}.toMap
@@ -59,7 +66,7 @@ case class Stop(override val name: String, override val location: Location, star
 
 trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 
-	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
+	override def getMetresDistance(location1: Point, location2: Point): BigDecimal = {
 		val R = 6371000 // m
 		var lat1 = location1.y.toDouble
 		var lat2 = location2.y.toDouble
@@ -76,7 +83,7 @@ trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 		BigDecimal(R * c)//.setScale(2, RoundingMode.HALF_UP)
 	}
 
-	override def getDuration(stop1: Location, stop2: Location): Duration = {
+	override def getDuration(stop1: Point, stop2: Point): Duration = {
 		// 50 is 20 m/s which is 72kmph
 		new Duration((getMetresDistance(stop1, stop2) * 50).toLong)
 	}
@@ -85,14 +92,14 @@ trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 
 trait SimpleTimeAndDistCalc extends TimeAndDistCalc {
 
-	override def getMetresDistance(location1: Location, location2: Location): BigDecimal = {
+	override def getMetresDistance(location1: Point, location2: Point): BigDecimal = {
 		val xdiff = location1.x.doubleValue() - location2.x.doubleValue()
 		val ydiff = location1.y.doubleValue() - location2.y.doubleValue()
 		val ans = math.hypot(xdiff, ydiff)
 		BigDecimal(ans)
 	}
 
-	override def getDuration(location1: Location, location2: Location): Duration = {
+	override def getDuration(location1: Point, location2: Point): Duration = {
 		// 10=m/s = 36kmph
 		new Duration ((getMetresDistance(location1, location2) * 100).toLong)
 	}
@@ -100,20 +107,20 @@ trait SimpleTimeAndDistCalc extends TimeAndDistCalc {
 
 trait TimeAndDistCalc {
 
-	def getMetresDistance(location1: Location, location2: Location): BigDecimal
+	def getMetresDistance(location1: Point, location2: Point): BigDecimal
 
-	def getDuration(location1: Location, location2: Location): Duration
+	def getDuration(location1: Point, location2: Point): Duration
 
-	def getDistanceTime(stop1: Location, stop2: Location): DistanceTime = {
+	def getDistanceTime(stop1: Point, stop2: Point): DistanceTime = {
 		new DistanceTime(getMetresDistance(stop1, stop2), getDuration(stop1, stop2))
 	}
 
 }
 
 trait Mean {
-	def getMean(locations: List[Location]): Location = {
-		locations.foldLeft(Location()) { (location1: Location, location2: Location) =>
-			Location(location1.x + location2.x, location1.y + location2.y, "")
-		}
+	def getMean(locations: List[Point]): Point = {
+		locations.foldLeft(new Point(0, 0, "")) { (location1: Point, location2: Point) =>
+			new Point(location1.x + location2.x, location1.y + location2.y, "")
+		} / locations.size
 	}
 }

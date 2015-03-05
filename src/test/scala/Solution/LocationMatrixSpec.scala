@@ -10,7 +10,7 @@ class LocationMatrixSpec extends WordSpec with Matchers with BeforeAndAfterEach 
 		"getting a time distance" should {
 
 			"get the correct time distance" in {
-				val distTime = truck.lm.getDistanceTime(truck.stops(0).location, truck.stops(1).location)
+				val distTime = truck.lm.getDistanceTime(truck.stops(0), truck.stops(1))
 
 				distTime.distance should equal (BigDecimal(4))
 				distTime.time should equal (new Duration(400))
@@ -23,7 +23,7 @@ class LocationMatrixSpec extends WordSpec with Matchers with BeforeAndAfterEach 
 
 				val stop = truck.lm.findFurthestStop(depot)
 
-				stop.location should equal(locationList.last)
+				stop should equal(stops.last)
 			}
 
 			"not get a depot and get the furthest stop" in {
