@@ -39,6 +39,15 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 				// tODO more checks
 			}
 
+			"shuffle a truck with one stop" in {
+				val truck: Truck = {
+					val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
+					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, List(stops(0)), lm, 1, Some(1))
+				}
+
+				truck.shuffle().cost should equal (truck.cost)
+			}
+
 		}
 	}
 }

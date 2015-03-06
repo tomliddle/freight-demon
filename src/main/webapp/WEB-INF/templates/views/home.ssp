@@ -14,12 +14,18 @@
 		<thead>
 			<tr>
 				<th>Name</th>
+				<th>X</th>
+				<th>Y</th>
+				<th>Postcode</th>
 			</tr>
 		</thead>
 		<tbody>
 			{{#each depots}}
 			<tr>
 				<td>{{name}}</td>
+				<td>{{x}}</td>
+				<td>{{y}}</td>
+				<td>{{address}}</td>
 			</tr>
 			{{/each}}
 		</tbody>
@@ -110,7 +116,7 @@
 				</div>
 				<div class="form-group">
 					<label for="name">Postcode</label>
-					<input type="text" class="form-control" name="postcode" />
+					<input type="text" class="form-control" name="address" />
 				</div>
 				<div class="form-group">
 					<input class="btn btn-primary" type="submit" value="Add"/>
@@ -126,6 +132,9 @@
 				<th>Start time</th>
 				<th>End time</th>
 				<th>Weight (kg)</th>
+				<th>X</th>
+				<th>Y</th>
+				<th>Postcode</th>
 				<th>Action</th>
 			</tr>
 		</thead>
@@ -136,6 +145,9 @@
 				<td>{{startTime}}</td>
 				<td>{{endTime}}</td>
 				<td>{{maxWeight}}</td>
+				<td>{{x}}</td>
+				<td>{{y}}</td>
+				<td>{{address}}</td>
 				<td><input class="btn remove" name="remove" type="submit" data-id="{{id}}" value="Remove"/></td>
 			</tr>
 			{{/each}}

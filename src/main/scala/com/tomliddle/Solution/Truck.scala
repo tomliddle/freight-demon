@@ -89,6 +89,7 @@ case class Truck(
 		def doShuffle(groupSizeMin: Int, groupSizeMax: Int, solution: Truck): Truck = {
 			require(groupSizeMax >= groupSizeMin)
 			require(groupSizeMin > 0)
+			logger.debug(s"Shuffle ${groupSizeMin} ${groupSizeMax} sol:${solution.stops.size}")
 
 			(groupSizeMin to groupSizeMax).foreach {
 				groupSize => {
@@ -104,7 +105,9 @@ case class Truck(
 			bestSol
 		}
 
-		doShuffle(1, getMaxSwapSize(), bestSol)
+		if (getMaxSwapSize() > 1)
+			doShuffle(1, getMaxSwapSize(), bestSol)
+		else this
 	}
 
 	// This could be more efficient
@@ -132,6 +135,8 @@ case class Truck(
 
 		assert(newSolution.stops.size == stops.size)
 		assert(newSolution2.stops.size == stops.size)
+		assert(newSolution.stops.distinct.size == newSolution.stops.size, s"swapping ${groupSize} ${newSolution.stops.distinct.size} != ${newSolution.stops.size}")
+		assert(newSolution2.stops.distinct.size == newSolution2.stops.size, s"swapping ${groupSize} ${newSolution2.stops.distinct.size} != ${newSolution2.stops.size}")
 
 		List(newSolution, newSolution2).sortBy(_.cost).head
 	}

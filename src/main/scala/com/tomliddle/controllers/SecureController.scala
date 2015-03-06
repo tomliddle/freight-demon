@@ -122,11 +122,12 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 				dbTruck.toTruck(stops, depots.head, lm)
 		}
 
-		dbSolutions.map {
+		val sol = dbSolutions.map {
 			dbSolution =>
 				dbSolution.toSolution(depots.head, stops, trucks).shuffle
 		}
 
+		sol
 	}
 
 	get("/solution/:id") {

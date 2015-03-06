@@ -135,8 +135,8 @@ class SolutionMapView extends BaseView {
 	}
 
 	addToMap(entity) {
-		var x = entity.location.x;
-		var y = entity.location.y;
+		var x = entity.x;
+		var y = entity.y;
 		L.marker([y, x])
 			.addTo(this.map)
 			.bindPopup(entity.name);
@@ -148,9 +148,9 @@ class SolutionMapView extends BaseView {
 		var stops = truck.stops;
 
 		for (var i = 0; i < stops.length; i++) {
-			alert(this.getLatLng(stops[i]));
 			latlngs.push(this.getLatLng(stops[i]));
 		}
+
 		latlngs.push(this.getLatLng(depot));
 
 		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
@@ -160,7 +160,7 @@ class SolutionMapView extends BaseView {
 	}
 
 	getLatLng(entity) {
-		return L.latLng(entity.location.y, entity.location.x)
+		return L.latLng(entity.y, entity.x)
 	}
 }
 
