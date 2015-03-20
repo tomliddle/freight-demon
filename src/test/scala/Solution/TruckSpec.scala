@@ -26,7 +26,7 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 
 			"get correct distance time" in {
 				// TODO check
-				truck.distance.setScale(2, BigDecimal.RoundingMode.HALF_UP) should equal (BigDecimal(17.72))
+				truck.distance.get.setScale(2, BigDecimal.RoundingMode.HALF_UP) should equal (BigDecimal(17.72))
 				truck.time should equal (new Duration((17715).toLong))
 
 			}

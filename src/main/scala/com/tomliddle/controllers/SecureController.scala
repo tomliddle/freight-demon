@@ -119,12 +119,12 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 		val trucks = dbTrucks.map {
 			dbTruck =>
-				dbTruck.toTruck(stops, depots.head, lm)
+				dbTruck.toTruck(List(), depots.head, lm)
 		}
 
 		val sol = dbSolutions.map {
 			dbSolution =>
-				dbSolution.toSolution(depots.head, stops, trucks).shuffle
+				dbSolution.toSolution(depots.head, stops, trucks).preload.shuffle
 		}
 
 		sol

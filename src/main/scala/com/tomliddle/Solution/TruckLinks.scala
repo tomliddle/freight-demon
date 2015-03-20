@@ -8,13 +8,14 @@ class RouteInvalidException(message: String) extends Exception
 trait TruckLinks {
 	this: Truck =>
 
-	@throws[RouteInvalidException]
-	def getLinks(): List[Link] = {
+
+	def getLinks: Option[List[Link]] = {
 
 		var routeEarliestStartTime: LocalTime = startTime
 		var routeLatestStartTime: LocalTime = endTime
 		var routeJourneyTime = new Duration(0)
 
+		@throws[RouteInvalidException]
 		def getNextLink(stop1: Stop, stop2: Stop): Link = {
 
 			//logger.trace("GET LINK ---------------------")
@@ -85,15 +86,24 @@ trait TruckLinks {
 			else (Link(), Link())
 
 
+		def getStopLinks: List[Link] = {
+			if (stops.size > 1)
+				stops.sliding(2).map {
+					(currCities: List[Stop]) =>
+						getNextLink(currCities(0), currCities(1))
+				}.toList
+			else List()
+		}
 
-		val stopLinks: List[Link] = if (stops.size > 1)
-			stops.sliding(2).map {
-				(currCities: List[Stop]) =>
-					getNextLink(currCities(0), currCities(1))
-			}.toList
-		else List()
+		try {
+			Some(List(depotLinks._1) ++ getStopLinks ++ List(depotLinks._2))
+		}
+		catch {
+			case rie: RouteInvalidException =>
+				None
+		}
 
-		List(depotLinks._1) ++ stopLinks ++ List(depotLinks._2)
+
 	}
 }
 

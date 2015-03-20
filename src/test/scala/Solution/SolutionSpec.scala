@@ -11,15 +11,15 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 		"calculating the cost" should {
 
 			"calculate the correct cost" in {
-				solution.cost should equal (truck.cost * 3)
+				solution.cost should equal (truck.cost.get * 3)
 			}
 
 			"calculate the correct distance " in {
-				solution.distanceTime.distance should equal (truck.distance * 3)
+				solution.distanceTime.distance should equal (truck.distance.get * 3)
 			}
 
 			"calculate the correct time " in {
-				solution.distanceTime.time should equal (truck.time.plus(truck.time).plus(truck.time))
+				solution.distanceTime.time should equal (truck.time.get.plus(truck.time.get).plus(truck.time.get))
 			}
 
 			"calculate the correct shuffled cost" in {
@@ -28,7 +28,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 
 				cost should be < (solution.cost)
 
-				cost should equal (truck.shuffle().cost * 3)
+				cost should equal (truck.shuffle.cost.get * 3)
 
 			}
 

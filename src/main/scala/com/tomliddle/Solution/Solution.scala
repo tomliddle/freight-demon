@@ -2,7 +2,7 @@ package com.tomliddle.solution
 
 case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, id: Option[Int] = None) {
 
-	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost}
+	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost.get}
 
 	def isValid: Boolean = {
 		loadedCities.size == loadedCities.distinct.size &&
@@ -11,7 +11,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 			loadedCities.distinct.size == loadedCities.size
 	}
 
-	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + new DistanceTime(b.distance, b.time)}
+	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()){(a : DistanceTime, b: Truck) => a + new DistanceTime(b.distance.get, b.time.get)}
 
 	lazy val loadedCities: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ++ truck.stops)
 
@@ -73,7 +73,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 
 								// If trucks fully reloaded, check the cost.
 								if (truck1Load._2.size == 0 && truck2Load._2.size == 0 &&
-									truck1Load._1.cost + truck2Load._1.cost < truck1.cost + truck2.cost)
+									truck1Load._1.cost.get + truck2Load._1.cost.get < truck1.cost.get + truck2.cost.get)
 									returnTrucks = Some(truck1Load._1, truck2Load._1)
 							}
 						}

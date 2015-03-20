@@ -118,28 +118,22 @@ class SolutionMapView extends BaseView {
 	}
 
 	drawSolution(solution) {
-		var stopsToLoad = solution.get("stopsToLoad");
-
-		for (var i = 0; i < stopsToLoad.length; i++) {
-			this.addToMap(stopsToLoad[i]);
-		}
-
 		var depot = solution.get("depot");
-		this.addToMap(depot);
+		this.addToMap(0, depot);
 
 		var trucks = solution.get("trucks");
 
-		for (i = 0; i < trucks.length; i++) {
+		for (var i = 0; i < trucks.length; i++) {
 			this.drawRoute(trucks[i], depot);
 		}
 	}
 
-	addToMap(entity) {
+	addToMap(number, entity) {
 		var x = entity.x;
 		var y = entity.y;
 		L.marker([y, x])
 			.addTo(this.map)
-			.bindPopup(entity.name);
+			.bindPopup(number + " " + entity.name + " " + entity.startTime + " " + entity.endTime);
 	}
 
 	drawRoute(truck, depot) {
@@ -148,7 +142,10 @@ class SolutionMapView extends BaseView {
 		var stops = truck.stops;
 
 		for (var i = 0; i < stops.length; i++) {
-			latlngs.push(this.getLatLng(stops[i]));
+			var stopCoords = this.getLatLng(stops[i]);
+			latlngs.push(stopCoords);
+
+			this.addToMap(i + 1, stops[i]);
 		}
 
 		latlngs.push(this.getLatLng(depot));
