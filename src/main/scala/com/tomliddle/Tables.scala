@@ -3,9 +3,7 @@ package com.tomliddle
 import java.sql.Time
 
 import Tables._
-import solution.Geocoding
 import solution._
-
 import org.joda.time.LocalTime
 
 import scala.slick.driver.H2Driver.simple._
