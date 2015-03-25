@@ -32,7 +32,7 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 			}
 
 			"get an optimised solution" in {
-				val shuffledTruck = truck.shuffle()
+				val shuffledTruck = truck.shuffle
 
 				shuffledTruck.cost should be < (truck.cost)
 
@@ -45,7 +45,7 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, List(stops(0)), lm, 1, Some(1))
 				}
 
-				truck.shuffle().cost should equal (truck.cost)
+				truck.shuffle.cost should equal (truck.cost)
 			}
 
 		}

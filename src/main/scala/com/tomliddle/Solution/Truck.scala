@@ -102,7 +102,7 @@ case class Truck(
 		var best: Truck = this
 
 		def doShuffle(groupSizeMin: Int, groupSizeMax: Int): Truck = {
-			require(groupSizeMax >= groupSizeMin)
+			//require(groupSizeMax >= groupSizeMin)
 			require(groupSizeMin > 0)
 			logger.debug(s"Shuffle ${groupSizeMin} ${groupSizeMax} sol:${best.stops.size}")
 
@@ -122,6 +122,7 @@ case class Truck(
 		}
 
 		if (getMaxSwapSize > 1) {
+			//We start from swapping 1 to max, then from max to 1 or it doesn't optimise properly.
 			best = doShuffle(1, getMaxSwapSize)
 			doShuffle(getMaxSwapSize, 1)
 		}
