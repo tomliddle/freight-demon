@@ -38,17 +38,6 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def * = (email, name, passwordHash, id.?) <>(User.tupled, User.unapply)
 }
 
-//************************** POSTCODE *****************************************
-/*class Locations(tag: Tag) extends Table[Location](tag, "LOCATIONS") {
-	def x: Column[BigDecimal] = column[BigDecimal]("x", O.NotNull)
-	def y: Column[BigDecimal] = column[BigDecimal]("y", O.NotNull)
-	def postcode: Column[String] = column[String]("postcode", O.NotNull)
-	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-
-	def * = (x, y, postcode, id.?) <>(Location.tupled, Location.unapply)
-}*/
-
-
 // ************************ TRUCK STUFF ***************************************
 
 case class DBTruck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
@@ -56,7 +45,6 @@ case class DBTruck(name: String, startTime: LocalTime, endTime: LocalTime, maxWe
 		Truck(name, startTime, endTime, maxWeight, depot, stops, lm, userId, id)
 	}
 }
-//Truck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None)
 
 class Trucks(tag: Tag) extends Table[DBTruck](tag, "TRUCKS") with TypeConvert {
 	def name: Column[String] = column[String]("name", O.NotNull)
@@ -115,7 +103,6 @@ class Solutions(tag: Tag) extends Table[DBSolution](tag, "SOLUTIONS") with TypeC
 
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]
-	//val locations: TableQuery[Locations] = TableQuery[Locations]
 	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
 	val depots: TableQuery[Depots] = TableQuery[Depots]
 	val stops: TableQuery[Stops] = TableQuery[Stops]

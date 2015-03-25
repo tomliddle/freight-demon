@@ -50,7 +50,6 @@ case class Truck(
 
 	lazy val links: Option[List[Link]] = getLinks
 
-
 	def getMaxSwapSize = stops.size / 2
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
@@ -96,17 +95,16 @@ case class Truck(
 			case None => lm.findFurthestStop(depot).asInstanceOf[Stop]
 		}
 	}
-	// TODO - should this require a valid truck or not????
+
 	// Shuffle algorithem
 	def shuffle: Truck = {
 		logger.debug("Shuffling ------------------")
-		//require(isValid, "cannot shuffle a non valid truck")
 		var best: Truck = this
 
-		def doShuffle(groupSizeMin: Int, groupSizeMax: Int, solution: Truck): Truck = {
+		def doShuffle(groupSizeMin: Int, groupSizeMax: Int): Truck = {
 			require(groupSizeMax >= groupSizeMin)
 			require(groupSizeMin > 0)
-			logger.debug(s"Shuffle ${groupSizeMin} ${groupSizeMax} sol:${solution.stops.size}")
+			logger.debug(s"Shuffle ${groupSizeMin} ${groupSizeMax} sol:${best.stops.size}")
 
 			(groupSizeMin to groupSizeMax).map {
 				groupSize => {
@@ -115,7 +113,7 @@ case class Truck(
 							if (truck.isValid && truck.cost.get < best.cost.get) {
 								best = truck
 								logger.debug("New solution found: {}", best.cost.get)
-								doShuffle(1, getMaxSwapSize, best)
+								doShuffle(1, getMaxSwapSize)
 							}
 					}
 				}
@@ -123,12 +121,19 @@ case class Truck(
 			best
 		}
 
-		if (getMaxSwapSize > 1)
-			doShuffle(1, getMaxSwapSize, best)
+		if (getMaxSwapSize > 1) {
+			best = doShuffle(1, getMaxSwapSize)
+			doShuffle(getMaxSwapSize, 1)
+		}
 		else this
 	}
-	// TODO - should this require a valid truck or not????
-	// This could be more efficient
+
+	/**
+	 * Doesn't require a valid truck to start with
+	 * // This could be more efficient
+	 * @param groupSize
+	 * @return
+	 */
 	private def shuffleBySize(groupSize: Int): Option[Truck] = {
 		require(groupSize > 0, "groupsize is 0")
 		require(groupSize <= stops.size, "groupsize too big")

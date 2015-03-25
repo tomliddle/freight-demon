@@ -35,8 +35,8 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			"have the right stops" in {
 				val shuffledSolution = solution.shuffle
 
-				solution.loadedCities.size should equal (solution.loadedCities.distinct.size)
-				shuffledSolution.loadedCities.size should equal (shuffledSolution.loadedCities.distinct.size)
+				solution.loadedCities.size should equal (30)
+				shuffledSolution.loadedCities.size should equal (30)
 
 			}
 
@@ -60,7 +60,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 				val solution = Solution("Solution", depot, truck.stops, List(truck, truck, truck), 1)
 				val shuffledSolution = solution.shuffle
 
-				solution.loadedCities.size should equal (shuffledSolution.loadedCities.distinct.size)
+				solution.loadedCities.size should equal (30)
 			}
 
 		}

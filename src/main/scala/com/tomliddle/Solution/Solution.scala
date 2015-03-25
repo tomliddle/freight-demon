@@ -7,7 +7,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 	def isValid: Boolean = {
 		loadedCities.size == loadedCities.distinct.size &&
 		trucks.foldLeft(true)((valid: Boolean, truck: Truck) => valid && truck.isValid) &&
-		stopsToLoad.distinct.size == stopsToLoad.size &&
+			stopsToLoad.distinct.size == stopsToLoad.size &&
 			loadedCities.distinct.size == loadedCities.size
 	}
 
