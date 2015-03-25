@@ -99,10 +99,17 @@
 					<td><input type="text" class="form-control" name="name" required="true" /></td>
 					<td><input type="time" class="form-control" name="startTime" value="09:00" required="true"/></td>
 					<td><input type="time" class="form-control" name="endTime" value="17:00" required="true"/></td>
-					<td><input type="number"  class="form-control" name="maxWeight" value="50" required="true"/></td>
-					<td></td>
-					<td></td>
-					<td><input type="text" class="form-control" name="address" required="true" /></td>
+					<td><input type="number" class="form-control" name="maxWeight" value="50" required="true"/></td>
+					<td><input type="number" class="form-control lat-lng" name="x" required="true" readonly="true"/></td>
+					<td><input type="number" class="form-control lat-lng" name="y" required="true" readonly="true"/></td>
+					<td>
+						<div class="input-group">
+							<input type="text" class="form-control" name="address" required="true" />
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+							</span>
+						</div>
+					</td>
 					<td><input class="btn btn-primary" type="submit" value="Add"/></td>
 				</tr>
 

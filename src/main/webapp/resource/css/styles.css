@@ -3,3 +3,7 @@
 .solution {
 	margin-bottom: 30px;
 }
+
+input.form-control.lat-lng {
+	width: 70px;
+}

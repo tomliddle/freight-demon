@@ -15,8 +15,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>FreightDemon</title>
 
-	<link href="/resource/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/resource/css/leaflet.css" rel="stylesheet">
+	<link href="/resource/css/vendor/bootstrap.min.css" rel="stylesheet">
+	<link href="/resource/css/vendor/leaflet.css" rel="stylesheet">
 <link href="/resource/css/styles.css" rel="stylesheet">
 	<style>
 		body {
