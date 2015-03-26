@@ -1,0 +1,59 @@
+
+class SolutionMapView extends BaseView {
+	constructor(options) {
+		super(options);
+	}
+
+	render(){
+		this.$el.html(Templates.mapTemplate());
+		this.map = L.map('map').setView([51.505, -0.09], 13);
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(this.map);
+		return this;
+	}
+
+	drawSolution(solution) {
+		var depot = solution.get("depot");
+		this.addToMap(0, depot);
+
+		var trucks = solution.get("trucks");
+
+		for (var i = 0; i < trucks.length; i++) {
+			this.drawRoute(trucks[i], depot);
+		}
+	}
+
+	addToMap(number, entity) {
+		var x = entity.x;
+		var y = entity.y;
+		L.marker([y, x])
+			.addTo(this.map)
+			.bindPopup(number + " " + entity.name + " " + entity.startTime + " " + entity.endTime);
+	}
+
+	drawRoute(truck, depot) {
+		var latlngs  = [this.getLatLng(depot)];
+
+		var stops = truck.stops;
+
+		for (var i = 0; i < stops.length; i++) {
+			var stopCoords = this.getLatLng(stops[i]);
+			latlngs.push(stopCoords);
+
+			this.addToMap(i + 1, stops[i]);
+		}
+
+		latlngs.push(this.getLatLng(depot));
+
+		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
+
+		// zoom the map to the polyline
+		this.map.fitBounds(polyline.getBounds());
+	}
+
+	getLatLng(entity) {
+		return L.latLng(entity.y, entity.x)
+	}
+}
+
+
+

@@ -3,6 +3,7 @@
 <script src="/resource/js/stop-backbone.js"></script>
 <script src="/resource/js/depot-backbone.js"></script>
 <script src="/resource/js/solution-backbone.js"></script>
+<script src="/resource/js/map-backbone.js"></script>
 
 <script id="depot-list-template" type="text/x-handlebars-template">
 	<div class="row">
@@ -131,7 +132,7 @@
 </script>
 
 <script id="solution-page-template" type="text/x-handlebars-template">
-	<%--<div class="row">
+	<div class="row">
 		<div class="col-xs-4">
 			<h2>Solutions</h2>
 		</div>
@@ -146,16 +147,20 @@
 				</tr>
 			</thead>
 		</table>
+	</form>
 
-	</form>--%>
+</script>
 
+<script id="solution-template" type="text/x-handlebars-template">
+	<td><input type="radio" name="solution-select" class="solution-select" data-target="{{solution.id}}"/></td>
+	<td>{{solution.name}}</td>
+</script>
+
+<script id="map-template" type="text/x-handlebars-template">
 	<div id="map"></div>
 </script>
 
-<%--<script id="solution-template" type="text/x-handlebars-template">
-	<td><input type="radio" name="solution-select" class="solution-select" data-target="{{solution.id}}"/></td>
-	<td>{{solution.name}}</td>
-</script>--%>
+
 
 
 <div class="content"></div>

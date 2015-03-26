@@ -5,7 +5,8 @@ var Templates = Templates || {
 		this.depotListTemplate = Handlebars.compile($("#depot-list-template").html());
 
 		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
-		//this.solutionTemplate = Handlebars.compile($("#solution-template").html());
+		this.solutionTemplate = Handlebars.compile($("#solution-template").html());
+		this.mapTemplate = Handlebars.compile($("#map-template").html());
 
 	}
 };
@@ -60,32 +61,35 @@ class AppRouter extends Backbone.Router {
 			vehicles: "truckListView",
 			depots: "depotListView",
 			stops: "stopListView",
-			solution: "solutionPageView",
+			map: "solutionMapView",
 			"*actions": "defaultRoute" // Backbone will try to match the route above first
 		};
 		super(options);
 	}
 
-	defaultRoute () {}
+	defaultRoute() {
+		this.view && this.view.close();
+		this.view = new SolutionPageView();
+	}
 
-	truckListView () {
+	truckListView() {
 		this.view && this.view.close();
 		this.view = new TruckListView();
 	}
 
-	depotListView () {
+	depotListView() {
 		this.view && this.view.close();
 		this.view = new DepotListView();
 	}
 
-	stopListView () {
+	stopListView() {
 		this.view && this.view.close();
 		this.view = new StopListView();
 	}
 
-	solutionPageView () {
+	solutionMapView() {
 		this.view && this.view.close();
-		this.view = new SolutionPageView();
+		this.view = new SolutionMapView();
 	}
 }
 

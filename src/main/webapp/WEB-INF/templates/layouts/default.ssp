@@ -55,7 +55,7 @@
 			<li><a href="#depots">Depots</a></li>
 			<li><a href="#vehicles">Vehicles</a></li>
 			<li><a href="#stops">Stops</a></li>
-			<li><a href="#solution">Solution</a></li>
+			<li><a href="#map">Map</a></li>
 			<li><a href="/sessions/logout">Logout</a></li>
 		</ul>
 	</div><!--/.nav-collapse -->

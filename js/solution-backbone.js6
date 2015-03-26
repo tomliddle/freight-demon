@@ -15,19 +15,15 @@ class SolutionList extends BaseCollection {
 class SolutionPageView extends BaseView {
 	constructor(options) {
 		this.el = '.content';
-		/*this.events = {
+		this.events = {
 			"submit form.solution": "runSolution"
-		}*/
+		}
 		super(options);
 	}
 
 	initialize(){
 		this.collection = new SolutionList();
-		this.solutionMapView = new SolutionMapView();
-		this.solutionListView = new SolutionListView({
-			solutions:this.collection,
-			mapView:this.solutionMapView
-		});
+		this.solutionListView = new SolutionListView({solutions:this.collection});
 
 		var that = this;
 		this.collection.fetch({success: function(){that.render()}});
@@ -35,16 +31,16 @@ class SolutionPageView extends BaseView {
 
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
-		//this.$el.find(".solution-list").append(this.solutionListView.render().$el);
+		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
 		// Map is rendered by external lib so we don't need to append
-		this.solutionMapView.render(this.collection.get(1));
+		//this.solutionMapView.render(this.collection.get(1));
 		return this;
 	}
 
 	runSolution(e) {
 		e.preventDefault();
-		//var selected = $(e.target).find("input[name='solution-select']:checked");
-		var y = 1; //selected.data("target");
+		var selected = $(e.target).find("input[name='solution-select']:checked");
+		var y = selected.data("target");
 		var that = this;
 		$.ajax({
 			url: "/solution/run/" + y,
@@ -59,7 +55,7 @@ class SolutionPageView extends BaseView {
 	}
 }
 
-/*class SolutionListView extends BaseView {
+class SolutionListView extends BaseView {
 	constructor(options) {
 		this.tagName = "tbody";
 		super(options);
@@ -67,14 +63,13 @@ class SolutionPageView extends BaseView {
 
 	initialize(options){
 		this.collection = options.solutions;
-		this.mapView = options.mapView;
 		this.listenTo(this.collection, "add", this.render);
 		this.listenTo(this.collection, "change", this.change);
 	}
 
 	render() {
 		this.collection.forEach(function(solution) {
-			var solutionView = new SolutionView({model: solution, mapView: this.mapView});
+			var solutionView = new SolutionView({model: solution});
 			this.$el.html(solutionView.render().$el);
 		}, this);
 		return this;
@@ -83,12 +78,11 @@ class SolutionPageView extends BaseView {
 	change() {
 		alert("update")
 	}
-}*/
+}
 
 // Each row of the table
-/*class SolutionView extends BaseView {
+class SolutionView extends BaseView {
 	constructor(options) {
-		this.mapView = options.mapView;
 		this.tagName = "tr";
 		this.events = {
 			"click input[type=radio]": "drawSolution"
@@ -102,62 +96,7 @@ class SolutionPageView extends BaseView {
 	}
 
 	drawSolution(e) {
-		this.mapView.drawSolution(this.model);
-	}
-}*/
-
-class SolutionMapView extends BaseView {
-	constructor(options) {
-		super(options);
-	}
-
-	render(){
-		this.map = L.map('map').setView([51.505, -0.09], 13);
-		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(this.map);
-		return this;
-	}
-
-	drawSolution(solution) {
-		var depot = solution.get("depot");
-		this.addToMap(0, depot);
-
-		var trucks = solution.get("trucks");
-
-		for (var i = 0; i < trucks.length; i++) {
-			this.drawRoute(trucks[i], depot);
-		}
-	}
-
-	addToMap(number, entity) {
-		var x = entity.x;
-		var y = entity.y;
-		L.marker([y, x])
-			.addTo(this.map)
-			.bindPopup(number + " " + entity.name + " " + entity.startTime + " " + entity.endTime);
-	}
-
-	drawRoute(truck, depot) {
-		var latlngs  = [this.getLatLng(depot)];
-
-		var stops = truck.stops;
-
-		for (var i = 0; i < stops.length; i++) {
-			var stopCoords = this.getLatLng(stops[i]);
-			latlngs.push(stopCoords);
-
-			this.addToMap(i + 1, stops[i]);
-		}
-
-		latlngs.push(this.getLatLng(depot));
-
-		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
-
-		// zoom the map to the polyline
-		this.map.fitBounds(polyline.getBounds());
-	}
-
-	getLatLng(entity) {
-		return L.latLng(entity.y, entity.x)
+		//this.mapView.drawSolution(this.model);
 	}
 }
 
