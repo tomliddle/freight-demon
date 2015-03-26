@@ -11,7 +11,7 @@ trait Geocoding {
 
 	private val logger = LoggerFactory.getLogger(getClass().getName());
 
-	def geocodeFromOnline(address: String): Option[(BigDecimal, BigDecimal)] = {
+	def geocodeFromOnline(address: String): Option[JValue] = {
 
 		//val url: String = "http://www.freethepostcode.org/geocode?postcode=" + postcode
 
@@ -21,14 +21,14 @@ trait Geocoding {
 
 		try {
 			val str = scala.io.Source.fromURL(url)
+			val data = parse(str.mkString)
+			Some(data)
 
-			val json = parse(str.mkString)
-
-			implicit lazy val formats = org.json4s.DefaultFormats
+		/*	implicit lazy val formats = org.json4s.DefaultFormats
 			val lat = (json \ "results" \ "geometry" \ "location" \ "lat").extractOpt[BigDecimal]
 			val lng = (json \ "results" \ "geometry" \ "location" \ "lng").extractOpt[BigDecimal]
 
-			Some((lng.get, lat.get))
+			Some((lng.get, lat.get))*/
 		}
 		catch {
 			case e: Exception =>

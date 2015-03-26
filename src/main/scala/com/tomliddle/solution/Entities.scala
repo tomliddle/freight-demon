@@ -2,8 +2,6 @@ package com.tomliddle.solution
 
 import org.joda.time.{Duration, LocalTime}
 
-import scala.math.BigDecimal.RoundingMode
-
 
 class DistanceTime(val distance: BigDecimal = BigDecimal(0), val time: Duration = new Duration(0)) {
 

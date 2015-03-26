@@ -11,9 +11,9 @@ case class TruckForm(name: String, startTime: String, endTime: String, maxWeight
 	def getTruck(userId: Int) = DBTruck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime, formatter), BigDecimal(maxWeight), userId)
 }
 
-case class StopForm(name: String, startTime: String, endTime: String, maxWeight: String, address: String) {
+case class StopForm(name: String, startTime: String, endTime: String, maxWeight: String, x: String, y: String, address: String) {
 	private val formatter = DateTimeFormat.forPattern("HH:mm")
-	def getStop(userId: Int, x: BigDecimal, y: BigDecimal) = {
-		Stop(name, x, y, address, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime, formatter), BigDecimal(maxWeight), List() , userId)
+	def getStop(userId: Int): Stop = {
+		Stop(name, BigDecimal(x), BigDecimal(y), address, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime, formatter), BigDecimal(maxWeight), List() , userId)
 	}
 }

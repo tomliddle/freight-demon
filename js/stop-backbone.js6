@@ -24,7 +24,7 @@ class StopListView extends BaseView {
 		var that = this;
 		this.collection.fetch({ success: function () {
 				that.render();
-			} });
+		}});
 	}
 
 	render () {
@@ -35,6 +35,25 @@ class StopListView extends BaseView {
 			var id = $(e.target).data("id");
 			that.removeItem(id);
 		});
+		this.$el.find("button.geocode").click(function (e) {
+			e.preventDefault();
+			var address = that.$el.find(".address").val();
+			that.geocode(address);
+		});
 		return this;
+	}
+
+	geocode(address) {
+		var that = this;
+		var jqxhr = $.get( "/geocode/" + address)
+			.done(function(data) {
+				var lng = data.results[0].geometry.location.lng;
+				var lat = data.results[0].geometry.location.lat;
+				that.$el.find(".x").val(lng)
+				that.$el.find(".y").val(lat)
+			 })
+			.fail(function() {
+				alert( "cannot find the address" );
+			});
 	}
 }

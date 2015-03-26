@@ -200,7 +200,7 @@ class DatabaseSupport(db: Database) extends Geocoding {
 		val stops = getStops(user)
 		val depots = getDepots(user)
 
-		val lm: LocationMatrix = new LocationMatrix(stops, depots) with LatLongTimeAndDistCalc
+		val lm: LocationMatrix = new LocationMatrix(stops, depots)
 
 		val trucks = dbTrucks.map {
 			dbTruck =>

@@ -8,7 +8,7 @@ import akka.util.Timeout
 import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{Geocoding, LocationMatrix}
+import com.tomliddle.solution.{Stop, Geocoding, LocationMatrix}
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import org.json4s.JsonAST.JString
@@ -45,6 +45,12 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 		requireLogin()
 	}
 
+	//************** Geocode HANDLING ******************************
+	get("/geocode/:address") {
+		contentType = formats("json")
+		geocodeFromOnline(params("address"))
+	}
+
 	//************** Truck HANDLING ******************************
 	// Add truck
 	post("/truck") {
@@ -72,15 +78,9 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	//************** Stop HANDLING ******************************
 	// Add stop
 	post("/stop") {
-		var stopForm = parsedBody.extract[StopForm]
+		val stop = parsedBody.extract[StopForm]
 
-		geocodeFromOnline(stopForm.address) match {
-			case Some(xy) =>
-				val stop = stopForm.getStop(scentry.user.id.get, xy._1, xy._2)
-				db.addStop(stop)
-			case None => None
-
-		}
+		db.addStop(stop.getStop(scentry.user.id.get))
 	}
 
 	// Get stop

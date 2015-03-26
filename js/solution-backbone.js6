@@ -15,9 +15,9 @@ class SolutionList extends BaseCollection {
 class SolutionPageView extends BaseView {
 	constructor(options) {
 		this.el = '.content';
-		this.events = {
+		/*this.events = {
 			"submit form.solution": "runSolution"
-		}
+		}*/
 		super(options);
 	}
 
@@ -35,16 +35,16 @@ class SolutionPageView extends BaseView {
 
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
-		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
+		//this.$el.find(".solution-list").append(this.solutionListView.render().$el);
 		// Map is rendered by external lib so we don't need to append
-		this.solutionMapView.render();
+		this.solutionMapView.render(this.collection.get(1));
 		return this;
 	}
 
 	runSolution(e) {
 		e.preventDefault();
-		var selected = $(e.target).find("input[name='solution-select']:checked");
-		var y = selected.data("target");
+		//var selected = $(e.target).find("input[name='solution-select']:checked");
+		var y = 1; //selected.data("target");
 		var that = this;
 		$.ajax({
 			url: "/solution/run/" + y,
@@ -59,7 +59,7 @@ class SolutionPageView extends BaseView {
 	}
 }
 
-class SolutionListView extends BaseView {
+/*class SolutionListView extends BaseView {
 	constructor(options) {
 		this.tagName = "tbody";
 		super(options);
@@ -83,10 +83,10 @@ class SolutionListView extends BaseView {
 	change() {
 		alert("update")
 	}
-}
+}*/
 
 // Each row of the table
-class SolutionView extends BaseView {
+/*class SolutionView extends BaseView {
 	constructor(options) {
 		this.mapView = options.mapView;
 		this.tagName = "tr";
@@ -104,7 +104,7 @@ class SolutionView extends BaseView {
 	drawSolution(e) {
 		this.mapView.drawSolution(this.model);
 	}
-}
+}*/
 
 class SolutionMapView extends BaseView {
 	constructor(options) {

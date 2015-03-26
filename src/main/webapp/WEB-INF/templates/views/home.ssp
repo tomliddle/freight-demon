@@ -100,13 +100,13 @@
 					<td><input type="time" class="form-control" name="startTime" value="09:00" required="true"/></td>
 					<td><input type="time" class="form-control" name="endTime" value="17:00" required="true"/></td>
 					<td><input type="number" class="form-control" name="maxWeight" value="50" required="true"/></td>
-					<td><input type="number" class="form-control lat-lng" name="x" required="true" readonly="true"/></td>
-					<td><input type="number" class="form-control lat-lng" name="y" required="true" readonly="true"/></td>
+					<td><input type="number" step="0.0001" class="form-control lat-lng x" name="x" required="true" readonly="true"/></td>
+					<td><input type="number" step="0.0001" class="form-control lat-lng y" name="y" required="true" readonly="true"/></td>
 					<td>
 						<div class="input-group">
-							<input type="text" class="form-control" name="address" required="true" />
+							<input type="text" class="form-control address" name="address" required="true" />
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+								<button class="btn btn-default geocode" type="button"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
 							</span>
 						</div>
 					</td>
@@ -131,7 +131,7 @@
 </script>
 
 <script id="solution-page-template" type="text/x-handlebars-template">
-	<div class="row">
+	<%--<div class="row">
 		<div class="col-xs-4">
 			<h2>Solutions</h2>
 		</div>
@@ -147,20 +147,15 @@
 			</thead>
 		</table>
 
-		<%--<div class="row">
-			<div class="col-xs-4">
-				<input class="btn btn-primary" name="run" type="submit" value="Run scheduler"/>
-			</div>
-		</div>--%>
-	</form>
+	</form>--%>
 
 	<div id="map"></div>
 </script>
 
-<script id="solution-template" type="text/x-handlebars-template">
+<%--<script id="solution-template" type="text/x-handlebars-template">
 	<td><input type="radio" name="solution-select" class="solution-select" data-target="{{solution.id}}"/></td>
 	<td>{{solution.name}}</td>
-</script>
+</script>--%>
 
 
 <div class="content"></div>
