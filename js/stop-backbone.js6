@@ -14,7 +14,7 @@ class StopList extends BaseCollection{
 
 class StopListView extends BaseView {
 	constructor(options) {
-		this.el = ".content";
+		this.el = ".stopdiv";
 		super(options);
 	}
 

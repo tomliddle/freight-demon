@@ -139,13 +139,6 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	////////////////////
 
-	post("/solution/truck/:id") {
-
-	}
-
-	post("/solution/stop/:id") {
-
-	}
 
 	get("/solution/run/:id") {
 		contentType = formats("json")

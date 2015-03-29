@@ -157,11 +157,27 @@
 </script>
 
 <script id="map-template" type="text/x-handlebars-template">
-	<div id="map"></div>
+	<div class="row">
+		<div class="col-xs-4">
+			<h2>Map</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div id="map"></div>
+		</div>
+	</div>
+
 </script>
 
 
 
 
-<div class="content"></div>
+<div class="content">
+	<div class="solutiondiv"></div>
+	<div class="depotdiv"></div>
+	<div class="truckdiv"></div>
+	<div class="stopdiv"></div>
+	<div class="mapdiv"></div>
+</div>
 

@@ -7,3 +7,7 @@
 input.form-control.lat-lng {
 	width: 80px;
 }
+
+.solutiondiv, .depotdiv, .mapdiv, .stopdiv, .truckdiv {
+	display: none;
+}

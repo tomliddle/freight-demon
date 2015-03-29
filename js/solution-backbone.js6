@@ -1,5 +1,9 @@
 class Solution extends Backbone.Model {
 	constructor(options) {
+		this.defaults = {
+			"depot":  null,
+			"trucks":  [],
+		}
 		super(options);
 	}
 }
@@ -12,52 +16,33 @@ class SolutionList extends BaseCollection {
 	}
 }
 
+// The page of solutions
 class SolutionPageView extends BaseView {
 	constructor(options) {
-		this.el = '.content';
-		this.events = {
-			"submit form.solution": "runSolution"
-		}
+		this.el = '.solutiondiv';
+		this.collection = options.collection;
+		this.evt = options.evt;
 		super(options);
 	}
 
 	initialize(){
-		this.collection = new SolutionList();
-		this.solutionListView = new SolutionListView({solutions:this.collection});
-
+		this.solutionListView = new SolutionListView({solutions:this.collection, evt: this.evt});
 		var that = this;
-		this.collection.fetch({success: function(){that.render()}});
+		this.render();
 	}
 
 	render(){
 		this.$el.html(Templates.solutionPageTemplate());
 		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
-		// Map is rendered by external lib so we don't need to append
-		//this.solutionMapView.render(this.collection.get(1));
 		return this;
-	}
-
-	runSolution(e) {
-		e.preventDefault();
-		var selected = $(e.target).find("input[name='solution-select']:checked");
-		var y = selected.data("target");
-		var that = this;
-		$.ajax({
-			url: "/solution/run/" + y,
-			dataType: "json"
-		})
-			.done(function(solution) {
-				that.collection.set(solution);
-			})
-			.fail(function() {
-				alert( "error" );
-			});
 	}
 }
 
+// The list of solutions
 class SolutionListView extends BaseView {
 	constructor(options) {
 		this.tagName = "tbody";
+		this.evt = options.evt;
 		super(options);
 	}
 
@@ -69,7 +54,7 @@ class SolutionListView extends BaseView {
 
 	render() {
 		this.collection.forEach(function(solution) {
-			var solutionView = new SolutionView({model: solution});
+			var solutionView = new SolutionView({model: solution, evt: this.evt});
 			this.$el.html(solutionView.render().$el);
 		}, this);
 		return this;
@@ -85,8 +70,9 @@ class SolutionView extends BaseView {
 	constructor(options) {
 		this.tagName = "tr";
 		this.events = {
-			"click input[type=radio]": "drawSolution"
+			"click input[type=radio]": "setSolution"
 		}
+		this.evt = options.evt;
 		super(options);
 	}
 
@@ -95,8 +81,8 @@ class SolutionView extends BaseView {
 		return this;
 	}
 
-	drawSolution(e) {
-		//this.mapView.drawSolution(this.model);
+	setSolution(e) {
+		this.evt.trigger("setSolution", this.model);
 	}
 }
 

@@ -15,7 +15,7 @@ class TruckList extends BaseCollection{
 
 class TruckListView extends BaseView {
 	constructor(options) {
-		this.el = ".content";
+		this.el = ".truckdiv";
 		super(options);
 	}
 

@@ -14,7 +14,7 @@ class DepotList extends BaseCollection {
 
 class DepotListView extends BaseView {
 	constructor(options) {
-		this.el = ".content";
+		this.el = ".depotdiv";
 		super(options);
 	}
 
@@ -22,13 +22,13 @@ class DepotListView extends BaseView {
 		this.collection = new DepotList();
 		this.listenTo(this.collection, "add", this.render);
 		var that = this;
-		this.collection.fetch({ success: function () {
+		this.collection.fetch({success: function () {
 			that.render();
 		}});
 	}
 
 	render () {
-		this.$el.html(Templates.depotListTemplate({ depots: this.collection.toJSON() }));
+		this.$el.html(Templates.depotListTemplate({depots: this.collection.toJSON()}));
 		return this;
 	}
 }

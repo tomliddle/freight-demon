@@ -1,24 +1,75 @@
 
 class SolutionMapView extends BaseView {
 	constructor(options) {
+		this.el = '.mapdiv';
+		this.evt = options.evt;
 		super(options);
 	}
 
-	render(){
-		this.$el.html(Templates.mapTemplate());
-		this.map = L.map('map').setView([51.505, -0.09], 13);
-		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(this.map);
+	initialize() {
+		this.listenTo(this.evt, "setSolution", this.setModel);
+	}
+
+	setModel(model) {
+		this.model = model;
+	}
+
+	show() {
+		super.show();
+		this.render();
 		return this;
 	}
 
-	drawSolution(solution) {
-		var depot = solution.get("depot");
-		this.addToMap(0, depot);
+	render() {
+		if (!this.rendered) {
+			this.rendered = true;
+			this.$el.html(Templates.mapTemplate());
+			var $map = this.$el.find("#map").get(0);
+			this.map = L.map($map).setView([51.505, -0.09], 13);
+			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar'}).addTo(this.map);
+			this.layerGroup = L.layerGroup().addTo(this.map);
+		}
 
-		var trucks = solution.get("trucks");
+		if (this.model) {
+			this.drawSolution(this.model);
+		}
 
-		for (var i = 0; i < trucks.length; i++) {
-			this.drawRoute(trucks[i], depot);
+		return this;
+	}
+
+/*	runSolution() {
+		//e.preventDefault();
+		//var selected = $(e.target).find("input[name='solution-select']:checked");
+		var y = 1;//selected.data("target");
+		var that = this;
+		$.ajax({
+			url: "/solution/run/" + y,
+			dataType: "json"
+		})
+			.done(function(solution) {
+
+				that.drawSolution(solution);
+			})
+			.fail(function() {
+				alert( "error" );
+			});
+	}*/
+
+	drawSolution(model) {
+		this.model = model;
+
+		if (this.rendered) {
+			this.layerGroup.clearLayers();
+
+			var depot = this.model.get("depot");
+			if (depot)
+				this.addToMap(0, depot);
+
+			var trucks = this.model.get("trucks");
+
+			for (var i = 0; i < trucks.length; i++) {
+				this.drawRoute(trucks[i], depot);
+			}
 		}
 	}
 
@@ -26,7 +77,7 @@ class SolutionMapView extends BaseView {
 		var x = entity.x;
 		var y = entity.y;
 		L.marker([y, x])
-			.addTo(this.map)
+			.addTo(this.layerGroup)
 			.bindPopup(number + " " + entity.name + " " + entity.startTime + " " + entity.endTime);
 	}
 
@@ -44,7 +95,7 @@ class SolutionMapView extends BaseView {
 
 		latlngs.push(this.getLatLng(depot));
 
-		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.map);
+		var polyline = L.polyline(latlngs, {color: 'red'}).addTo(this.layerGroup);
 
 		// zoom the map to the polyline
 		this.map.fitBounds(polyline.getBounds());

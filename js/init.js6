@@ -7,9 +7,14 @@ var Templates = Templates || {
 		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
 		this.solutionTemplate = Handlebars.compile($("#solution-template").html());
 		this.mapTemplate = Handlebars.compile($("#map-template").html());
-
 	}
 };
+
+class AppEvents extends Backbone.View {
+	constructor(options) {
+		super(options);
+	}
+}
 
 class BaseCollection extends Backbone.Collection {
 	constructor(options) {
@@ -29,18 +34,28 @@ class BaseView extends Backbone.View {
 		super(options);
 	}
 
-	removeItem (id) {
+	removeItem(id) {
 		id && this.collection.get(id).destroy();
 		this.render();
 	}
 
-	close () {
+	close() {
 		this.undelegateEvents();
 		this.unbind();
 		this.$el.empty();
 	}
 
-	save (e) {
+	hide() {
+		this.$el.hide();
+		return this;
+	}
+
+	show() {
+		this.$el.show();
+		return this;
+	}
+
+	save(e) {
 		e.preventDefault();
 		var arr = $(e.target).serializeArray();
 		var data = _(arr).reduce(function (acc, field) {
@@ -54,48 +69,64 @@ class BaseView extends Backbone.View {
 }
 
 
+
+
 // ******************************* ROUTER **************************************
 class AppRouter extends Backbone.Router {
 	constructor(options) {
+
+		this.evt = new AppEvents();
+		this.collection = new SolutionList();
+		var that = this;
+		this.collection.fetch();
+		this.solutionMapView = new SolutionMapView({evt: this.evt});
+		this.solutionPageView = new SolutionPageView({collection: that.collection, evt: this.evt});
+		this.truckListView = new TruckListView();
+		this.depotListView = new DepotListView();
+		this.stopListView = new StopListView();
+
+
 		this.routes = {
-			vehicles: "truckListView",
-			depots: "depotListView",
-			stops: "stopListView",
-			map: "solutionMapView",
-			"*actions": "defaultRoute" // Backbone will try to match the route above first
+			vehicles: "showTruckListView",
+			depots: "showDepotListView",
+			stops: "showStopListView",
+			map: "showSolutionMapView",
+			"*actions": "showDefaultRoute" // Backbone will try to match the route above first
 		};
 		super(options);
 	}
 
-	defaultRoute() {
-		this.view && this.view.close();
-		this.view = new SolutionPageView();
+	showDefaultRoute() {
+		this.view && this.view.hide();
+		this.view = this.solutionPageView.show();
 	}
 
-	truckListView() {
-		this.view && this.view.close();
-		this.view = new TruckListView();
+	showTruckListView() {
+		this.view && this.view.hide();
+		this.view = this.truckListView.show();
 	}
 
-	depotListView() {
-		this.view && this.view.close();
-		this.view = new DepotListView();
+	showDepotListView() {
+		this.view && this.view.hide();
+		this.view = this.depotListView.show();
+
 	}
 
-	stopListView() {
-		this.view && this.view.close();
-		this.view = new StopListView();
+	showStopListView() {
+		this.view && this.view.hide();
+		this.view = this.stopListView.show();
 	}
 
-	solutionMapView() {
-		this.view && this.view.close();
-		this.view = new SolutionMapView();
+	showSolutionMapView() {
+		this.view && this.view.hide();
+		this.view = this.solutionMapView.show();
 	}
 }
 
 
 $(document).ready(function () {
 	Templates.load();
+
 	var app_router = new AppRouter();
 	Backbone.history.start();
 });
