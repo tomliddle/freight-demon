@@ -43,7 +43,7 @@ case class Depot(name: String, override val x: BigDecimal,  override val y: BigD
 
 case class Stop(name: String, override val x: BigDecimal, override val y: BigDecimal, override val address: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, specialCodes: List[String], userId: Int, id: Option[Int] = None) extends Point(x, y, address)
 
-case class LocationMatrix(stops: List[Point], depots: List[Point]) extends LatLongTimeAndDistCalc {
+case class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends LatLongTimeAndDistCalc {
 
 	private val distancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
 		(stops ++ depots).map {

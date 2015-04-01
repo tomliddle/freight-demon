@@ -13,7 +13,8 @@ case class Truck(
 					depot: Depot,
 					stops: List[Stop],
 					lm: LocationMatrix,
-					userId: Int, id: Option[Int] = None)
+					userId: Int,
+					id: Option[Int] = None)
 	extends SwapUtilities with Mean with TruckLinks {
 
 	protected final val logger = LoggerFactory.getLogger(this.getClass)

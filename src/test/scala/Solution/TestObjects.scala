@@ -86,4 +86,6 @@ trait TestObjects {
 	}
 
 	val solution = Solution("Solution", depot, truck.stops, List(truck, truck, truck), 1)
+
+	val simpleSolution = Solution("Solution", depot, List(), List(truck), 1)
 }

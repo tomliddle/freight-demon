@@ -19,10 +19,6 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 
 	lazy val cost: BigDecimal = getTotalCost(trucks)
 
-	override def toString() = {
-		"Valid:" + isValid + " Cost:" + cost + " Unloaded stops:" + stopsToLoad.size + " Distance:" + distanceTime + "\n" +
-		trucks.map(_.toString).toString
-	}
 
 	/*def loadSpecialCodes: Solution = {
 		var unloadedStops = stopsToLoad

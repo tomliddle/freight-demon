@@ -23,20 +23,12 @@ class MongoSupport(databaseName: String){
 	def getMSolutions(userId: Int): List[Solution] = {
 		val q = MongoDBObject("userId" -> userId)
 
-		val users = for (x <- mongoSolutions.find(q)) yield x
-		logger.debug("size is sdfsdf" + users.size.toString)
-		val x = users.map {
-			obj => {
-				logger.debug("size ssss " + obj.toString)
-				val y = grater[Solution].asObject(obj)
-				logger.debug("size ssss " + y.toString)
-				y
-			}
-		}
+		//val users: Iterator[DBObject] = for (x <- mongoSolutions.find(q)) yield x
+		val dbObj: Iterator[DBObject] = mongoSolutions.find(q)
 
-		logger.debug("size is " + x.size.toString)
-
-		x.toList
+		dbObj.map {
+			db => grater[Solution].asObject(db)
+		}.toList
 	}
 
 	def getMSolution(userId: Int, id: Int): Option[Solution] = {
@@ -55,7 +47,7 @@ class MongoSupport(databaseName: String){
 
 	def addMSolution(solution: Solution) {
 		val dbo = grater[Solution].asDBObject(solution)
-		mongoSolutions += dbo
+		mongoSolutions += (dbo)
 		logger.debug(s"size is ${mongoSolutions.size.toString} after adding")
 	}
 
