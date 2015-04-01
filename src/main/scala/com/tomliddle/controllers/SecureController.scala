@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import com.tomliddle.DatabaseSupport
 import com.tomliddle.auth.AuthenticationSupport
+import com.tomliddle.database.DatabaseSupport
 import com.tomliddle.form.{StopForm, TruckForm}
 import com.tomliddle.solution.{Stop, Geocoding, LocationMatrix}
 import org.joda.time.LocalTime

@@ -1,6 +1,6 @@
 package com.tomliddle.auth
 
-import com.tomliddle.{DatabaseSupport, User}
+import com.tomliddle.database.{DatabaseSupport, User}
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 import org.slf4j.LoggerFactory

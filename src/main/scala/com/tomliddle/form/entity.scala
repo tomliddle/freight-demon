@@ -1,6 +1,6 @@
 package com.tomliddle.form
 
-import com.tomliddle.DBTruck
+import com.tomliddle.database.DBTruck
 import com.tomliddle.solution.Stop
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat

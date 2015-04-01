@@ -4,6 +4,10 @@
 	margin-bottom: 30px;
 }
 
+input.form-control {
+	width: 250px;
+}
+
 input.form-control.lat-lng {
 	width: 80px;
 }

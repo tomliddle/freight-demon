@@ -3,6 +3,7 @@ package com.tomliddle
 package com.tomliddle
 
 import akka.actor.{Actor, ActorLogging}
+import database.Users
 
 import scala.concurrent.ExecutionContext
 

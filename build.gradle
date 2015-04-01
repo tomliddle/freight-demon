@@ -71,9 +71,14 @@ dependencies {
 	compile 'org.json4s:json4s-ext_2.11:3.2.11'
 	// compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.0'
 
+	// databases
 	compile 'com.typesafe.slick:slick_2.11:2.1.0'
 	compile 'com.h2database:h2:1.4.184'
 	compile 'c3p0:c3p0:0.9.1.2'
+	//compile 'org.mongodb:casbah-core_2.11:2.8.0'
+	compile 'org.mongodb:casbah_2.11:2.8.0'
+	compile 'com.novus:salat_2.11:1.9.9'
+
 
 	testCompile 'org.scalatest:scalatest_2.11:2.2.4'
 	//testCompile 'org.pegdown:pegdown:1.0.2'

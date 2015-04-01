@@ -1,7 +1,7 @@
 package com.tomliddle.controllers
 
 import com.tomliddle.auth.AuthenticationSupport
-import com.tomliddle.{DatabaseSupport, User}
+import com.tomliddle.database.{DatabaseSupport, User}
 
 class SessionsController(protected val db: DatabaseSupport) extends ScalateServlet with AuthenticationSupport {
 	before("/new") {

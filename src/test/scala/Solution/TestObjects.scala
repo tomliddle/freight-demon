@@ -12,7 +12,6 @@ trait TestObjects {
 	val stop = Stop("1", 0, 0, "234234", startTime, endTime, BigDecimal(1), List(), 1)
 	val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
 
-
 	private val locationList = List(
 		stop.copy(x = 1, y = 5),
 		stop.copy(x = 1, y = 1),

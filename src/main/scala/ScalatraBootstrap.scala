@@ -2,11 +2,11 @@ import javax.servlet.ServletContext
 
 import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
-import _root_.com.tomliddle.Tables._
+import com.tomliddle.database.{DatabaseSupport, DBSolution, User, Tables}
+import Tables._
 import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import com.tomliddle.solution.Depot
-import com.tomliddle.{DBSolution, DatabaseSupport, User}
 import org.scalatra._
 
 import scala.slick.driver.H2Driver.simple._

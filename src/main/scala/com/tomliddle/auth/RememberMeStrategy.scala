@@ -1,8 +1,7 @@
 package com.tomliddle.auth
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-
-import com.tomliddle.{DatabaseSupport, User}
+import com.tomliddle.database.{DatabaseSupport, User}
 import org.scalatra.auth.ScentryStrategy
 import org.scalatra.{CookieOptions, ScalatraBase}
 import org.slf4j.LoggerFactory
