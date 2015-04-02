@@ -1,7 +1,6 @@
 package com.tomliddle.database
 
 import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.casbah.{MongoClient}
 import com.novus.salat._
 import com.novus.salat.global._
 import com.mongodb.casbah.Imports._
@@ -23,8 +22,8 @@ class MongoSupport(databaseName: String){
 	def getMSolutions(userId: Int): List[Solution] = {
 		val q = MongoDBObject("userId" -> userId)
 
-		//val users: Iterator[DBObject] = for (x <- mongoSolutions.find(q)) yield x
-		val dbObj: Iterator[DBObject] = mongoSolutions.find(q)
+		val dbObj = for (x <- mongoSolutions.find(q)) yield x
+		//val dbObj: Iterator[DBObject] = mongoSolutions.find(q)
 
 		dbObj.map {
 			db => grater[Solution].asObject(db)
@@ -49,6 +48,12 @@ class MongoSupport(databaseName: String){
 		val dbo = grater[Solution].asDBObject(solution)
 		mongoSolutions += (dbo)
 		logger.debug(s"size is ${mongoSolutions.size.toString} after adding")
+	}
+
+	def removeMSolution(userId: Int, id: Int) {
+		val q = MongoDBObject("userId" -> userId, "id" -> id)
+		mongoSolutions -= q
+		logger.debug(s"size is ${mongoSolutions.size.toString} after removal")
 	}
 
 	def removeMSolutions(userId: Int) {

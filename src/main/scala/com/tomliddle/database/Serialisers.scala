@@ -10,11 +10,11 @@ import scala.reflect.ClassTag
 
 class LocalTimeConverter {
 	// Massive hack
-	private final val KEY = "XOXOXO:"
+	private final val KEY = "LOCALTIME:"
 	private final val fmt = DateTimeFormat.forPattern("HH:mm:ss.SSS")
 	private val decodeTransformer = new Transformer {
 		def transform(o: AnyRef): AnyRef = o match {
-			case s: String if (s.startsWith(KEY)) => fmt.parseLocalTime(s.drop(8))
+			case s: String if (s.startsWith(KEY)) => fmt.parseLocalTime(s.drop(KEY.length))
 			case d: LocalTime => d
 			case _ => o
 		}

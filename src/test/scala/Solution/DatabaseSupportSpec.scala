@@ -28,11 +28,16 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 
 		"Save operations" should {
 
-			"save the sol" in {
+			"save (update) the sol" in {
+				fail("not impemented")
+			}
+
+			"save a new solution" in {
 				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
 
 				val solutions = mongoSupport.getMSolutions(USER_ID)
 				solutions.size should equal(1)
+
 			}
 		}
 
@@ -48,6 +53,20 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 
 				val solutions2 = mongoSupport.getMSolutions(USER_ID)
 				solutions2.size should equal (3)
+			}
+
+			"remove a single solution" in {
+				val solutions = mongoSupport.getMSolutions(USER_ID)
+				solutions.size should equal (0)
+
+				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
+				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
+				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
+
+				val solutions2 = mongoSupport.getMSolutions(USER_ID)
+				solutions2.size should equal (3)
+
+				mongoSupport.removeMSolution(USER_ID, 3)
 			}
 		}
 
@@ -67,16 +86,21 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 				solOpt.get.stopsToLoad should equal (sol.stopsToLoad)
 
 				solOpt.get.userId should equal (sol.userId)
-				solOpt.get.trucks(0).depot should equal (sol.trucks(0).depot)
-				//solOpt.get.trucks(0).endTime should equal (sol.trucks(0).endTime)
-				//solOpt.get.trucks(0).startTime should equal (sol.trucks(0).startTime)
-				solOpt.get.trucks(0).id should equal (sol.trucks(0).id)
-				solOpt.get.trucks(0).maxWeight should equal (sol.trucks(0).maxWeight)
-				solOpt.get.trucks(0).name should equal (sol.trucks(0).name)
-				solOpt.get.trucks(0).stops.head should equal (sol.trucks(0).stops.head)
-				solOpt.get.trucks(0).userId should equal (sol.trucks(0).userId)
-				solOpt.get.trucks(0).lm should equal (sol.trucks(0).lm)
+				solOpt.get.trucks.head.depot should equal (sol.trucks.head.depot)
+				solOpt.get.trucks.head.endTime should equal (sol.trucks.head.endTime)
+				solOpt.get.trucks.head.startTime should equal (sol.trucks.head.startTime)
+				solOpt.get.trucks.head.id should equal (sol.trucks.head.id)
+				solOpt.get.trucks.head.maxWeight should equal (sol.trucks.head.maxWeight)
+				solOpt.get.trucks.head.name should equal (sol.trucks.head.name)
+				solOpt.get.trucks.head.stops.head.startTime should equal (sol.trucks.head.stops.head.startTime)
+				solOpt.get.trucks.head.stops.head.endTime should equal (sol.trucks.head.stops.head.endTime)
+				solOpt.get.trucks.head.userId should equal (sol.trucks.head.userId)
+				solOpt.get.trucks.head.lm should equal (sol.trucks.head.lm)
 
+			}
+
+			"get all records" in {
+				fail("not implemented")
 			}
 		}
 	}
