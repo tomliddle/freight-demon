@@ -6,9 +6,10 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.tomliddle.auth.AuthenticationSupport
-import com.tomliddle.database.DatabaseSupport
+import com.tomliddle.database.{MongoSupport, DatabaseSupport}
 import com.tomliddle.form.{StopForm, TruckForm}
 import com.tomliddle.solution.{Stop, Geocoding, LocationMatrix}
+import org.bson.types.ObjectId
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import org.json4s.JsonAST.JString
@@ -21,7 +22,7 @@ import scala.concurrent.ExecutionContext
 
 case class Status(status: String)
 
-class SecureController(protected val db: DatabaseSupport, system: ActorSystem, myActor: ActorRef)
+class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with Geocoding with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
 	configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
@@ -109,32 +110,12 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 
 	get("/solution") {
 		contentType = formats("json")
-		val user = scentry.user.id.get
-		val dbSolutions = db.getSolutions(user)
-		val dbTrucks = db.getTrucks(user)
-		val stops = db.getStops(user)
-		val depots = db.getDepots(user)
-
-		val lm = new LocationMatrix(stops, depots)
-
-		val trucks = dbTrucks.map {
-			dbTruck =>
-				dbTruck.toTruck(List(), depots.head, lm)
-		}
-
-		val sol = dbSolutions.map {
-			dbSolution =>
-				dbSolution.toSolution(depots.head, stops, trucks).preload.shuffle
-		}
-
-		sol
+		mdb.getSolutions(scentry.user.id.get)
 	}
 
 	get("/solution/:id") {
 		contentType = formats("json")
-		val user = scentry.user.id.get
-		db.getSolution(params("id").toInt, user)
-
+		mdb.getSolution(scentry.user.id.get, new ObjectId(params("id")))
 	}
 
 	////////////////////
@@ -143,10 +124,7 @@ class SecureController(protected val db: DatabaseSupport, system: ActorSystem, m
 	get("/solution/run/:id") {
 		contentType = formats("json")
 
-		db.getSolution(params("id").toInt, scentry.user.id.get).map {
-			solution =>
-				solution.shuffle
-		}
+
 	}
 
 

@@ -2,7 +2,7 @@ import javax.servlet.ServletContext
 
 import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
-import com.tomliddle.database.{DatabaseSupport, DBSolution, User, Tables}
+import com.tomliddle.database.{MongoSupport, DatabaseSupport, User, Tables}
 import Tables._
 import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
@@ -21,11 +21,13 @@ class ScalatraBootstrap extends LifeCycle {
 	createData()
 	private val db = new DatabaseSupport(database)
 
+	private val mongoSupport = new MongoSupport("freight_demon")
+
 	private val system = ActorSystem("actor_system")
 	private val myActor = system.actorOf(Props[Worker])
 
 	override def init(context: ServletContext) {
-		context.mount(new SecureController(db, system, myActor), "/*")
+		context.mount(new SecureController(db, mongoSupport, system, myActor), "/*")
 		context.mount(new SessionsController(db), "/sessions/*")
 		context.mount(new ResourceController, "/resource/*")
 	}
@@ -51,12 +53,7 @@ class ScalatraBootstrap extends LifeCycle {
 			}
 			if (!MTable.getTables.list.exists(_.name.name == "DEPOTS")) {
 				(depots.ddl).create
-				//val userId = (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
 				depots += Depot("depot", BigDecimal(0), BigDecimal(51.48), "Greenwich", 1)
-			}
-			if (!MTable.getTables.list.exists(_.name.name == "SOLUTIONS")) {
-				(solutions.ddl).create
-				solutions += DBSolution("Solution" , 1, Some(1))
 			}
 		}
 	}

@@ -80,27 +80,10 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def * = (name, x, y, address, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
-case class DBSolution(name: String, userId: Int, id: Option[Int] = None) {
-	def toSolution(depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck]) = {
-		Solution(name, depot, stopsToLoad, trucks, userId, id)
-	}
-}
-
-class Solutions(tag: Tag) extends Table[DBSolution](tag, "SOLUTIONS") with TypeConvert {
-
-	def name: Column[String] = column[String]("name", O.NotNull)
-	def userId: Column[Int] = column[Int]("userId")
-	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
-
-	def * = (name, userId, id.?) <>(DBSolution.tupled, DBSolution.unapply)
-}
-
-
 object Tables {
 	val users: TableQuery[Users] = TableQuery[Users]
 	val trucks: TableQuery[Trucks] = TableQuery[Trucks]
 	val depots: TableQuery[Depots] = TableQuery[Depots]
 	val stops: TableQuery[Stops] = TableQuery[Stops]
-	val solutions: TableQuery[Solutions] = TableQuery[Solutions]
 }
 

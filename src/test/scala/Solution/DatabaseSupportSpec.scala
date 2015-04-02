@@ -10,7 +10,7 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 	val USER_ID = -20
 
 	override def beforeEach {
-		mongoSupport.removeMSolutions(USER_ID)
+		mongoSupport.removeSolutions(USER_ID)
 	}
 
 	"Database support" when {
@@ -29,60 +29,93 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 		"Save operations" should {
 
 			"save (update) the sol" in {
-				fail("not impemented")
+				val solToUpdate = solution.copy(userId = USER_ID)
+				mongoSupport.addSolution(solToUpdate)
+
+				val solutions = mongoSupport.getSolutions(USER_ID)
+				solutions.size should equal(1)
+
+				solToUpdate should equal(solutions.head)
+
+				val updated = solToUpdate.copy(stopsToLoad = solToUpdate.stopsToLoad.tail)
+				mongoSupport.updateSolution(updated)
+
+				val solutions2 = mongoSupport.getSolutions(USER_ID)
+				solutions2.size should equal(1)
+
+				solutions2.head should equal(updated)
 			}
 
 			"save a new solution" in {
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
+				val sol = solution.copy(userId = USER_ID)
+				mongoSupport.addSolution(sol)
 
-				val solutions = mongoSupport.getMSolutions(USER_ID)
+				val solutions = mongoSupport.getSolutions(USER_ID)
 				solutions.size should equal(1)
 
+				sol should equal(solutions.head)
 			}
 		}
 
 		"Remove operations " should {
 
 			"remove all user solutions" in {
-				val solutions = mongoSupport.getMSolutions(USER_ID)
+				val solutions = mongoSupport.getSolutions(USER_ID)
 				solutions.size should equal (0)
 
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
 
-				val solutions2 = mongoSupport.getMSolutions(USER_ID)
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+
+				val solutions2 = mongoSupport.getSolutions(USER_ID)
 				solutions2.size should equal (3)
+
+				mongoSupport.removeSolutions(USER_ID)
+
+				val solutions3 = mongoSupport.getSolutions(USER_ID)
+				solutions3.size should equal (0)
 			}
 
 			"remove a single solution" in {
-				val solutions = mongoSupport.getMSolutions(USER_ID)
+				val solutions = mongoSupport.getSolutions(USER_ID)
 				solutions.size should equal (0)
 
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
-				mongoSupport.addMSolution(solution.copy(userId = USER_ID))
+				val sol1 = solution.copy(userId = USER_ID)
+				mongoSupport.addSolution(sol1)
 
-				val solutions2 = mongoSupport.getMSolutions(USER_ID)
+				val solToRemove = solution.copy(userId = USER_ID, _id = new ObjectId)
+				mongoSupport.addSolution(solToRemove)
+
+				val sol3 = solution.copy(userId = USER_ID, _id = new ObjectId)
+				mongoSupport.addSolution(sol3)
+
+				val solutions2 = mongoSupport.getSolutions(USER_ID)
 				solutions2.size should equal (3)
 
-				mongoSupport.removeMSolution(USER_ID, 3)
+				mongoSupport.removeSolution(solToRemove)
+				val solutions3 = mongoSupport.getSolutions(USER_ID)
+				solutions3.size should equal (2)
+
+				solutions3.contains(sol1) should equal(true)
+				solutions3.contains(sol3) should equal(true)
+
 			}
 		}
 
 		"Get operations" should {
 
 			"get a record" in {
-				val sol = simpleSolution.copy(userId = USER_ID, id = Some(1))
-				mongoSupport.addMSolution(sol)
+				val sol = simpleSolution.copy(userId = USER_ID, _id = new ObjectId)
+				val id = mongoSupport.addSolution(sol)
 
-				val solOpt = mongoSupport.getMSolution(USER_ID, 1)
+				val solOpt = mongoSupport.getSolution(USER_ID, id.get)
 
 				solOpt.isDefined should equal (true)
 
 				solOpt.get.name should equal (sol.name)
 				solOpt.get.depot should equal (sol.depot)
-				solOpt.get.id should equal (sol.id)
+				solOpt.get._id should equal (sol._id)
 				solOpt.get.stopsToLoad should equal (sol.stopsToLoad)
 
 				solOpt.get.userId should equal (sol.userId)
@@ -100,7 +133,15 @@ class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach
 			}
 
 			"get all records" in {
-				fail("not implemented")
+				val solutions = mongoSupport.getSolutions(USER_ID)
+				solutions.size should equal (0)
+
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+				mongoSupport.addSolution(solution.copy(userId = USER_ID, _id = new ObjectId))
+
+				val solutions2 = mongoSupport.getSolutions(USER_ID)
+				solutions2.size should equal (3)
 			}
 		}
 	}

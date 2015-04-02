@@ -2,7 +2,7 @@ package com.tomliddle.database
 
 import com.tomliddle.solution.{LocationMatrix, Solution, Depot, Stop}
 import scala.slick.driver.H2Driver.simple._
-import com.tomliddle.database.Tables.{depots, users, trucks, stops, solutions}
+import com.tomliddle.database.Tables.{depots, users, trucks, stops}
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession
 
 
@@ -91,47 +91,4 @@ class DatabaseSupport(db: Database) {
 			depots.filter { depot => depot.userId === userId }.list
 		}
 	}
-
-	//************************ Solution ***********************************
-	def getSolution(id: Int, user: Int): Option[Solution] = {
-
-		val dbTrucks = getTrucks(user)
-		val stops = getStops(user)
-		val depots = getDepots(user)
-
-		val lm: LocationMatrix = new LocationMatrix(stops, depots)
-
-		val trucks = dbTrucks.map {
-			dbTruck =>
-				dbTruck.toTruck(stops, depots.head, lm)
-		}
-
-		db.withDynSession {
-			val solution = solutions.filter { solution => solution.id === id }.firstOption
-			solution.map {
-				solution =>
-					solution.toSolution(depots.head, stops, trucks)
-			}
-		}
-	}
-
-
-	def getSolutions(userId: Int): List[DBSolution] = {
-		db.withDynSession {
-			solutions.filter { solution => solution.userId === userId }.list
-		}
-	}
-
-	def addSolution(solution: DBSolution) = {
-		db.withDynSession {
-			solutions += solution
-		}
-	}
-
-	def deleteSolution(id: Int, userId: Int) = {
-		db.withDynSession {
-			solutions.filter { solution => solution.id === id && solution.userId === userId }.delete
-		}
-	}
-
 }

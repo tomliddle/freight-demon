@@ -1,6 +1,8 @@
 package com.tomliddle.solution
 
-case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, id: Option[Int] = None) {
+import org.bson.types.ObjectId
+
+case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], userId: Int, _id: ObjectId = new ObjectId) {
 
 	private def getTotalCost(trucks: List[Truck]): BigDecimal = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost.get}
 
