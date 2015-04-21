@@ -144,16 +144,27 @@
 				<tr>
 					<th>Select</th>
 					<th>Name</th>
+					<th>Action</th>
 				</tr>
 			</thead>
+			<tbody class="solution-body">
+				<tr>
+					<td></td>
+					<td><input type="text" class="form-control" name="name" required="true"/></td>
+					<td><input class="btn add" name="add" type="submit" value="Add"/></td>
+				</tr>
+			</tbody>
 		</table>
 	</form>
-
 </script>
 
 <script id="solution-template" type="text/x-handlebars-template">
 	<td><input type="radio" name="solution-select" class="solution-select" data-target="{{solution.id}}"/></td>
 	<td>{{solution.name}}</td>
+	<td>
+		<input class="btn add" name="add" type="submit" value="Copy"/>
+		<input class="btn remove" name="remove" type="submit" data-id="{{solution.id}}" value="Remove"/>
+	</td>
 </script>
 
 <script id="map-template" type="text/x-handlebars-template">

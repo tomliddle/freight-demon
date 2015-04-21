@@ -4,7 +4,7 @@ import com.mongodb.casbah.Imports._
 import com.tomliddle.database.MongoSupport
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
-class DatabaseSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
+class MongoSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
 
 	val mongoSupport = new MongoSupport("test")
 	val USER_ID = -20

@@ -41,7 +41,7 @@ class SolutionPageView extends BaseView {
 // The list of solutions
 class SolutionListView extends BaseView {
 	constructor(options) {
-		this.tagName = "tbody";
+		this.el = ".solution-body";
 		this.evt = options.evt;
 		super(options);
 	}
@@ -55,7 +55,7 @@ class SolutionListView extends BaseView {
 	render() {
 		this.collection.forEach(function(solution) {
 			var solutionView = new SolutionView({model: solution, evt: this.evt});
-			this.$el.html(solutionView.render().$el);
+			this.$el.append(solutionView.render().$el);
 		}, this);
 		return this;
 	}

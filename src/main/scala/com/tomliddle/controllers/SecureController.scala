@@ -106,6 +106,7 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 
 	post("/solution") {
 		val name = params("name")
+
 	}
 
 	get("/solution") {
