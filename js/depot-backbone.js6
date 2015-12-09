@@ -1,20 +1,24 @@
 class Depot extends Backbone.Model {
-	constructor(options) {
-		super(options);
+	constructor(attrs, options) {
+		super(attrs, options);
 	}
 }
 
 class DepotList extends BaseCollection {
+
+	url() { return "/depot" }
+	model(attrs, options) { return new Depot(attrs, options); }
+
 	constructor(options) {
-		this.url = "/depot";
-		this.model = Depot;
 		super(options);
 	}
 }
 
 class DepotListView extends BaseView {
+
+	el() { return ".depotdiv" }
+
 	constructor(options) {
-		this.el = ".depotdiv";
 		super(options);
 	}
 

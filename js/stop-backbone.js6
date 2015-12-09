@@ -1,20 +1,25 @@
 class Stop extends Backbone.Model {
-	constructor(options) {
-		super(options);
+	constructor(attrs, options) {
+		super(attrs, options);
 	}
 }
 
 class StopList extends BaseCollection{
+
+	url() { return "/stop"; }
+
+	model(attrs, options) { return new Stop(attrs, options); }
+
 	constructor(options) {
-		this.url = "/stop";
-		this.model =  Stop;
 		super(options);
 	}
 }
 
 class StopListView extends BaseView {
+
+	el() { return ".stopdiv" }
+
 	constructor(options) {
-		this.el = ".stopdiv";
 		super(options);
 	}
 

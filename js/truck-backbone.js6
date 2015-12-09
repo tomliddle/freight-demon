@@ -1,21 +1,26 @@
 class Truck extends Backbone.Model{
-	constructor (args) {
-		super(args)
+	constructor (attrs, options) {
+		super(attrs, options)
 	}
 }
 
 // Represents a list
-class TruckList extends BaseCollection{
-	constructor(args) {
-		this.url = "/truck";
-		this.model = Truck;
-		super(args);
+class TruckList extends BaseCollection {
+
+	url() { return "/truck";}
+
+	model(attrs, options) { return new Truck(attrs, options);}
+
+	constructor(options) {
+		super(options);
 	}
 }
 
 class TruckListView extends BaseView {
+
+	el() { return ".truckdiv"}
+
 	constructor(options) {
-		this.el = ".truckdiv";
 		super(options);
 	}
 

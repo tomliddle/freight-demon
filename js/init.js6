@@ -23,14 +23,13 @@ class BaseCollection extends Backbone.Collection {
 }
 
 class BaseView extends Backbone.View {
-	constructor(options) {
-		if (this.events) {
-			this.events["submit form.add"] = "save";
-		}
-		else {
-			this.events = {"submit form.add": "save"}
-		}
 
+	events() {
+		// todoo was opts.events
+		return {"submit form.add" : "save"};
+	}
+
+	constructor(options) {
 		super(options);
 	}
 
@@ -73,7 +72,19 @@ class BaseView extends Backbone.View {
 
 // ******************************* ROUTER **************************************
 class AppRouter extends Backbone.Router {
+
+	routes() {
+		return {
+			vehicles: "showTruckListView",
+			depots: "showDepotListView",
+			stops: "showStopListView",
+			map: "showSolutionMapView",
+			"*actions": "showDefaultRoute" // Backbone will try to match the route above first
+		}
+	}
+
 	constructor(options) {
+		super(options);
 
 		this.evt = new AppEvents();
 		this.collection = new SolutionList();
@@ -84,16 +95,6 @@ class AppRouter extends Backbone.Router {
 		this.truckListView = new TruckListView();
 		this.depotListView = new DepotListView();
 		this.stopListView = new StopListView();
-
-
-		this.routes = {
-			vehicles: "showTruckListView",
-			depots: "showDepotListView",
-			stops: "showStopListView",
-			map: "showSolutionMapView",
-			"*actions": "showDefaultRoute" // Backbone will try to match the route above first
-		};
-		super(options);
 	}
 
 	showDefaultRoute() {

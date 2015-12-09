@@ -1,27 +1,33 @@
 class Solution extends Backbone.Model {
-	constructor(options) {
-		this.defaults = {
+
+	defaults() {
+		return {
 			"depot":  null,
 			"trucks":  [],
 		}
-		super(options);
+	}
+
+	constructor(attrs, options) {
+		super(attrs, options);
 	}
 }
 
 class SolutionList extends BaseCollection {
+
+	url() { return "/solution" }
+	model(attrs, options) { return new Solution(attrs, options); }
+
 	constructor(options) {
-		this.url = '/solution';
-		this.model = Solution;
 		super(options);
 	}
 }
 
 // The page of solutions
 class SolutionPageView extends BaseView {
+
+	el() { return '.solutiondiv'; }
+
 	constructor(options) {
-		this.el = '.solutiondiv';
-		this.collection = options.collection;
-		this.evt = options.evt;
 		super(options);
 	}
 
@@ -40,9 +46,10 @@ class SolutionPageView extends BaseView {
 
 // The list of solutions
 class SolutionListView extends BaseView {
+
+	el() { return ".solution-body"; }
+
 	constructor(options) {
-		this.el = ".solution-body";
-		this.evt = options.evt;
 		super(options);
 	}
 
@@ -67,13 +74,14 @@ class SolutionListView extends BaseView {
 
 // Each row of the table
 class SolutionView extends BaseView {
+
+	tagName() { return "li"; }
+
+	events() { return {"click input[type=radio]": "setSolution"}}
+
 	constructor(options) {
-		this.tagName = "tr";
-		this.events = {
-			"click input[type=radio]": "setSolution"
-		}
-		this.evt = options.evt;
 		super(options);
+		this.evt = options.evt;
 	}
 
 	render() {

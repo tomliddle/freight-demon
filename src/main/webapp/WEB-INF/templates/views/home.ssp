@@ -138,7 +138,7 @@
 		</div>
 	</div>
 
-	<form method="post" action="/solution/run" class="solution" enctype="multipart/form-data">
+	<form method="post" action="/solution" class="solution add" enctype="multipart/form-data">
 		<table class="table table-striped solution-list">
 			<thead>
 				<tr>
@@ -191,4 +191,3 @@
 	<div class="stopdiv"></div>
 	<div class="mapdiv"></div>
 </div>
-

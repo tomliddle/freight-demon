@@ -54,36 +54,7 @@ object JettyLauncher {
 		http.setIdleTimeout(10000)
 		server.addConnector(http)
 
-		// Status handler
-		//val stats = new StatisticsHandler
-		//stats.setHandler(server.getHandler())
-		//server.setHandler(stats)
-
-		// Request log
-		/*val requestLog = new NCSARequestLog
-		requestLog.setFilename("yyyy_mm_dd.request.log")
-		requestLog.setFilenameDateFormat("yyyy_MM_dd")
-		requestLog.setRetainDays(90)
-		requestLog.setAppend(true)
-		requestLog.setExtended(true)
-		requestLog.setLogCookies(false)
-		requestLog.setLogTimeZone("GMT")
-		requestLogHandler.setRequestLog(requestLog)*/
-		//server.setHandler(requestLogHandler)
-
-		// Low resources monitor
-		/*val lowResourcesMonitor = new LowResourceMonitor(server)
-		lowResourcesMonitor.setPeriod(1000)
-		lowResourcesMonitor.setLowResourcesIdleTimeout(200)
-		lowResourcesMonitor.setMonitorThreads(true)
-		lowResourcesMonitor.setMaxConnections(0)
-		lowResourcesMonitor.setMaxMemory(0)
-		lowResourcesMonitor.setMaxLowResourcesTime(5000)
-		server.addBean(lowResourcesMonitor)*/
-
 		server.start
 		server.join
-		//http://www.eclipse.org/jetty/documentation/current/quickstart-config-what.html
-
 	}
 }

@@ -1,8 +1,9 @@
 
 class SolutionMapView extends BaseView {
+
+	el() { return ".mapdiv" }
+
 	constructor(options) {
-		this.el = '.mapdiv';
-		this.evt = options.evt;
 		super(options);
 	}
 
