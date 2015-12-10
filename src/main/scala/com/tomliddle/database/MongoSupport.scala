@@ -31,8 +31,8 @@ class MongoSupport(databaseName: String){
 		solutionDAO.find(MongoDBObject("userId" -> userId)).toList
 	}
 
-	def getSolution(userId: Int, id: ObjectId): Option[Solution] = {
-		solutionDAO.findOne(MongoDBObject("userId" -> userId, "_id" -> id))
+	def getSolution(userId: Int, _id: ObjectId): Option[Solution] = {
+		solutionDAO.findOne(MongoDBObject("userId" -> userId, "_id" -> _id))
 	}
 
 	def addSolution(solution: Solution): Option[ObjectId] = {

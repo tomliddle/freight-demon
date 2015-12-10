@@ -34,12 +34,8 @@ class StopListView extends BaseView {
 
 	render () {
 		this.$el.html(Templates.stopListTemplate({ stops: this.collection.toJSON() }));
+		super.registerRemoveHandler();
 		var that = this;
-		this.$el.find("input.remove").click(function (e) {
-			e.preventDefault();
-			var id = $(e.target).data("id");
-			that.removeItem(id);
-		});
 		this.$el.find("button.geocode").click(function (e) {
 			e.preventDefault();
 			var address = that.$el.find(".address").val();

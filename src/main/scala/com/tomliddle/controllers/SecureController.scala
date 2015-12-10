@@ -7,8 +7,8 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.database.{MongoSupport, DatabaseSupport}
-import com.tomliddle.form.{StopForm, TruckForm}
-import com.tomliddle.solution.{Stop, Geocoding, LocationMatrix}
+import com.tomliddle.form.{SolutionForm, StopForm, TruckForm}
+import com.tomliddle.solution.{Solution, Stop, Geocoding, LocationMatrix}
 import org.bson.types.ObjectId
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
@@ -19,8 +19,6 @@ import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintE
 import org.scalatra.{FutureSupport, RequestEntityTooLarge}
 
 import scala.concurrent.ExecutionContext
-
-case class Status(status: String)
 
 class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, system: ActorSystem, myActor: ActorRef)
 		extends ScalateServlet with Geocoding with FutureSupport with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
@@ -105,8 +103,8 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 	// ****************************** SOLUTION *********************
 
 	post("/solution") {
-		val name = params("name")
-
+		var solution = parsedBody.extract[SolutionForm]
+		mdb.addSolution(Solution(solution.name, db.getDepots(scentry.user.id.get).head, List(), List(), scentry.user.id.get))
 	}
 
 	get("/solution") {
@@ -124,8 +122,6 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 
 	get("/solution/run/:id") {
 		contentType = formats("json")
-
-
 	}
 
 

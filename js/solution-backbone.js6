@@ -1,11 +1,6 @@
 class Solution extends Backbone.Model {
 
-	defaults() {
-		return {
-			"depot":  null,
-			"trucks":  [],
-		}
-	}
+	idAttribute() { return '_id' }
 
 	constructor(attrs, options) {
 		super(attrs, options);
@@ -15,6 +10,7 @@ class Solution extends Backbone.Model {
 class SolutionList extends BaseCollection {
 
 	url() { return "/solution" }
+
 	model(attrs, options) { return new Solution(attrs, options); }
 
 	constructor(options) {
@@ -22,60 +18,32 @@ class SolutionList extends BaseCollection {
 	}
 }
 
-// The page of solutions
-class SolutionPageView extends BaseView {
-
-	el() { return '.solutiondiv'; }
-
-	constructor(options) {
-		super(options);
-	}
-
-	initialize(){
-		this.solutionListView = new SolutionListView({solutions:this.collection, evt: this.evt});
-		var that = this;
-		this.render();
-	}
-
-	render(){
-		this.$el.html(Templates.solutionPageTemplate());
-		this.$el.find(".solution-list").append(this.solutionListView.render().$el);
-		return this;
-	}
-}
-
 // The list of solutions
 class SolutionListView extends BaseView {
 
-	el() { return ".solution-body"; }
+	el() { return ".solutiondiv"; }
 
 	constructor(options) {
 		super(options);
 	}
 
 	initialize(options){
-		this.collection = options.solutions;
+		this.collection = options.collection;
 		this.listenTo(this.collection, "add", this.render);
-		this.listenTo(this.collection, "change", this.change);
+		this.render();
 	}
 
 	render() {
-		this.collection.forEach(function(solution) {
-			var solutionView = new SolutionView({model: solution, evt: this.evt});
-			this.$el.append(solutionView.render().$el);
-		}, this);
+		this.$el.html(Templates.solutionListTemplate({ solution: this.collection.toJSON() }));
+		super.registerRemoveHandler();
 		return this;
-	}
-
-	change() {
-		alert("update")
 	}
 }
 
 // Each row of the table
 class SolutionView extends BaseView {
 
-	tagName() { return "li"; }
+	tagName() { return "td"; }
 
 	events() { return {"click input[type=radio]": "setSolution"}}
 

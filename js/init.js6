@@ -4,8 +4,7 @@ var Templates = Templates || {
 		this.stopListTemplate = Handlebars.compile($("#stop-list-template").html());
 		this.depotListTemplate = Handlebars.compile($("#depot-list-template").html());
 
-		this.solutionPageTemplate = Handlebars.compile($("#solution-page-template").html());
-		this.solutionTemplate = Handlebars.compile($("#solution-template").html());
+		this.solutionListTemplate = Handlebars.compile($("#solution-list-template").html());
 		this.mapTemplate = Handlebars.compile($("#map-template").html());
 	}
 };
@@ -31,6 +30,15 @@ class BaseView extends Backbone.View {
 
 	constructor(options) {
 		super(options);
+	}
+
+	registerRemoveHandler() {
+		var that = this;
+		this.$el.find("input.remove").click(function (e) {
+			e.preventDefault();
+			var id = $(e.target).data("id");
+			that.removeItem(id);
+		});
 	}
 
 	removeItem(id) {
@@ -91,7 +99,7 @@ class AppRouter extends Backbone.Router {
 		var that = this;
 		this.collection.fetch();
 		this.solutionMapView = new SolutionMapView({evt: this.evt});
-		this.solutionPageView = new SolutionPageView({collection: that.collection, evt: this.evt});
+		this.solutionListView = new SolutionListView({collection: that.collection, evt: this.evt});
 		this.truckListView = new TruckListView();
 		this.depotListView = new DepotListView();
 		this.stopListView = new StopListView();
@@ -99,7 +107,7 @@ class AppRouter extends Backbone.Router {
 
 	showDefaultRoute() {
 		this.view && this.view.hide();
-		this.view = this.solutionPageView.show();
+		this.view = this.solutionListView.show();
 	}
 
 	showTruckListView() {

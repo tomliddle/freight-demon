@@ -12,6 +12,11 @@ input.form-control.lat-lng {
 	width: 80px;
 }
 
+input.form-control.weight {
+	width: 100px;
+}
+
+
 .solutiondiv, .depotdiv, .mapdiv, .stopdiv, .truckdiv {
 	display: none;
 }

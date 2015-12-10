@@ -100,7 +100,7 @@
 					<td><input type="text" class="form-control" name="name" required="true" /></td>
 					<td><input type="time" class="form-control" name="startTime" value="09:00" required="true"/></td>
 					<td><input type="time" class="form-control" name="endTime" value="17:00" required="true"/></td>
-					<td><input type="number" class="form-control" name="maxWeight" value="50" required="true"/></td>
+					<td><input type="number" class="form-control weight" name="maxWeight" value="50" required="true"/></td>
 					<td><input type="number" step="0.0001" class="form-control lat-lng x" name="x" required="true" readonly="true"/></td>
 					<td><input type="number" step="0.0001" class="form-control lat-lng y" name="y" required="true" readonly="true"/></td>
 					<td>
@@ -131,7 +131,7 @@
 	</form>
 </script>
 
-<script id="solution-page-template" type="text/x-handlebars-template">
+<script id="solution-list-template" type="text/x-handlebars-template">
 	<div class="row">
 		<div class="col-xs-4">
 			<h2>Solutions</h2>
@@ -147,25 +147,25 @@
 					<th>Action</th>
 				</tr>
 			</thead>
-			<tbody class="solution-body">
+			<tbody>
 				<tr>
 					<td></td>
 					<td><input type="text" class="form-control" name="name" required="true"/></td>
 					<td><input class="btn add" name="add" type="submit" value="Add"/></td>
 				</tr>
+				{{#each solution}}
+				<tr>
+					<td><input type="radio" name="solution-select" class="solution-select" data-target="{{_id}}"/></td>
+					<td>{{name}}</td>
+					<td><input class="btn remove" name="remove" type="submit" data-id="{{_id}}" value="Remove"/></td>
+				</tr>
+				{{/each}}
 			</tbody>
 		</table>
 	</form>
 </script>
 
-<script id="solution-template" type="text/x-handlebars-template">
-	<td><input type="radio" name="solution-select" class="solution-select" data-target="{{solution.id}}"/></td>
-	<td>{{solution.name}}</td>
-	<td>
-		<input class="btn add" name="add" type="submit" value="Copy"/>
-		<input class="btn remove" name="remove" type="submit" data-id="{{solution.id}}" value="Remove"/>
-	</td>
-</script>
+
 
 <script id="map-template" type="text/x-handlebars-template">
 	<div class="row">
@@ -180,7 +180,6 @@
 	</div>
 
 </script>
-
 
 
 

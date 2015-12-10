@@ -17,3 +17,6 @@ case class StopForm(name: String, startTime: String, endTime: String, maxWeight:
 		Stop(name, BigDecimal(x), BigDecimal(y), address, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime, formatter), BigDecimal(maxWeight), List() , userId)
 	}
 }
+
+
+case class SolutionForm(name: String)
