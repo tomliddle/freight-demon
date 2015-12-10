@@ -112,9 +112,14 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 		mdb.getSolutions(scentry.user.id.get)
 	}
 
-	get("/solution/:id") {
+	get("/solution/:name") {
 		contentType = formats("json")
-		mdb.getSolution(scentry.user.id.get, new ObjectId(params("id")))
+		mdb.getSolution(scentry.user.id.get, params("name"))
+	}
+
+	delete("/solution/:name") {
+		contentType = formats("json")
+		mdb.removeSolution(scentry.user.id.get, params("name"))
 	}
 
 	////////////////////

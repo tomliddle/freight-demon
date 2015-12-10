@@ -37,12 +37,12 @@ class BaseView extends Backbone.View {
 		this.$el.find("input.remove").click(function (e) {
 			e.preventDefault();
 			var id = $(e.target).data("id");
-			that.removeItem(id);
+			id && that.removeItem(id);
 		});
 	}
 
 	removeItem(id) {
-		id && this.collection.get(id).destroy();
+		this.collection.get(id).destroy();
 		this.render();
 	}
 

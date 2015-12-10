@@ -93,7 +93,7 @@ class MongoSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach wi
 				val solutions2 = mongoSupport.getSolutions(USER_ID)
 				solutions2.size should equal (3)
 
-				mongoSupport.removeSolution(solToRemove)
+				mongoSupport.removeSolution(USER_ID, solToRemove.name)
 				val solutions3 = mongoSupport.getSolutions(USER_ID)
 				solutions3.size should equal (2)
 
@@ -106,10 +106,10 @@ class MongoSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach wi
 		"Get operations" should {
 
 			"get a record" in {
-				val sol = simpleSolution.copy(userId = USER_ID, _id = new ObjectId)
+				val sol = simpleSolution.copy(userId = USER_ID, _id = new ObjectId, name = "TEST")
 				val id = mongoSupport.addSolution(sol)
 
-				val solOpt = mongoSupport.getSolution(USER_ID, id.get)
+				val solOpt = mongoSupport.getSolution(USER_ID, "TEST")
 
 				solOpt.isDefined should equal (true)
 

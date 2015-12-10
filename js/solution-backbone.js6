@@ -1,6 +1,6 @@
 class Solution extends Backbone.Model {
 
-	idAttribute() { return '_id' }
+	idAttribute() { return "name"; }
 
 	constructor(attrs, options) {
 		super(attrs, options);
@@ -8,6 +8,8 @@ class Solution extends Backbone.Model {
 }
 
 class SolutionList extends BaseCollection {
+
+	modelId(attrs) { return attrs.name; }
 
 	url() { return "/solution" }
 

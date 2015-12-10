@@ -9,7 +9,7 @@ import com.mongodb.casbah.Imports._
 import com.tomliddle.solution.Solution
 import org.slf4j.LoggerFactory
 
-class SolutionDAO extends SalatDAO[Solution, ObjectId](collection = MongoClient()("test_db")("test_coll"))
+class SolutionDAO extends SalatDAO[Solution, ObjectId](collection = MongoClient()("d")("test_coll"))
 
 class MongoSupport(databaseName: String){
 
@@ -31,8 +31,8 @@ class MongoSupport(databaseName: String){
 		solutionDAO.find(MongoDBObject("userId" -> userId)).toList
 	}
 
-	def getSolution(userId: Int, _id: ObjectId): Option[Solution] = {
-		solutionDAO.findOne(MongoDBObject("userId" -> userId, "_id" -> _id))
+	def getSolution(userId: Int, name: String): Option[Solution] = {
+		solutionDAO.findOne(MongoDBObject("userId" -> userId, "name" -> name))
 	}
 
 	def addSolution(solution: Solution): Option[ObjectId] = {
@@ -43,8 +43,11 @@ class MongoSupport(databaseName: String){
 		solutionDAO.update(MongoDBObject("userId" -> solution.userId, "_id" -> solution._id), solution)
 	}
 
-	def removeSolution(solution: Solution) {
-		solutionDAO.remove(solution)
+	def removeSolution(userId: Int, name: String) {
+		getSolution(userId, name) match {
+			case Some(sol) => solutionDAO.remove(sol)
+			case None => None
+		}
 	}
 
 	def removeSolutions(userId: Int) {
