@@ -10,8 +10,21 @@ var Templates = Templates || {
 };
 
 class AppEvents extends Backbone.View {
+
 	constructor(options) {
 		super(options);
+	}
+
+	initialize() {
+		this.on("setSolution", this.setSolution);
+	}
+
+	setSolution(model) {
+		this.model = model;
+	}
+
+	getSolution() {
+		return this.model;
 	}
 }
 
@@ -25,7 +38,9 @@ class BaseView extends Backbone.View {
 
 	events() {
 		// todoo was opts.events
-		return {"submit form.add" : "save"};
+		return {
+			"submit form.add" : "save"
+		};
 	}
 
 	constructor(options) {

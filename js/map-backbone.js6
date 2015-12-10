@@ -5,14 +5,17 @@ class SolutionMapView extends BaseView {
 
 	constructor(options) {
 		super(options);
+		this.evt = options.evt;
 	}
 
 	initialize() {
 		this.listenTo(this.evt, "setSolution", this.setModel);
 	}
 
-	setModel(model) {
-		this.model = model;
+	// TODO this should work...
+	sestModel(model) {
+		alert("set model")
+		this.model= model;
 	}
 
 	show() {
@@ -22,6 +25,7 @@ class SolutionMapView extends BaseView {
 	}
 
 	render() {
+
 		if (!this.rendered) {
 			this.rendered = true;
 			this.$el.html(Templates.mapTemplate());
@@ -31,8 +35,9 @@ class SolutionMapView extends BaseView {
 			this.layerGroup = L.layerGroup().addTo(this.map);
 		}
 
-		if (this.model) {
-			this.drawSolution(this.model);
+		var model = this.evt.getSolution();
+		if (model) {
+			this.drawSolution(model);
 		}
 
 		return this;

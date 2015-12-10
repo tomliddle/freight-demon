@@ -31,6 +31,7 @@ class SolutionListView extends BaseView {
 
 	initialize(options){
 		this.collection = options.collection;
+		this.evt = options.evt;
 		this.listenTo(this.collection, "add", this.render);
 		this.render();
 	}
@@ -38,31 +39,16 @@ class SolutionListView extends BaseView {
 	render() {
 		this.$el.html(Templates.solutionListTemplate({ solution: this.collection.toJSON() }));
 		super.registerRemoveHandler();
+
+		var self = this;
+		this.$el.find(".solution-select").click(function (e) {
+			var id = $(e.target).data("id");
+			var model = self.collection.get(id)
+			self.evt.trigger("setSolution", model);
+		});
+
 		return this;
 	}
 }
-
-// Each row of the table
-class SolutionView extends BaseView {
-
-	tagName() { return "td"; }
-
-	events() { return {"click input[type=radio]": "setSolution"}}
-
-	constructor(options) {
-		super(options);
-		this.evt = options.evt;
-	}
-
-	render() {
-		this.$el.html(Templates.solutionTemplate({solution: this.model.toJSON()}));
-		return this;
-	}
-
-	setSolution(e) {
-		this.evt.trigger("setSolution", this.model);
-	}
-}
-
 
 

@@ -155,7 +155,7 @@
 				</tr>
 				{{#each solution}}
 				<tr>
-					<td><input type="radio" name="solution-select" class="solution-select" data-target="{{name}}"/></td>
+					<td><input type="radio" name="solution-select" class="solution-select select" data-id="{{name}}"/></td>
 					<td>{{name}}</td>
 					<td><input class="btn remove" name="remove" type="submit" data-id="{{name}}" value="Remove"/></td>
 				</tr>
