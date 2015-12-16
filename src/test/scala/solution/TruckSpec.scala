@@ -2,13 +2,15 @@ package com.bullionvault.bvbot.price
 
 import java.math.{RoundingMode, MathContext}
 
-import Solution.TestObjects
+import solution.TestObjects
+import com.tomliddle.entity.LocationMatrix
 import com.tomliddle.solution._
+import com.tomliddle.solution.timeanddistance.SimpleTimeAndDistCalc
 import org.joda.time.{Duration, LocalTime}
 import org.scalatest.{Matchers, BeforeAndAfterEach, WordSpec}
 
 
-class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
+class TruckSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAndAfterEach with TestObjects {
 
 
 	"Truck" when {
@@ -32,7 +34,7 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 			}
 
 			"get an optimised solution" in {
-				val shuffledTruck = truck.shuffle
+				val shuffledTruck = shuffle(truck)
 
 				shuffledTruck.cost should be < (truck.cost)
 
@@ -45,7 +47,7 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, List(stops(0)), lm, 1, Some(1))
 				}
 
-				truck.shuffle.cost should equal (truck.cost)
+				shuffle(truck).cost should equal (truck.cost)
 			}
 
 		}

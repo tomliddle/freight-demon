@@ -1,5 +1,7 @@
 package com.tomliddle.solution
 
+import com.tomliddle.entity.Stop
+
 /**
  * Created by tom on 20/02/2015.
  */

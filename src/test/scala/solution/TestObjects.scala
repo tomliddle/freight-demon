@@ -1,6 +1,8 @@
-package Solution
+package solution
 
+import com.tomliddle.entity.{LocationMatrix, Stop, Depot}
 import com.tomliddle.solution._
+import com.tomliddle.solution.timeanddistance.SimpleTimeAndDistCalc
 import org.joda.time.LocalTime
 
 
@@ -9,7 +11,7 @@ trait TestObjects {
 
 	val startTime = new LocalTime(0).withHourOfDay(9)
 	val endTime = new LocalTime(0).withHourOfDay(19)
-	val stop = Stop("1", 0, 0, "234234", startTime, endTime, BigDecimal(1), List(), 1)
+	val stop = Stop("1", 0, 0, "234234", startTime, endTime, BigDecimal(1), 1)
 	val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
 
 	private val locationList = List(
@@ -38,24 +40,20 @@ trait TestObjects {
 		stop.copy(x = 100000, y = 0)
 	)
 
-	val stops: List[Stop] = (0 to locationList.size - 1).map {
+	val stops = (0 to locationList.size - 1).map {
 		stopId => locationList(stopId).copy(id = Some(stopId))
 	}.toList
 
-	val truck: Truck = {
-		val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
-		Truck("Truck1", startTime, endTime, BigDecimal(100), depot, stops, lm, 1, Some(1))
-	}
+	val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
+	val truck = Truck("Truck1", startTime, endTime, BigDecimal(100), depot, stops, lm, 1, Some(1))
 
 	// Straight line to test distance
-	val straightLineTruck: Truck = {
-		val stops2: List[Stop] = (0 to straightLineLocations.size - 1).map {
-			id => straightLineLocations(id).copy(id = Some(id))
-		}.toList
-	
-		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
-		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
-	}
+	val stops2 = (0 to straightLineLocations.size - 1).map {
+		id => straightLineLocations(id).copy(id = Some(id))
+	}.toList
+	val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
+	val straightLineTruck: Truck = Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
+
 
 	// With delivery times to test start and end times
 	val straightLineTruckWithTimes: Truck = {
@@ -82,10 +80,10 @@ trait TestObjects {
 		}.toList
 
 		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
-		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
+		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm, 1, Some(1))
 	}
 
-	val solution = Solution("Solution", depot, truck.stops, List(truck, truck, truck), 1)
+	val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm2, 1)
 
-	val simpleSolution = Solution("Solution", depot, List(), List(truck), 1)
+	val simpleSolution = Solution("solution", depot, List(), List(truck), lm2, 1)
 }

@@ -13,21 +13,7 @@ object JettyLauncher {
 	def main(args: Array[String]) {
 		val port = 8080
 
-		val threadPool = new QueuedThreadPool
-		threadPool.setMaxThreads(20)
-		val server = new Server(threadPool)
-
-		// Extra options
-		server.setDumpAfterStart(false)
-		server.setDumpBeforeStop(false)
-		server.setStopAtShutdown(true)
-
-		// Handler Structure
-		val handlers = new HandlerCollection
-		val contexts = new ContextHandlerCollection()
-		//val requestLogHandler = new RequestLogHandler
-		handlers.setHandlers(List(contexts, new DefaultHandler()).toArray)
-		server.setHandler(handlers)
+		val server = new Server(port)
 
 		// Context handler
 		val context = new WebAppContext()
@@ -37,22 +23,6 @@ object JettyLauncher {
 		context.addEventListener(new ScalatraListener)
 		context.addServlet(classOf[DefaultServlet], "/")
 		server.setHandler(context)
-
-		// HTTP Configuration
-		val http_config = new HttpConfiguration()
-		//http_config.setSecureScheme("https")
-		//http_config.setSecurePort(8443)
-		http_config.setOutputBufferSize(32768)
-		http_config.setRequestHeaderSize(8192)
-		http_config.setResponseHeaderSize(8192)
-		http_config.setSendServerVersion(true)
-		http_config.setSendDateHeader(false)
-
-		// Server connector
-		val http = new ServerConnector(server, new HttpConnectionFactory(http_config))
-		http.setPort(port)
-		http.setIdleTimeout(10000)
-		server.addConnector(http)
 
 		server.start
 		server.join

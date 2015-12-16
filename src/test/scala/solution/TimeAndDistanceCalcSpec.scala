@@ -1,6 +1,7 @@
-package Solution
+package solution
 
-import com.tomliddle.solution.{LatLongTimeAndDistCalc, Point}
+import com.tomliddle.entity.Point
+import com.tomliddle.solution.timeanddistance.LatLongTimeAndDistCalc
 import org.joda.time.Duration
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 

@@ -1,15 +1,16 @@
 package com.tomliddle.solution
+
+import com.tomliddle.entity.{LocationMatrix, Stop, Link}
+import com.tomliddle.exception.RouteInvalidException
 import org.joda.time.{Duration, LocalTime}
 
 
-
-class RouteInvalidException(message: String) extends Exception
 
 trait TruckLinks {
 	this: Truck =>
 
 
-	def getLinks: Option[List[Link]] = {
+	def getLinks(lm: LocationMatrix): Option[List[Link]] = {
 
 		var routeEarliestStartTime: LocalTime = startTime
 		var routeLatestStartTime: LocalTime = endTime
@@ -96,7 +97,7 @@ trait TruckLinks {
 		}
 
 		try {
-			Some(List(depotLinks._1) ++ getStopLinks ++ List(depotLinks._2))
+			Some(List(depotLinks._1) ::: getStopLinks ::: List(depotLinks._2))
 		}
 		catch {
 			case rie: RouteInvalidException =>

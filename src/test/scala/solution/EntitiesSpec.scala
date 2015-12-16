@@ -1,7 +1,7 @@
-package Solution
+package solution
 
 
-import com.tomliddle.solution.{Mean, Point}
+import com.tomliddle.entity.{Mean, Point}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
 class EntitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {

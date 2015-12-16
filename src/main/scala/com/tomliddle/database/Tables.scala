@@ -1,5 +1,6 @@
 package com.tomliddle.database
 
+import com.tomliddle.entity.{LocationMatrix, Stop, Depot}
 import com.tomliddle.solution._
 import java.sql.Time
 import org.joda.time.LocalTime
@@ -73,11 +74,10 @@ class Stops(tag: Tag) extends Table[Stop](tag, "STOPS") with TypeConvert {
 	def startTime: Column[LocalTime] = column[LocalTime]("startTime")
 	def endTime: Column[LocalTime] = column[LocalTime]("endTime")
 	def maxWeight: Column[BigDecimal] = column[BigDecimal]("maxWeight")
-	def specialCodes: Column[List[String]] = column[List[String]]("specialCodes")
 	def userId: Column[Int] = column[Int]("userId")
 	def id: Column[Int] = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-	def * = (name, x, y, address, startTime, endTime, maxWeight, specialCodes, userId, id.?) <>(Stop.tupled, Stop.unapply)
+	def * = (name, x, y, address, startTime, endTime, maxWeight, userId, id.?) <>(Stop.tupled, Stop.unapply)
 }
 
 object Tables {

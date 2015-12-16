@@ -1,6 +1,7 @@
-package Solution
+package solution
 
-import com.tomliddle.solution.{Stop, Point, SwapUtilities}
+import com.tomliddle.entity.Stop
+import com.tomliddle.solution.SwapUtilities
 import org.joda.time.{LocalTime, DateTime}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 

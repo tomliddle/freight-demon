@@ -7,8 +7,10 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.database.{MongoSupport, DatabaseSupport}
+import com.tomliddle.entity.LocationMatrix
 import com.tomliddle.form.{SolutionForm, StopForm, TruckForm}
-import com.tomliddle.solution.{Solution, Stop, Geocoding, LocationMatrix}
+import com.tomliddle.solution.timeanddistance.Geocoding
+import com.tomliddle.solution.Solution
 import org.bson.types.ObjectId
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
@@ -104,17 +106,33 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 
 	post("/solution") {
 		var solution = parsedBody.extract[SolutionForm]
-		mdb.addSolution(Solution(solution.name, db.getDepots(scentry.user.id.get).head, List(), List(), scentry.user.id.get))
+		val lm = new LocationMatrix(List(), List())
+		mdb.addSolution(Solution(solution.name, db.getDepots(scentry.user.id.get).head, List(), List(), lm, scentry.user.id.get))
 	}
 
 	get("/solution") {
 		contentType = formats("json")
-		mdb.getSolutions(scentry.user.id.get)
+
+		val userId = scentry.user.id.get
+		val depots = db.getDepots(userId)
+		val stops = db.getStops(userId)
+		val lm = new LocationMatrix(stops, depots)
+
+		//, depots = depots, , depots.head, lm))
+		mdb.getSolutions(scentry.user.id.get).map {
+			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm))).preload.shuffle
+		}
 	}
 
 	get("/solution/:name") {
 		contentType = formats("json")
-		mdb.getSolution(scentry.user.id.get, params("name"))
+		val userId = scentry.user.id.get
+		mdb.getSolution(userId, params("name"))
+
+		val depots = db.getDepots(userId)
+		val stops = db.getStops(userId)
+		val lm = new LocationMatrix(stops, depots)
+		Solution(params("name"), depots.head, stops, db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm, userId)
 	}
 
 	delete("/solution/:name") {

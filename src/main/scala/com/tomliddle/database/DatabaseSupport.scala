@@ -1,6 +1,7 @@
 package com.tomliddle.database
 
-import com.tomliddle.solution.{LocationMatrix, Solution, Depot, Stop}
+import com.tomliddle.entity.{Stop, Depot}
+import com.tomliddle.solution.Solution
 import scala.slick.driver.H2Driver.simple._
 import com.tomliddle.database.Tables.{depots, users, trucks, stops}
 import scala.slick.jdbc.JdbcBackend.Database.dynamicSession

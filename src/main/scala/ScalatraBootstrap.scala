@@ -6,7 +6,7 @@ import com.tomliddle.database.{MongoSupport, DatabaseSupport, User, Tables}
 import Tables._
 import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
-import com.tomliddle.solution.Depot
+import com.tomliddle.entity.Depot
 import org.scalatra._
 
 import scala.slick.driver.H2Driver.simple._

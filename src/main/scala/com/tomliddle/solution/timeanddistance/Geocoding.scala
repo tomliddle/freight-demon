@@ -1,10 +1,10 @@
-package com.tomliddle.solution
+package com.tomliddle.solution.timeanddistance
 
 import java.net.URLEncoder
 
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
-import org.slf4j.{LoggerFactory, Logger}
+import org.slf4j.LoggerFactory
 
 
 trait Geocoding {

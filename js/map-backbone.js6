@@ -84,7 +84,7 @@ class SolutionMapView extends BaseView {
 		var y = entity.y;
 		L.marker([y, x])
 			.addTo(this.layerGroup)
-			.bindPopup(number + " " + entity.name + " " + entity.startTime + " " + entity.endTime);
+			.bindPopup(number + " " + entity.name + " " + entity.startTime || "" + " " + entity.endTime || "");
 	}
 
 	drawRoute(truck, depot) {

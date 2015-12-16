@@ -1,12 +1,13 @@
-package Solution
+package solution
 
-import com.tomliddle.solution.{Depot, Solution, Stop}
+import com.tomliddle.entity.{Stop, Depot}
+import com.tomliddle.solution.{TruckAlgorithm, Solution}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
-class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
+class SolutionSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAndAfterEach with TestObjects {
 
 
-	"Solution" when {
+	"solution" when {
 
 		"calculating the cost" should {
 
@@ -28,15 +29,15 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 
 				cost should be < (solution.cost)
 
-				cost should equal (truck.shuffle.cost.get * 3)
+				cost should equal (shuffle(truck).cost.get * 3)
 
 			}
 
 			"have the right stops" in {
 				val shuffledSolution = solution.shuffle
 
-				solution.loadedCities.size should equal (30)
-				shuffledSolution.loadedCities.size should equal (30)
+				solution.loadedStops.size should equal (30)
+				shuffledSolution.loadedStops.size should equal (30)
 
 			}
 
@@ -45,22 +46,22 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			}
 
 			"get loaded cities" in {
-				solution.loadedCities.size should equal (30)
+				solution.loadedStops.size should equal (30)
 			}
 
 			"swap 4 " in {
 				val stops = List(
-					Stop("1", -0.09, 51.55, "234234", startTime, endTime, BigDecimal(1), List(), 1),
-					Stop("1", -0.36, 51.58, "234234", startTime, endTime, BigDecimal(1), List(), 1),
-					Stop("1", 0.11, 52.25, "234234", startTime, endTime, BigDecimal(1), List(), 1),
-					Stop("1", -0.3, 51.47, "234234", startTime, endTime, BigDecimal(1), List(), 1)
+					Stop("1", -0.09, 51.55, "234234", startTime, endTime, BigDecimal(1), 1),
+					Stop("1", -0.36, 51.58, "234234", startTime, endTime, BigDecimal(1), 1),
+					Stop("1", 0.11, 52.25, "234234", startTime, endTime, BigDecimal(1), 1),
+					Stop("1", -0.3, 51.47, "234234", startTime, endTime, BigDecimal(1), 1)
 				)
 
 				val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
-				val solution = Solution("Solution", depot, truck.stops, List(truck, truck, truck), 1)
+				val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm, 1)
 				val shuffledSolution = solution.shuffle
 
-				solution.loadedCities.size should equal (30)
+				solution.loadedStops.size should equal (30)
 			}
 
 		}

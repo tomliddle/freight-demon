@@ -1,4 +1,4 @@
-package Solution
+package solution
 
 import com.mongodb.casbah.Imports._
 import com.tomliddle.database.MongoSupport
@@ -128,8 +128,6 @@ class MongoSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach wi
 				solOpt.get.trucks.head.stops.head.startTime should equal (sol.trucks.head.stops.head.startTime)
 				solOpt.get.trucks.head.stops.head.endTime should equal (sol.trucks.head.stops.head.endTime)
 				solOpt.get.trucks.head.userId should equal (sol.trucks.head.userId)
-				solOpt.get.trucks.head.lm should equal (sol.trucks.head.lm)
-
 			}
 
 			"get all records" in {
