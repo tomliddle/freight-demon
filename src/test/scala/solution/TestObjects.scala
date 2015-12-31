@@ -80,7 +80,7 @@ trait TestObjects {
 		}.toList
 
 		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
-		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm, 1, Some(1))
+		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
 	}
 
 	val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm2, 1)

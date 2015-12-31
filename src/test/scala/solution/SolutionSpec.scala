@@ -4,7 +4,7 @@ import com.tomliddle.entity.{Stop, Depot}
 import com.tomliddle.solution.{TruckAlgorithm, Solution}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
-class SolutionSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAndAfterEach with TestObjects {
+class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
 
 
 	"solution" when {
@@ -29,7 +29,7 @@ class SolutionSpec extends WordSpec with TruckAlgorithm with Matchers with Befor
 
 				cost should be < (solution.cost)
 
-				cost should equal (shuffle(truck).cost.get * 3)
+				cost should equal (truck.shuffle.cost.get * 3)
 
 			}
 

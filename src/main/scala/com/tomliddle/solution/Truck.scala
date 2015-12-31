@@ -5,6 +5,7 @@ import com.tomliddle.entity.{LocationMatrix, Stop, Depot, Link}
 import com.tomliddle.util.Logging
 import org.joda.time.{Duration, LocalTime}
 import scala.math.BigDecimal.RoundingMode
+import scala.util.{Failure, Success, Try}
 
 case class Truck(
 										name: String,
@@ -18,6 +19,7 @@ case class Truck(
 										id: Option[Int] = None)
 	extends TruckAlgorithm with TruckLinks with Logging  {
 
+	require(stops.size == stops.distinct.size, "Stops aren't distinct")
 
 
 	lazy val totalWeight: BigDecimal = {
@@ -34,24 +36,26 @@ case class Truck(
 
 	lazy val getMaxSwapSize = stops.size / 2
 
-	lazy val links: Option[List[Link]] = getLinks(lm)
+	lazy val links: Try[List[Link]] = getLinks
 
 	lazy val distance: Option[BigDecimal] = links match {
-			case Some(links: List[Link]) => Some(links.foldLeft(BigDecimal(0)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance })
-			case None => None
+			case Success(links: List[Link]) => Some(links.foldLeft(BigDecimal(0)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance })
+			case Failure(_) => None
 	}
 
 	lazy val time: Option[Duration] = links match {
-		case Some(links: List[Link]) => Some(links.foldLeft(new Duration(0)) { (a: Duration, b: Link) => a.plus(b.travelDT.time).plus(b.waitTime) })
-		case None => None
+		case Success(links: List[Link]) => Some(links.foldLeft(new Duration(0)) { (a: Duration, b: Link) => a.plus(b.travelDT.time).plus(b.waitTime) })
+		case Failure(_) => None
 	}
 
 
-	lazy val isValid: Boolean = weightValid && timeValid
+	lazy val isValid: Boolean = weightValid && timeValid && distanceValid
 
 	lazy val weightValid: Boolean = totalWeight <= maxWeight
 
-	lazy val timeValid: Boolean = time.isDefined //&& time.get.isShorterThan(new Duration(5 * 1000 * 60 * 60))
+	lazy val timeValid: Boolean = time.isDefined//&& time.get.isShorterThan(new Duration(5 * 1000 * 60 * 60))
+
+	lazy val distanceValid: Boolean = distance.isDefined
 }
 
 

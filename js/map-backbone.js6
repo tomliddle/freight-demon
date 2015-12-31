@@ -12,8 +12,7 @@ class SolutionMapView extends BaseView {
 		this.listenTo(this.evt, "setSolution", this.setModel);
 	}
 
-	// TODO this should work...
-	sestModel(model) {
+	setModel(model) {
 		alert("set model")
 		this.model= model;
 	}

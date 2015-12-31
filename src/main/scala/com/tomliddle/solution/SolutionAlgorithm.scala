@@ -3,87 +3,78 @@ package com.tomliddle.solution
 import com.tomliddle.entity.Stop
 
 
-trait SolutionAlgorithm extends SwapUtilities with TruckAlgorithm {
+trait SolutionAlgorithm extends SwapUtilities {
 
 	this: Solution =>
 
 	def preload: Solution = {
-		var unloadedCities = stopsToLoad
-		val truckSol = trucks.map {
-			truck => {
-				// Try and load the onloaded stops
-				var truckRes: (Truck, List[Stop]) = load(truck, unloadedCities, lm)
-				// Set unloaded stops to the ones that weren't loaded on the current truck
-				unloadedCities = truckRes._2
-				truckRes._1
-			}
+		val (unloadedStops, loadedTrucks) = trucks.foldLeft(List[Stop](), List[Truck]()) {
+			case ((unloadedStops: List[Stop], truckList: List[Truck]), currTruck: Truck) =>
+				currTruck.load(stopsToLoad) match {
+					case (modifiedTruck: Truck, stopList: List[Stop]) =>
+						(unloadedStops ::: stopList, modifiedTruck :: truckList)
+				}
 		}
-		copy(trucks = truckSol, stopsToLoad = unloadedCities)
+
+		copy(trucks = loadedTrucks, stopsToLoad = unloadedStops)
 	}
 
 	def shuffle : Solution = {
-		val newTrucks = trucks.map { truck => shuffle(truck)}
-		copy(trucks = newTrucks)
+		copy(trucks = trucks.map { _.shuffle}).swapBetweenTrucks
 	}
 
 	def swapBetweenTrucks: Solution = {
 
 		// Iterates through two trucks trying to swap all points
-		def swapBetween(truck1: Truck, truck2: Truck) : Option[(Truck, Truck)] = {
+		def swapBetween(truck1: Truck, truck2: Truck) : (Truck, Truck) = {
 
-			def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : Option[(Truck, Truck)] = {
-				var returnTrucks: Option[(Truck, Truck)] = None
-				(0 to truck1.stops.size - swapSize).foreach {
-					truck1Pos => {
-						(0 to truck2.stops.size - swapSize).foreach {
-							truck2Pos => {
-								val truck1Unloaded: (Truck, List[Stop]) = unload(truck1, truck1Pos, swapSize)
-								val truck2Unloaded: (Truck, List[Stop]) = unload(truck2, truck2Pos, swapSize)
-								val truck1Load: (Truck, List[Stop]) = load(truck1Unloaded._1, truck2Unloaded._2, lm)
-								val truck2Load: (Truck, List[Stop]) = load(truck2Unloaded._1, truck1Unloaded._2, lm)
+			def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : (Truck, Truck) = {
+
+				(0 to truck1.stops.size - swapSize).foldLeft(truck1, truck2) {
+					case (_, truck1Pos) => {
+						(0 to truck2.stops.size - swapSize).foldLeft(truck1, truck2){
+							case ((bestTruck1: Truck, bestTruck2: Truck), truck2Pos: Int) => {
+								val (t1Unloaded, t1stops) = truck1.unload(truck1Pos, swapSize)
+								val (t2Unloaded, t2stops) = truck2.unload(truck2Pos, swapSize)
+								val (t1New, t1NewStops) = t1Unloaded.load(t2stops)
+								val (t2New, t2NewStops)  = t2Unloaded.load(t1stops)
 
 								// If trucks fully reloaded, check the cost.
-								if (truck1Load._2.size == 0 && truck2Load._2.size == 0 &&
-										truck1Load._1.cost.get + truck2Load._1.cost.get < truck1.cost.get + truck2.cost.get)
-									returnTrucks = Some(truck1Load._1, truck2Load._1)
+								if (t1NewStops.size == 0 && t2NewStops.size == 0 &&
+										t1New.cost.get + t2New.cost.get < bestTruck1.cost.get + bestTruck2.cost.get)
+									(t1New, t2New)
+								else (bestTruck1, bestTruck2)
 							}
 						}
 					}
 				}
-				returnTrucks
 			}
 
-			var bestSol: Option[(Truck, Truck)]  = None
-			(1 to truck1.getMaxSwapSize).foreach {
+			(1 to truck1.getMaxSwapSize).map {
 				swapSize => {
-					doSwapBetween(truck1, truck2, swapSize) match {
-						case Some(trucks) => bestSol = Some(trucks)
-						case None =>
-					}
+					doSwapBetween(truck1, truck2, swapSize)
 				}
-			}
-			bestSol
+			}.minBy(truckTup => truckTup._1.cost.get + truckTup._2.cost.get)
+
 		}
 
 		// Swaps from one truck to all trucks
 		def swapOneToAll(trucks: List[Truck], truck1Pos: Int): List[Truck] = {
-			var returnTrucks: List[Truck] = trucks
-			(0 to trucks.size -1).foreach {
-				truck2Pos: Int => {
+
+			(0 to trucks.size -1).foldLeft(trucks) {
+				(returnTrucks, truck2Pos) => {
 					if (truck1Pos != truck2Pos) {
 						swapBetween(returnTrucks(truck1Pos), returnTrucks(truck2Pos)) match {
-							case Some(newTrucks) => {
-								returnTrucks = returnTrucks
-										.patch(truck1Pos, List[Truck](newTrucks._1), 1)
-										.patch(truck2Pos, List[Truck](newTrucks._2), 1)
+							case (truck1, truck2) => {
+								val patchedTruck = returnTrucks.patch(truck1Pos, List[Truck](truck1), 1).patch(truck2Pos, List[Truck](truck2), 1)
 								assert(returnTrucks.size == trucks.size, s"trucks size: ${trucks.size} returntrucks size: ${returnTrucks.size}")
+								patchedTruck
 							}
-							case None => None
 						}
 					}
+					else returnTrucks
 				}
 			}
-			returnTrucks
 		}
 
 		def swapAllToAll(trucks: List[Truck]): List[Truck] = {

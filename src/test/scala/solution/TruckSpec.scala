@@ -10,7 +10,7 @@ import org.joda.time.{Duration, LocalTime}
 import org.scalatest.{Matchers, BeforeAndAfterEach, WordSpec}
 
 
-class TruckSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAndAfterEach with TestObjects {
+class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {
 
 
 	"Truck" when {
@@ -22,19 +22,17 @@ class TruckSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAn
 			}
 
 			"get correct cost" in {
-				// TODO check
 				truck.cost should equal (BigDecimal(21.26))
 			}
 
 			"get correct distance time" in {
-				// TODO check
 				truck.distance.get.setScale(2, BigDecimal.RoundingMode.HALF_UP) should equal (BigDecimal(17.72))
 				truck.time should equal (new Duration((17715).toLong))
 
 			}
 
 			"get an optimised solution" in {
-				val shuffledTruck = shuffle(truck)
+				val shuffledTruck = truck.shuffle
 
 				shuffledTruck.cost should be < (truck.cost)
 
@@ -47,7 +45,7 @@ class TruckSpec extends WordSpec with TruckAlgorithm with Matchers with BeforeAn
 					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, List(stops(0)), lm, 1, Some(1))
 				}
 
-				shuffle(truck).cost should equal (truck.cost)
+				truck.shuffle.cost should equal (truck.cost)
 			}
 
 		}

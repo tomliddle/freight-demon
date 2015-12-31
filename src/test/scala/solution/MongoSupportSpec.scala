@@ -81,7 +81,7 @@ class MongoSupportSpec extends WordSpec with Matchers with BeforeAndAfterEach wi
 				val solutions = mongoSupport.getSolutions(USER_ID)
 				solutions.size should equal (0)
 
-				val sol1 = solution.copy(userId = USER_ID)
+				val sol1 = solution.copy(userId = USER_ID, _id = new ObjectId)
 				mongoSupport.addSolution(sol1)
 
 				val solToRemove = solution.copy(userId = USER_ID, _id = new ObjectId)

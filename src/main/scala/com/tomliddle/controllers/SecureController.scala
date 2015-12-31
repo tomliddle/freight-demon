@@ -118,10 +118,10 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 		val stops = db.getStops(userId)
 		val lm = new LocationMatrix(stops, depots)
 
-		//, depots = depots, , depots.head, lm))
-		mdb.getSolutions(scentry.user.id.get).map {
-			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm))).preload.shuffle
+		val solutions = mdb.getSolutions(scentry.user.id.get).map {
+			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm = lm).preload.shuffle
 		}
+		solutions
 	}
 
 	get("/solution/:name") {

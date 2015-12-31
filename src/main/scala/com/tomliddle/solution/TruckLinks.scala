@@ -4,13 +4,14 @@ import com.tomliddle.entity.{LocationMatrix, Stop, Link}
 import com.tomliddle.exception.RouteInvalidException
 import org.joda.time.{Duration, LocalTime}
 
+import scala.util.{Failure, Success, Try}
 
 
 trait TruckLinks {
 	this: Truck =>
 
 
-	def getLinks(lm: LocationMatrix): Option[List[Link]] = {
+	def getLinks: Try[List[Link]] = {
 
 		var routeEarliestStartTime: LocalTime = startTime
 		var routeLatestStartTime: LocalTime = endTime
@@ -18,8 +19,6 @@ trait TruckLinks {
 
 		@throws[RouteInvalidException]
 		def getNextLink(stop1: Stop, stop2: Stop): Link = {
-
-			//logger.trace("GET LINK ---------------------")
 
 			val linkJourneyDistTime = lm.distanceTimeBetween(stop1, stop2)
 			val linkEarliestStartTime: LocalTime = stop2.startTime.minus(routeJourneyTime.toPeriod)
@@ -77,8 +76,6 @@ trait TruckLinks {
 			if (stops.size > 0) {
 				routeJourneyTime = routeJourneyTime.plus(lm.distanceTimeBetween(depot, stops(0)).time)
 
-				//logger.debug("Route journey time: {}", routeJourneyTime.toStandardMinutes)
-
 				// TODO add wait time here
 
 				(Link(new Duration(0), lm.distanceTimeBetween(depot, stops(0))),
@@ -97,20 +94,18 @@ trait TruckLinks {
 		}
 
 		try {
-			Some(List(depotLinks._1) ::: getStopLinks ::: List(depotLinks._2))
+			Success(List(depotLinks._1) ::: getStopLinks ::: List(depotLinks._2))
 		}
 		catch {
 			case rie: RouteInvalidException =>
-				None
+				Failure(rie)
 		}
-
-
 	}
 }
 
 
 
-/*
+/* N.b. original function written in C# a while ago!
 
 //Helper method, calculates the opportunity cost and actual cost for the current stop and adds this on to total cost
 private bool addLinkTimeCostDistance(Stop previous, Stop current, ref TimeSpan tsRouteEarliestStart, ref TimeSpan tsRouteLatestStart, ref long lCurrRouteDistance, ref double dCurrRouteCost, ref TimeSpan tsRouteJourneyTime, bool bSetStopVars, int iOrder) {

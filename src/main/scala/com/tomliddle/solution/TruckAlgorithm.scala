@@ -5,10 +5,12 @@ import com.tomliddle.util.Logging
 
 trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 
-	def load(truck: Truck, city: Stop): (Truck, Option[Stop]) = {
-		shuffleBySize(truck.copy(stops = city :: truck.stops), 1) match {
+	this: Truck =>
+
+	def load(city: Stop): (Truck, Option[Stop]) = {
+		copy(stops = city :: stops).shuffleBySize(1) match {
 			case Some(truck) => (truck, None)
-			case None => (truck, Some(city))
+			case None => (this, Some(city))
 		}
 	}
 
@@ -16,66 +18,50 @@ trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 		* @param stops to load
 		* @return ones it couldn't load, plus a valid truck
 		*/
-	def load(truck: Truck, stops: List[Stop], lm: LocationMatrix): (Truck, List[Stop]) = {
-		var currCity: Stop = nextStopToLoad(truck, stops, lm)
-		var notLoadedCities = List[Stop]()
-		var currTruck = truck
-		stops.sortBy(lm.distanceTimeBetween(_, currCity).distance).foreach {
-			city => {
-				load(currTruck, city) match {
-					case (truck, Some(cityNotLoaded)) => notLoadedCities = cityNotLoaded :: notLoadedCities
-					case (truck, None) => currTruck = truck
+	def load(stops: List[Stop]): (Truck, List[Stop]) = {
+		val currStop: Stop = nextStopToLoad(stops)
+
+		stops.sortBy(lm.distanceTimeBetween(_, currStop).distance).foldLeft(this, List[Stop]()) {
+			case ((truck: Truck, stopList: List[Stop]), currStop: Stop) =>
+				truck.load(currStop) match {
+					// Stop wasn't loaded so add the stop to the not loaded ones
+					case (truck, Some(stop)) => (truck, stop :: stopList)
+					case (truck, None) => (truck, stopList)
 				}
-			}
 		}
-		(currTruck, notLoadedCities)
 	}
 
-	def unload(truck: Truck, position: Int, size: Int): (Truck, List[Stop]) = {
-		val newStops = takeOff(truck.stops, position, size)
-		(truck.copy(stops = newStops._1), newStops._2)
+	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
+		val newStops = takeOff(stops, position, size)
+		(copy(stops = newStops._1), newStops._2)
 	}
 
 
-	private def nextStopToLoad(truck: Truck, stops: List[Stop], lm: LocationMatrix): Stop = {
+	private def nextStopToLoad(stops: List[Stop]): Stop = {
 		getMean(stops) match {
 			case Some(mean) => stops.minBy(stop => lm.getMetresDistance(stop, mean))
-			case None => lm.findFurthestStop(truck.depot)
+			case None => lm.findFurthestStop(depot)
 		}
 	}
 
 	// Shuffle algorithm
-	def shuffle(truck: Truck): Truck = {
+	def shuffle: Truck = {
 		logger.debug("Shuffling ------------------")
-		var best: Truck = truck
+		logger.debug(s"Shuffle ${1} ${getMaxSwapSize} sol:${this.stops.size}")
 
-		//@tailrec
-		def doShuffle(groupSizeMin: Int, groupSizeMax: Int): Truck = {
-			//require(groupSizeMax >= groupSizeMin)
-			require(groupSizeMin > 0)
-			logger.debug(s"Shuffle ${groupSizeMin} ${groupSizeMax} sol:${best.stops.size}")
-
-			(groupSizeMin to groupSizeMax).map {
-				groupSize => {
-					best.shuffleBySize(truck, groupSize).map {
-						truck =>
-							if (truck.isValid && truck.cost.get < best.cost.get) {
-								best = truck
-								logger.debug(s"New solution found: ${best.cost.get}")
-								doShuffle(1, truck.getMaxSwapSize)
-							}
-					}
+		// We add this to begining of the list to simplify finding minimum for an empty list.
+		(1 to getMaxSwapSize).map {
+			groupSize => {
+				shuffleBySize(groupSize).foldLeft(this) {
+					(best, currTruck) =>
+						if (currTruck.isValid && currTruck.cost.get < best.cost.get) {
+							logger.debug(s"New solution found: ${currTruck.cost.get}")
+							currTruck
+						}
+						else best
 				}
 			}
-			best
-		}
-
-		if (truck.getMaxSwapSize > 1) {
-			//We start from swapping 1 to max, then from max to 1 or it doesn't optimise properly.
-			best = doShuffle(1, truck.getMaxSwapSize)
-			doShuffle(truck.getMaxSwapSize, 1)
-		}
-		else truck
+		}.minBy(_.cost)
 	}
 
 	/**
@@ -84,36 +70,27 @@ trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 		* @param groupSize
 		* @return
 		*/
-	protected def shuffleBySize(truck: Truck, groupSize: Int): Option[Truck] = {
+	protected def shuffleBySize(groupSize: Int): Option[Truck] = {
 		require(groupSize > 0, "groupsize is 0")
-		require(groupSize <= truck.stops.size, "groupsize too big")
+		require(groupSize <= stops.size, "groupsize too big")
 
 		def swap(groupSize: Int, invert: Boolean): Option[Truck] = {
 
-			def copyOption(stops: List[Stop]): Option[Truck] = {
-				val truckCopy = truck.copy(stops = stops)
-				if (truckCopy.isValid) Some(truckCopy)
-				else None
-			}
-
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Option[Truck] = {
-				(0 to truck.stops.size - groupSize).map {
+				(0 to stops.size - groupSize).flatMap {
 					to =>
-						copyOption(stops = swapStops(truck.stops, from, to, groupSize, invert))
-				}.flatten.toList.sortWith(_.cost.get < _.cost.get).headOption
+						val truckCopy = copy(stops = swapStops(stops, from, to, groupSize, invert))
+						if (truckCopy.isValid) Some(truckCopy)
+						else None
+				}.sortWith(_.cost.get < _.cost.get).headOption
 			}
 
-			// We add this on so head of list always has one solution
-			(Some(truck) :: (0 to truck.stops.size - groupSize).map {
-				from => doSwap(from, groupSize, invert, truck)
-			}.toList).flatten.filter(truck => truck.cost.isDefined).sortWith(_.cost.get < _.cost.get).headOption
+			(0 to stops.size - groupSize).flatMap {
+				from => doSwap(from, groupSize, invert, this)
+			}.filter(truck => truck.cost.isDefined).sortWith(_.cost.get < _.cost.get).headOption
 		}
 
-		val newSolution: Option[Truck] = swap(groupSize, false)
-		val newSolution2: Option[Truck] = swap(groupSize, true)
-
-		List(Some(truck), newSolution, newSolution2).flatten.sortBy(_.cost).headOption
+		// We add this on so head of list always have the current solution
+		List(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
 	}
-
-
 }
