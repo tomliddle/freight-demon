@@ -101,6 +101,13 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport, sys
 		db.deleteStop(params("id").toInt, scentry.user.id.get)
 	}
 
+	// ****************************** DEPOT *********************
+	// Get stop for that user
+	get("/depot") {
+		contentType = formats("json")
+		db.getDepots(scentry.user.id.get)
+	}
+
 
 	// ****************************** SOLUTION *********************
 
