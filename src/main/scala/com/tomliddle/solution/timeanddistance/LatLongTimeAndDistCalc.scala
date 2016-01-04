@@ -3,9 +3,7 @@ package com.tomliddle.solution.timeanddistance
 import com.tomliddle.entity.Point
 import org.joda.time.Duration
 
-/**
-	* Created by tom on 10/12/15.
-	*/
+
 trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 
 	override def getMetresDistance(location1: Point, location2: Point): BigDecimal = {
@@ -22,7 +20,7 @@ trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
 		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 			Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
 		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-		BigDecimal(R * c)//.setScale(2, RoundingMode.HALF_UP)
+		BigDecimal(R * c)
 	}
 
 	override def getDuration(stop1: Point, stop2: Point): Duration = {

@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 
 
 class LocalTimeConverter {
-	// Massive hack
+	// TODO - this needs to be implemented correctly
 	private final val KEY = "LOCALTIME:"
 	private final val fmt = DateTimeFormat.forPattern("HH:mm:ss.SSS")
 	private val decodeTransformer = new Transformer {

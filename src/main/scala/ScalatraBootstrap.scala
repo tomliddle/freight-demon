@@ -4,7 +4,6 @@ import _root_.akka.actor.{ActorSystem, Props}
 import _root_.com.mchange.v2.c3p0.ComboPooledDataSource
 import com.tomliddle.database.{MongoSupport, DatabaseSupport, User, Tables}
 import Tables._
-import _root_.com.tomliddle.com.tomliddle.Worker
 import com.tomliddle.controllers.{ResourceController, SecureController, SessionsController}
 import com.tomliddle.entity.Depot
 import org.scalatra._
@@ -23,18 +22,14 @@ class ScalatraBootstrap extends LifeCycle {
 
 	private val mongoSupport = new MongoSupport("freight_demon")
 
-	private val system = ActorSystem("actor_system")
-	private val myActor = system.actorOf(Props[Worker])
-
 	override def init(context: ServletContext) {
-		context.mount(new SecureController(db, mongoSupport, system, myActor), "/*")
+		context.mount(new SecureController(db, mongoSupport), "/*")
 		context.mount(new SessionsController(db), "/sessions/*")
 		context.mount(new ResourceController, "/resource/*")
 	}
 
 	override def destroy(context: ServletContext) {
 		super.destroy(context)
-		system.shutdown() // shut down the actor system
 		cpds.close
 	}
 

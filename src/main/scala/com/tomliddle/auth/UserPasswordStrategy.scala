@@ -2,14 +2,14 @@ package com.tomliddle.auth
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import com.tomliddle.database.{DatabaseSupport, User}
+import com.tomliddle.util.Logging
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.LoggerFactory
 
 class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(implicit request: HttpServletRequest, response: HttpServletResponse)
-		extends ScentryStrategy[User] {
+		extends ScentryStrategy[User] with Logging {
 
-	private val logger = LoggerFactory.getLogger(getClass)
 	private def login = app.params.getOrElse("login", "")
 	private def password = app.params.getOrElse("password", "")
 	override def name: String = "UserPassword"
@@ -18,7 +18,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)
 	  * Determine whether the strategy should be run for the current request.
 	  */
 	override def isValid(implicit request: HttpServletRequest) = {
-		logger.info("UserPasswordStrategy: determining isValid: " + (login != "" && password != "").toString())
+		logg.info("UserPasswordStrategy: determining isValid: " + (login != "" && password != "").toString())
 		login != "" && password != ""
 	}
 
@@ -28,7 +28,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)
 	 * it's found.
 	 */
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
-		logger.info("UserPasswordStrategy: attempting authentication")
+		logg.info("UserPasswordStrategy: attempting authentication")
 		db.getUser(login, password)
 	}
 

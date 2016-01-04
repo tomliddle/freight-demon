@@ -4,6 +4,7 @@ import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.database.{DatabaseSupport, User}
 
 class SessionsController(protected val db: DatabaseSupport) extends ScalateServlet with AuthenticationSupport {
+
 	before("/new") {
 		logger.info("SessionsController: checking whether to run RememberMeStrategy: " + !isAuthenticated)
 

@@ -2,14 +2,14 @@ package com.tomliddle.auth
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import com.tomliddle.database.{DatabaseSupport, User}
+import com.tomliddle.util.Logging
 import org.scalatra.auth.ScentryStrategy
 import org.scalatra.{CookieOptions, ScalatraBase}
 import org.slf4j.LoggerFactory
 
 class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(implicit request: HttpServletRequest, response: HttpServletResponse)
-		extends ScentryStrategy[User] {
+		extends ScentryStrategy[User] with Logging {
 
-	val logger = LoggerFactory.getLogger(getClass)
 	override def name: String = "RememberMe"
 
 	private val COOKIE_KEY = "rememberMe"
@@ -29,7 +29,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	  * Determine whether the strategy should be run for the current request.
 	  */
 	override def isValid(implicit request: HttpServletRequest): Boolean = {
-		logger.info("RememberMeStrategy: determining isValid: " + (tokenVal != "").toString)
+		logg.info("RememberMeStrategy: determining isValid: " + (tokenVal != "").toString)
 		tokenVal != ""
 	}
 
@@ -39,7 +39,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	  * earlier ("foobar") and accept it if so.
 	  */
 	def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-		logger.info("RememberMeStrategy: attempting authentication")
+		logg.info("RememberMeStrategy: attempting authentication")
 		if (tokenVal == "foobar") {
 			//db.getUser("tom@gmail.com")
 			None
@@ -63,7 +63,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	  * more than 1 cookie.
 	  */
 	override def afterAuthenticate(winningStrategy: String, user: User)(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-		logger.info("rememberMe: afterAuth fired")
+		logg.info("rememberMe: afterAuth fired")
 		if (winningStrategy == "RememberMe" ||
 				(winningStrategy == "UserPassword" && checkbox2boolean(app.params.get("rememberMe").getOrElse("")))) {
 
@@ -76,7 +76,7 @@ class RememberMeStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(i
 	 * Run this code before logout, to clean up any leftover database state and delete the rememberMe token cookie.
 	 */
 	override def beforeLogout(user: User)(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-		logger.info("rememberMe: beforeLogout")
+		logg.info("rememberMe: beforeLogout")
 		if (user != null) {
 			user.forgetMe
 		}

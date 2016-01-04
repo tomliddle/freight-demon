@@ -51,8 +51,8 @@ trait TruckOptimiser extends Logging {
 
 	// Shuffle algorithm
 	def shuffle: Truck = {
-		logger.debug("Shuffling ------------------")
-		logger.debug(s"Shuffle $getMaxSwapSize sol:${stops.size}")
+		logg.debug("Shuffling ------------------")
+		logg.debug(s"Shuffle $getMaxSwapSize sol:${stops.size}")
 
 		// We add this to begining of the list to simplify finding minimum for an empty list.
 		(1 to getMaxSwapSize).map {
@@ -60,7 +60,7 @@ trait TruckOptimiser extends Logging {
 				shuffleBySize(groupSize).foldLeft(this) {
 					(best, currTruck) =>
 						if (currTruck.isValid && currTruck.cost.get < best.cost.get) {
-							logger.debug(s"New solution found: ${currTruck.cost.get}")
+							logg.debug(s"New solution found: ${currTruck.cost.get}")
 							currTruck
 						}
 						else best
