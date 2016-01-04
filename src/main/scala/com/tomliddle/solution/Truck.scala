@@ -37,6 +37,7 @@ case class Truck(
 	lazy val getMaxSwapSize = stops.size / 2
 
 	// TODO this should be part of the truck not generated every time.
+	// There may be circumstances where the links don't need to be re-calculated
 	// LM shouldn't be passed in to the truck either as this is part of the solution object.
 	lazy val links: Try[List[Link]] = getLinks
 

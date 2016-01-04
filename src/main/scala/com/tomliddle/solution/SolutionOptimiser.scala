@@ -27,11 +27,8 @@ trait SolutionOptimiser {
 		copy(trucks = loadedTrucks, stopsToLoad = unloadedStops)
 	}
 
-	def shuffle : Solution = {
-		copy(trucks = trucks.map { _.shuffle})//.swapBetweenTrucks
-	}
+	def shuffle : Solution = copy(trucks = trucks.map { _.shuffle})//.swapBetweenTrucks
 
-	def swapBetweenTrucks: Solution = {
-		copy(trucks = trucks.swapAllToAll)
-	}
+	def swapBetweenTrucks: Solution = copy(trucks = trucks.swapAllToAll)
+
 }

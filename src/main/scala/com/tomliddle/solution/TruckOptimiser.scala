@@ -29,15 +29,16 @@ trait TruckOptimiser extends Logging {
 			case ((truck: Truck, stopList: List[Stop]), currStop: Stop) =>
 				truck.load(currStop) match {
 					// Stop wasn't loaded so add the stop to the not loaded ones
-					case (truck, Some(stop)) => (truck, stop :: stopList)
-					case (truck, None) => (truck, stopList)
+					case (newTruck, Some(stop)) => (newTruck, stop :: stopList)
+					case (newTruck, None) => (newTruck, stopList)
 				}
 		}
 	}
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
-		val newStops = stops.takeOff(position, size)
-		(copy(stops = newStops._1), newStops._2)
+		stops.takeOff(position, size) match {
+			case (loaded, unloaded) => (copy(stops = loaded), unloaded)
+		}
 	}
 
 
@@ -51,7 +52,7 @@ trait TruckOptimiser extends Logging {
 	// Shuffle algorithm
 	def shuffle: Truck = {
 		logger.debug("Shuffling ------------------")
-		logger.debug(s"Shuffle ${1} ${getMaxSwapSize} sol:${this.stops.size}")
+		logger.debug(s"Shuffle $getMaxSwapSize sol:${stops.size}")
 
 		// We add this to begining of the list to simplify finding minimum for an empty list.
 		(1 to getMaxSwapSize).map {
@@ -99,7 +100,7 @@ trait TruckOptimiser extends Logging {
 	}
 
 	// Iterates through two trucks trying to swap all points
-	def swapBetween(truck2: Truck) : (Truck, Truck) = {
+	def swapBetween(swapTruck: Truck) : (Truck, Truck) = {
 
 		def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : (Truck, Truck) = {
 
@@ -123,11 +124,8 @@ trait TruckOptimiser extends Logging {
 			}
 		}
 
-		(1 to getMaxSwapSize).map {
-			swapSize => {
-				doSwapBetween(this, truck2, swapSize)
-			}
-		}.minBy(truckTup => truckTup._1.cost.get + truckTup._2.cost.get)
+		(1 to getMaxSwapSize).map{swapSize => doSwapBetween(this, swapTruck, swapSize)}
+			.minBy(truckTup => truckTup._1.cost.get + truckTup._2.cost.get)
 	}
 
 }

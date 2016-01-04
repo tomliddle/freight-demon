@@ -73,12 +73,12 @@ trait TruckLinks {
 		}
 
 		val depotLinks: (Link, Link) =
-			if (stops.size > 0) {
-				routeJourneyTime = routeJourneyTime.plus(lm.distanceTimeBetween(depot, stops(0)).time)
+			if (stops.nonEmpty) {
+				routeJourneyTime = routeJourneyTime.plus(lm.distanceTimeBetween(depot, stops.head).time)
 
 				// TODO add wait time here
 
-				(Link(new Duration(0), lm.distanceTimeBetween(depot, stops(0))),
+				(Link(new Duration(0), lm.distanceTimeBetween(depot, stops.head)),
 				Link(new Duration(0), lm.distanceTimeBetween(depot, stops.last)))
 			}
 			else (Link(), Link())
@@ -88,7 +88,7 @@ trait TruckLinks {
 			if (stops.size > 1)
 				stops.sliding(2).map {
 					(currCities: List[Stop]) =>
-						getNextLink(currCities(0), currCities(1))
+						getNextLink(currCities.head, currCities(1))
 				}.toList
 			else List()
 		}

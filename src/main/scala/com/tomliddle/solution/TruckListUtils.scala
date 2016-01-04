@@ -16,11 +16,10 @@ object TruckListUtils {
 				(returnTrucks, truck2Pos) => {
 					if (truck1Pos != truck2Pos) {
 						returnTrucks(truck1Pos).swapBetween(returnTrucks(truck2Pos)) match {
-							case (truck1, truck2) => {
+							case (truck1, truck2) =>
 								val patchedTruck = returnTrucks.patch(truck1Pos, List[Truck](truck1), 1).patch(truck2Pos, List[Truck](truck2), 1)
 								assert(returnTrucks.size == trucks.size, s"trucks size: ${trucks.size} returntrucks size: ${returnTrucks.size}")
 								patchedTruck
-							}
 						}
 					}
 					else returnTrucks
@@ -29,18 +28,14 @@ object TruckListUtils {
 		}
 
 		def swapAllToAll: List[Truck] = {
-			val swappedTrucks = trucks.indices.map {
-				truck1Pos => {
-					swapOneToAll(truck1Pos)
-				}
-			}
+			val swappedTrucks = trucks.indices.map(swapOneToAll)
 
 			// Return the lowest cost list of trucks
 			swappedTrucks.foldLeft(trucks, trucks.totalCost){
-				case ((trucks: List[Truck], cost: BigDecimal), curr: List[Truck]) =>
-					val currCost = curr.totalCost
-					if (currCost < cost) (curr, currCost)
-					else (trucks, cost)
+				case ((lcTrucks, lowestCost), currTruck) =>
+					val currCost = currTruck.totalCost
+					if (currCost < lowestCost) (currTruck, currCost)
+					else (lcTrucks, lowestCost)
 			}._1
 		}
 	}
