@@ -4,12 +4,11 @@ Freight Demon
 
 This is TruckScheduling webapp which is more of a demonstration at present.
 
-It uses immutable classes for the entities to allow these to be easily persisted using a document database
-and recalled later.
+It uses immutable classes for the entities to allow easy persistence using a document database.
 
-This also helps with reducing of bugs and simplification of code.
+The design also helps with reducing of bugs and simplification of code.
 
-For example anything done to change a particular solution can be returned as a new object and compared
+Any modifications to a particular solution can be returned as a new object and compared
 against other solutions for cost, time and distance etc.
 
 
