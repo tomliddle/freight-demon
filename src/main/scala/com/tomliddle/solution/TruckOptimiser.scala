@@ -1,10 +1,14 @@
 package com.tomliddle.solution
 
-import com.tomliddle.entity.{Mean, LocationMatrix, Stop}
+import com.tomliddle.entity.Stop
 import com.tomliddle.util.Logging
+import PointListUtils._
+import ListUtils._
 
-trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
-
+/**
+	* Adds functionality to Truck to optimise, load and unload
+	*/
+trait TruckOptimiser extends Logging {
 	this: Truck =>
 
 	def load(city: Stop): (Truck, Option[Stop]) = {
@@ -32,13 +36,13 @@ trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 	}
 
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
-		val newStops = takeOff(stops, position, size)
+		val newStops = stops.takeOff(position, size)
 		(copy(stops = newStops._1), newStops._2)
 	}
 
 
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
-		getMean(stops) match {
+		stops.mean match {
 			case Some(mean) => stops.minBy(stop => lm.getMetresDistance(stop, mean))
 			case None => lm.findFurthestStop(depot)
 		}
@@ -79,7 +83,7 @@ trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Option[Truck] = {
 				(0 to stops.size - groupSize).flatMap {
 					to =>
-						val truckCopy = copy(stops = swapStops(stops, from, to, groupSize, invert))
+						val truckCopy = copy(stops = stops.swap(from, to, groupSize, invert))
 						if (truckCopy.isValid) Some(truckCopy)
 						else None
 				}.sortWith(_.cost.get < _.cost.get).headOption
@@ -93,4 +97,37 @@ trait TruckAlgorithm extends SwapUtilities with Mean with Logging {
 		// We add this on so head of list always have the current solution
 		List(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
 	}
+
+	// Iterates through two trucks trying to swap all points
+	def swapBetween(truck2: Truck) : (Truck, Truck) = {
+
+		def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : (Truck, Truck) = {
+
+			(0 to truck1.stops.size - swapSize).foldLeft(truck1, truck2) {
+				case (_, truck1Pos) => {
+					(0 to truck2.stops.size - swapSize).foldLeft(truck1, truck2){
+						case ((bestTruck1: Truck, bestTruck2: Truck), truck2Pos: Int) => {
+							val (t1Unloaded, t1stops) = truck1.unload(truck1Pos, swapSize)
+							val (t2Unloaded, t2stops) = truck2.unload(truck2Pos, swapSize)
+							val (t1New, t1NewStops) = t1Unloaded.load(t2stops)
+							val (t2New, t2NewStops)  = t2Unloaded.load(t1stops)
+
+							// If trucks fully reloaded, check the cost.
+							if (t1NewStops.size == 0 && t2NewStops.size == 0 &&
+									t1New.cost.get + t2New.cost.get < bestTruck1.cost.get + bestTruck2.cost.get)
+								(t1New, t2New)
+							else (bestTruck1, bestTruck2)
+						}
+					}
+				}
+			}
+		}
+
+		(1 to getMaxSwapSize).map {
+			swapSize => {
+				doSwapBetween(this, truck2, swapSize)
+			}
+		}.minBy(truckTup => truckTup._1.cost.get + truckTup._2.cost.get)
+	}
+
 }

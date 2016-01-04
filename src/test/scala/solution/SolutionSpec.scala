@@ -1,7 +1,7 @@
 package solution
 
 import com.tomliddle.entity.{Stop, Depot}
-import com.tomliddle.solution.{TruckAlgorithm, Solution}
+import com.tomliddle.solution.{TruckOptimiser, Solution}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
 class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with TestObjects {

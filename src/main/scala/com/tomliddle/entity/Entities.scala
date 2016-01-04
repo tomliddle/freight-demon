@@ -55,16 +55,3 @@ case class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends LatLon
 
 }
 
-
-
-
-
-trait Mean {
-	def getMean(locations: List[Point]): Option[Point] = {
-		if (locations.size > 0)
-			Some (locations.foldLeft(new Point(0, 0, "")) { (location1: Point, location2: Point) =>
-				new Point(location1.x + location2.x, location1.y + location2.y, "")
-			} / locations.size)
-		else None
-	}
-}

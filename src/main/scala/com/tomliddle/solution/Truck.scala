@@ -17,7 +17,7 @@ case class Truck(
 										lm: LocationMatrix,
 										userId: Int,
 										id: Option[Int] = None)
-	extends TruckAlgorithm with TruckLinks with Logging  {
+	extends TruckOptimiser with TruckLinks with Logging  {
 
 	require(stops.size == stops.distinct.size, "Stops aren't distinct")
 
@@ -36,6 +36,8 @@ case class Truck(
 
 	lazy val getMaxSwapSize = stops.size / 2
 
+	// TODO this should be part of the truck not generated every time.
+	// LM shouldn't be passed in to the truck either as this is part of the solution object.
 	lazy val links: Try[List[Link]] = getLinks
 
 	lazy val distance: Option[BigDecimal] = links match {

@@ -45,7 +45,7 @@ class MongoSupport(databaseName: String){
 
 	def removeSolution(userId: Int, name: String) {
 		getSolution(userId, name) match {
-			case Some(sol) => solutionDAO.remove(sol)
+			case Some(sol) => solutionDAO.remove(MongoDBObject("_id" -> sol._id))
 			case None => None
 		}
 	}

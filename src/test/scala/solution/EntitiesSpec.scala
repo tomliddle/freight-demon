@@ -1,8 +1,9 @@
 package solution
 
 
-import com.tomliddle.entity.{Mean, Point}
+import com.tomliddle.entity.{Stop, Point}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import com.tomliddle.solution.PointListUtils._
 
 class EntitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
@@ -36,15 +37,13 @@ class EntitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 		"can calculate the mean " should {
 
 			"with 0 stops" in {
-				val obj = new Object with Mean
-				val mean = obj.getMean(List())
+				val mean = List[Stop]().mean
 
 				mean.isDefined should equal (false)
 			}
 
 			"with 10 stops" in {
-				val obj = new Object with Mean
-				val mean = obj.getMean(List(point, point2, point3, point4))
+				val mean = List[Point](point, point2, point3, point4).mean
 
 				mean.get.x should equal (4.5)
 				mean.get.y should equal (16.375)
