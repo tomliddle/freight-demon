@@ -5,9 +5,9 @@ import org.bson.{BSON, Transformer}
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 
-import scala.reflect.ClassTag
-
-
+	/**
+	* Joda LocalTime Serialiser for MongoDB
+	*/
 class LocalTimeConverter {
 	// TODO - this needs to be implemented correctly
 	private final val KEY = "LOCALTIME:"
@@ -30,7 +30,9 @@ class LocalTimeConverter {
 	new MyConversionHelper[LocalTime, String](classOf[LocalTime], encodeTransformer, classOf[String], decodeTransformer).register
 }
 
-
+	/**
+	* BigDecimal Serialiser for MongoDB
+	*/
 class BigDecimalConverter {
 	private val decodeTransformer = new Transformer {
 		def transform(o: AnyRef): AnyRef = o match {

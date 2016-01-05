@@ -6,7 +6,12 @@ import org.joda.time.{Duration, LocalTime}
 
 import scala.util.{Failure, Success, Try}
 
-
+/**
+	* Adds functionality to a Truck to calculate the links of the truck route.
+	* For each stop on the route, the earliest and latest start time are calculated.
+	* As the route becomes more constrained these two times will converge. If they
+	* cross, there is no possible valid route and an exception is thrown.
+	*/
 trait TruckLinks {
 	this: Truck =>
 

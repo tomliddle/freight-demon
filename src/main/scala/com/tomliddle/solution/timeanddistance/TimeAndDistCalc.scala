@@ -3,6 +3,10 @@ package com.tomliddle.solution.timeanddistance
 import com.tomliddle.entity.{Point, DistanceTime}
 import org.joda.time.Duration
 
+/**
+	* Adds time and distance calculation functionality.
+	* In the future this will be replaced by real world road time and distance calculations
+	*/
 trait TimeAndDistCalc {
 
 	def getMetresDistance(location1: Point, location2: Point): BigDecimal

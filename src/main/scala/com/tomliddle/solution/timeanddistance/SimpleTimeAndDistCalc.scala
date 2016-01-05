@@ -3,6 +3,9 @@ package com.tomliddle.solution.timeanddistance
 import com.tomliddle.entity.Point
 import org.joda.time.Duration
 
+/**
+	* Calculates hypotenuse lengths between points.
+	*/
 trait SimpleTimeAndDistCalc extends TimeAndDistCalc {
 
 	override def getMetresDistance(location1: Point, location2: Point): BigDecimal = {

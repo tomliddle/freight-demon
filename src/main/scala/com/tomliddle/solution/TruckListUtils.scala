@@ -9,7 +9,10 @@ object TruckListUtils {
 
 		def totalCost = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost.get}
 
-		// Swaps from one truck to all trucks
+		/**
+			* Swaps stops from one trucks to all trucks
+			* @return the lowest cost list of trucks
+			*/
 		def swapOneToAll(truck1Pos: Int): List[Truck] = {
 
 			trucks.indices.foldLeft(trucks) {
@@ -27,15 +30,19 @@ object TruckListUtils {
 			}
 		}
 
+		/**
+			* Swaps stops from all trucks to all trucks
+			* @return the lowest cost list of trucks
+			*/
 		def swapAllToAll: List[Truck] = {
 			val swappedTrucks = trucks.indices.map(swapOneToAll)
 
 			// Return the lowest cost list of trucks
 			swappedTrucks.foldLeft(trucks, trucks.totalCost){
-				case ((lcTrucks, lowestCost), currTruck) =>
-					val currCost = currTruck.totalCost
-					if (currCost < lowestCost) (currTruck, currCost)
-					else (lcTrucks, lowestCost)
+				case ((bestTrucks, bestCost), currTrucks) =>
+					val currCost = currTrucks.totalCost
+					if (currCost < bestCost) (currTrucks, currCost)
+					else (bestTrucks, bestCost)
 			}._1
 		}
 	}

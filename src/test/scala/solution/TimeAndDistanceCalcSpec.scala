@@ -1,7 +1,7 @@
 package solution
 
 import com.tomliddle.entity.Point
-import com.tomliddle.solution.timeanddistance.LatLongTimeAndDistCalc
+import com.tomliddle.solution.timeanddistance.StraightLineTimeAndDistCalc
 import org.joda.time.Duration
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
@@ -9,7 +9,7 @@ class TimeAndDistanceCalcSpec extends WordSpec with Matchers with BeforeAndAfter
 
 	val point1 = new Point(0, 52.1, "")
 	val point2 = new Point(1, 53, "")
-	val timeAndDistCalc = new Object with LatLongTimeAndDistCalc
+	val timeAndDistCalc = new Object with StraightLineTimeAndDistCalc
 
 	"TimeAndDistCalcSpec" when {
 

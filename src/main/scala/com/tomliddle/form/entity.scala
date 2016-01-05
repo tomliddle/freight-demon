@@ -5,7 +5,10 @@ import com.tomliddle.entity.Stop
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 
-
+/**
+	* TODO use the proper serialisers.
+	* These classes are supposed to be a temporary measure to avoid issues with scalatra serialisation
+	*/
 case class TruckForm(name: String, startTime: String, endTime: String, maxWeight: String) {
 	private val formatter = DateTimeFormat.forPattern("HH:mm")
 	def getTruck(userId: Int) = DBTruck(name, LocalTime.parse(startTime, formatter), LocalTime.parse(endTime, formatter), BigDecimal(maxWeight), userId)

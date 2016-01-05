@@ -11,12 +11,13 @@ import ListUtils._
 trait TruckOptimiser extends Logging {
 	this: Truck =>
 
-	def load(city: Stop): (Truck, Option[Stop]) = {
-		copy(stops = city :: stops).shuffleBySize(1) match {
-			case Some(truck) => (truck, None)
-			case None => (this, Some(city))
-		}
-	}
+	/**
+		* Load a stop on the Truck in the optimal location
+		* @param stop
+		* @return Truck with loaded stop, or None
+		*/
+	def load(stop: Stop): Option[Truck] = copy(stops = stop :: stops).shuffleBySize(1)
+
 
 	/**
 		* @param stops to load
@@ -29,19 +30,30 @@ trait TruckOptimiser extends Logging {
 			case ((truck: Truck, stopList: List[Stop]), currStop: Stop) =>
 				truck.load(currStop) match {
 					// Stop wasn't loaded so add the stop to the not loaded ones
-					case (newTruck, Some(stop)) => (newTruck, stop :: stopList)
-					case (newTruck, None) => (newTruck, stopList)
+					case Some(newTruck) => (newTruck, stopList)
+					case None => (this, currStop :: stopList)
 				}
 		}
 	}
 
+	/**
+		* Take a set of stops off the truck and return the new truck and unloaded stops
+		* @param position
+		* @param size
+		* @return
+		*/
 	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
 		stops.takeOff(position, size) match {
 			case (loaded, unloaded) => (copy(stops = loaded), unloaded)
 		}
 	}
 
-
+	/**
+		* Find the next best stop to load.
+		* If no stops are loaded, load the furthest one, otherwise the one nearest to the mean.
+		* @param stops the list of stops to try.
+		* @return the best stop to load
+		*/
 	private def nextStopToLoad(stops: List[Stop]): Stop = {
 		stops.mean match {
 			case Some(mean) => stops.minBy(stop => lm.getMetresDistance(stop, mean))
@@ -49,7 +61,11 @@ trait TruckOptimiser extends Logging {
 		}
 	}
 
-	// Shuffle algorithm
+	/**
+		* Shuffle algorithm - swaps increasing numbers of stops in all locations on the route
+		* Returns this truck, or a lower cost truck.
+ 		*/
+
 	def shuffle: Truck = {
 		logg.debug("Shuffling ------------------")
 		logg.debug(s"Shuffle $getMaxSwapSize sol:${stops.size}")
@@ -70,10 +86,11 @@ trait TruckOptimiser extends Logging {
 	}
 
 	/**
+		* Shuffles specified size of stops on the route in all positions
 		* Doesn't require a valid truck to start with
-		* // This could be more efficient
+		* // TODO This could be more efficient
 		* @param groupSize
-		* @return
+		* @return the lowest cost truck found, or none if none are valid.
 		*/
 	protected def shuffleBySize(groupSize: Int): Option[Truck] = {
 		require(groupSize > 0, "groupsize is 0")
@@ -99,7 +116,9 @@ trait TruckOptimiser extends Logging {
 		List(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
 	}
 
-	// Iterates through two trucks trying to swap all points
+	/**
+		* Swaps stops from swapTruck to find a lower cost solution for both trucks
+ 		*/
 	def swapBetween(swapTruck: Truck) : (Truck, Truck) = {
 
 		def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : (Truck, Truck) = {

@@ -7,6 +7,18 @@ import org.joda.time.{Duration, LocalTime}
 import scala.math.BigDecimal.RoundingMode
 import scala.util.{Failure, Success, Try}
 
+/**
+	* A truck with information about its route.
+	* @param name
+	* @param startTime
+	* @param endTime
+	* @param maxWeight
+	* @param depot
+	* @param stops
+	* @param lm
+	* @param userId
+	* @param id
+	*/
 case class Truck(
 										name: String,
 										startTime: LocalTime,
@@ -27,6 +39,7 @@ case class Truck(
 				.setScale(2, RoundingMode.HALF_UP)
 	}
 
+	// For now we use the distance * 1.2 to represent cost.
 	lazy val cost: Option[BigDecimal] = {
 		distance match {
 			case Some(distance) => Some((distance * 1.2).setScale(2, RoundingMode.HALF_UP))
@@ -34,6 +47,7 @@ case class Truck(
 		}
 	}
 
+	// The max number of stops that should be swapped during optimisation
 	lazy val getMaxSwapSize = stops.size / 2
 
 	// TODO this should be part of the truck not generated every time.
@@ -46,6 +60,7 @@ case class Truck(
 			case Failure(_) => None
 	}
 
+	// The route time
 	lazy val time: Option[Duration] = links match {
 		case Success(links: List[Link]) => Some(links.foldLeft(new Duration(0)) { (a: Duration, b: Link) => a.plus(b.travelDT.time).plus(b.waitTime) })
 		case Failure(_) => None

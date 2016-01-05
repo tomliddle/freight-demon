@@ -5,6 +5,9 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 import org.slf4j.LoggerFactory
 
+/**
+* Provides security authentication support such as getting the user id to and from the session
+*/
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	self: ScalatraBase =>
 
@@ -48,6 +51,5 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
 	 */
 	override protected def registerAuthStrategies = {
 		scentry.register("UserPassword", app => new UserPasswordStrategy(app, db))
-		//scentry.register("RememberMe", app => new RememberMeStrategy(app, db))
 	}
 }

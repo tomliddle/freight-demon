@@ -3,6 +3,10 @@ package com.tomliddle.controllers
 import com.tomliddle.auth.AuthenticationSupport
 import com.tomliddle.database.{DatabaseSupport, User}
 
+	/**
+	* Handles authentication check, and redirects according to authentication status.
+	* @param db
+	*/
 class SessionsController(protected val db: DatabaseSupport) extends ScalateServlet with AuthenticationSupport {
 
 	before("/new") {
@@ -51,6 +55,8 @@ class SessionsController(protected val db: DatabaseSupport) extends ScalateServl
 
 }
 
-
+/**
+	* Simple resource controller which doesn't need authentication
+	*/
 class ResourceController extends ScalateServlet {
 }

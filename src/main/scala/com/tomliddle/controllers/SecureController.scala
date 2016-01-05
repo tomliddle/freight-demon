@@ -17,7 +17,11 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import org.scalatra.{FutureSupport, RequestEntityTooLarge}
 
-
+	/**
+	* Handles authenticated API requests
+	* @param db - the Slick DB handler (needs to be eventually replaced fully with MongoDB)
+	* @param mdb - The mongo DB handler
+	*/
 class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 		extends ScalateServlet with Geocoding with FileUploadSupport with AuthenticationSupport with JacksonJsonSupport {
 
@@ -69,7 +73,7 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 		db.deleteTruck(params("id").toInt, scentry.user.id.get)
 	}
 
-	//************** Stop HANDLING ******************************
+	//************** STOP ******************************
 	post("/stop") {
 		val stop = parsedBody.extract[StopForm]
 
@@ -98,7 +102,6 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 
 
 	// ****************************** SOLUTION *********************
-
 	post("/solution") {
 		var solution = parsedBody.extract[SolutionForm]
 		val lm = new LocationMatrix(List(), List())
@@ -115,10 +118,9 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 		val lm = new LocationMatrix(stops, depots)
 
 		// TODO imlement correctly
-		val solutions = mdb.getSolutions(scentry.user.id.get).map {
+		mdb.getSolutions(scentry.user.id.get).map {
 			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm = lm).preload.shuffle
 		}
-		solutions
 	}
 
 	get("/solution/:name") {
@@ -141,8 +143,6 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 
 
 	//****************************** OTHER *************************
-
-
 	get("/") {
 		contentType = "text/html"
 		ssp("/home")

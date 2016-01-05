@@ -3,8 +3,10 @@ package com.tomliddle.solution.timeanddistance
 import com.tomliddle.entity.Point
 import org.joda.time.Duration
 
-
-trait LatLongTimeAndDistCalc extends TimeAndDistCalc {
+/**
+	* Calculates straight line distances and times from lat long positions
+	*/
+trait StraightLineTimeAndDistCalc extends TimeAndDistCalc {
 
 	override def getMetresDistance(location1: Point, location2: Point): BigDecimal = {
 		val R = 6371000 // m

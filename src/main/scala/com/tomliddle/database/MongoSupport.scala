@@ -9,8 +9,15 @@ import com.mongodb.casbah.Imports._
 import com.tomliddle.solution.Solution
 import org.slf4j.LoggerFactory
 
+/**
+* Salat serialisation for case classes which plugs into Mongo's DBObject
+*/
 class SolutionDAO extends SalatDAO[Solution, ObjectId](collection = MongoClient()("d")("test_coll"))
 
+/**
+* MongoDB Support class
+* @param databaseName
+*/
 class MongoSupport(databaseName: String){
 
 	private final val logger = LoggerFactory.getLogger(this.getClass)
@@ -22,7 +29,6 @@ class MongoSupport(databaseName: String){
 	implicit def solutionToDBObject(params: Solution): DBObject = grater[Solution].asDBObject(params)
 	implicit def solutionFromDBObject(c: DBObject): Solution = grater[Solution].asObject(c)
 
-	// TODO massive hack
 	private val jodaLocalTimeSerializer = new LocalTimeConverter
 	private val bigDecimalSerializer = new BigDecimalConverter
 	private val solutionDAO = new SolutionDAO

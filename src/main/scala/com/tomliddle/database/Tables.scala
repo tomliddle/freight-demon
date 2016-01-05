@@ -7,6 +7,9 @@ import org.joda.time.LocalTime
 import scala.slick.driver.H2Driver.simple._
 import scala.slick.lifted.TableQuery
 
+	/**
+	* Adds implicit conversions to slick tables
+	*/
 trait TypeConvert {
 
 	implicit def localTime = MappedColumnType.base[LocalTime, Time](dt => new Time(dt.getMillisOfDay), ts => new LocalTime(ts.getTime))
@@ -17,12 +20,11 @@ trait TypeConvert {
 	)
 }
 
-case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None) {
-	def forgetMe = {
-		//logger.info("User: this is where you'd invalidate the saved token in you User model")
-	}
-}
+case class User(email: String, name: String, passwordHash: String, id: Option[Int] = None)
 
+/**
+* Slick user table
+*/
 class Users(tag: Tag) extends Table[User](tag, "USERS") {
 	def email: Column[String] = column[String]("email", O.NotNull)
 	def name: Column[String] = column[String]("name", O.NotNull)
@@ -36,6 +38,11 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 
 // ************************ TRUCK STUFF ***************************************
 
+/**
+* DBTruck is saved to the database. This excludes additional information stored in the
+* truck such as depot and stops.
+* This is not ideal which is why the move to MongoDB should solve this.
+*/
 case class DBTruck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
 	def toTruck(stops: List[Stop], depot: Depot, lm: LocationMatrix): Truck = {
 		Truck(name, startTime, endTime, maxWeight, depot, stops, lm, userId, id)

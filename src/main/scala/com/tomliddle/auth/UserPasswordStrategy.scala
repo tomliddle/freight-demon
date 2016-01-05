@@ -7,6 +7,11 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.LoggerFactory
 
+/**
+	* Provides the user password authentication strategy from the database.
+	* @param app
+	* @param db
+	*/
 class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)(implicit request: HttpServletRequest, response: HttpServletResponse)
 		extends ScentryStrategy[User] with Logging {
 
@@ -14,7 +19,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase, db: DatabaseSupport)
 	private def password = app.params.getOrElse("password", "")
 	override def name: String = "UserPassword"
 
-	/** *
+	/**
 	  * Determine whether the strategy should be run for the current request.
 	  */
 	override def isValid(implicit request: HttpServletRequest) = {
