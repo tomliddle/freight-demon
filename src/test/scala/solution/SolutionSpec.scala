@@ -24,7 +24,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			}
 
 			"calculate the correct shuffled cost" in {
-				val shuffledSolution = solution.shuffle
+				val shuffledSolution = solution.optimise
 				val cost = shuffledSolution.cost
 
 				cost should be < (solution.cost)
@@ -34,7 +34,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			}
 
 			"have the right stops" in {
-				val shuffledSolution = solution.shuffle
+				val shuffledSolution = solution.optimise
 
 				solution.loadedStops.size should equal (30)
 				shuffledSolution.loadedStops.size should equal (30)
@@ -59,7 +59,7 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 
 				val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
 				val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm, 1)
-				val shuffledSolution = solution.shuffle
+				val shuffledSolution = solution.optimise
 
 				solution.loadedStops.size should equal (30)
 			}

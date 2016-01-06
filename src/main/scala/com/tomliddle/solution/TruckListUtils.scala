@@ -34,7 +34,7 @@ object TruckListUtils {
 			* Swaps stops from all trucks to all trucks
 			* @return the lowest cost list of trucks
 			*/
-		def swapAllToAll: List[Truck] = {
+		def optimiseAllToAll: List[Truck] = {
 			val swappedTrucks = trucks.indices.map(swapOneToAll)
 
 			// Return the lowest cost list of trucks

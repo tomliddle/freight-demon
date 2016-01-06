@@ -119,7 +119,7 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 
 		// TODO imlement correctly
 		mdb.getSolutions(scentry.user.id.get).map {
-			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm = lm).preload.shuffle
+			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm = lm).preload.optimise
 		}
 	}
 
