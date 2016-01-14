@@ -11,13 +11,11 @@ object PointListUtils {
 	implicit class PointList[T <: Point](val points: List[T]) {
 
 		def mean: Option[Point] = {
-			if (points.size > 0)
-				Some (points.foldLeft(new Point(0, 0, "")) { (location1: Point, location2: Point) =>
-					new Point(location1.x + location2.x, location1.y + location2.y, "")
-				} / points.size)
+			if (points.nonEmpty) Some(points.reduceLeft[Point]((a, b) => a + b) / points.size)
 			else None
 		}
+	}
 
 	}
 
-}
+

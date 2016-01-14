@@ -35,10 +35,10 @@ case class Link(waitTime: Duration = new Duration(0), travelDT: DistanceTime = n
 	*/
 class Point(val x: BigDecimal, val y: BigDecimal, val address: String) {
 	def +(operand: Point): Point = {
-		new Point(this.x + operand.x, this.y + operand.y, "")
+		new Point(x + operand.x, y + operand.y, "")
 	}
 	def /(operand: BigDecimal): Point = {
-		new Point(this.x / operand, this.y / operand, this.address)
+		new Point(x / operand, y / operand, address)
 	}
 }
 
