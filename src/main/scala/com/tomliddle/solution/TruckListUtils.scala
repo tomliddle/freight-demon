@@ -5,7 +5,7 @@ package com.tomliddle.solution
 	*/
 object TruckListUtils {
 
-	class TruckList(val trucks: List[Truck]) {
+	implicit class TruckList(val trucks: List[Truck]) {
 
 		def totalCost = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost.get}
 
@@ -46,7 +46,5 @@ object TruckListUtils {
 			}._1
 		}
 	}
-
-	implicit def listToTruckList(trucks: List[Truck]): TruckList = new TruckList(trucks)
 
 }

@@ -8,7 +8,7 @@ object PointListUtils {
 	/**
 		* Adds get mean function to a List of [T <: Point]
 		*/
-	class PointList[T <: Point](val points: List[T]) {
+	implicit class PointList[T <: Point](val points: List[T]) {
 
 		def mean: Option[Point] = {
 			if (points.size > 0)
@@ -19,7 +19,5 @@ object PointListUtils {
 		}
 
 	}
-
-	implicit def listToStopList[T <: Point](stops: List[T]) = new PointList(stops)
 
 }

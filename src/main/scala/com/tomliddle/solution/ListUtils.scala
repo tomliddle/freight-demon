@@ -5,7 +5,7 @@ object ListUtils {
 	/**
 		* Adds functionality to lists to swap and take off sections of a list.
 		*/
-	class PimpedList[T](list: List[T]) {
+	implicit class SwapList[T](list: List[T]) {
 
 		/** Swaps points in a list.
 			* @param from the 0 based start position
@@ -35,7 +35,5 @@ object ListUtils {
 			(list.take(position) ::: list.drop(position + size), list.slice(position, position + size))
 		}
 	}
-
-	implicit def listToPimpedList[T](list: List[T]) = new PimpedList(list)
 
 }
