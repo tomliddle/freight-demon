@@ -17,7 +17,7 @@ class TruckLinksSpec extends WordSpec with Matchers with BeforeAndAfterEach with
 		"calculating a normal route" should {
 
 			"get correct links" in {
-				val links = straightLineTruck.getLinks.get
+				val (links, isValid) = straightLineTruck.getLinks
 
 				links.size should equal(straightLineTruck.stops.size + 1)
 
@@ -31,7 +31,7 @@ class TruckLinksSpec extends WordSpec with Matchers with BeforeAndAfterEach with
 			}
 
 			"get correct links with start and end times" in {
-				val links = straightLineTruckWithTimes.getLinks.get
+				val (links, isValid) = straightLineTruckWithTimes.getLinks
 
 				links.size should equal (straightLineTruckWithTimes.stops.size + 1)
 
@@ -48,9 +48,9 @@ class TruckLinksSpec extends WordSpec with Matchers with BeforeAndAfterEach with
 			}
 
 			"should be a failure on invalid route" in {
-					val links = invalidTruck.getLinks
+					val (links, isValid) = invalidTruck.getLinks
 
-					links.failure.exception.getClass should equal(classOf[RouteInvalidException])
+					isValid should equal(false)
 			}
 
 		}

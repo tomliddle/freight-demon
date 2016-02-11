@@ -4,6 +4,7 @@ import com.tomliddle.entity.Stop
 import com.tomliddle.util.Logging
 import PointSeqUtils._
 import SeqUtils._
+import TruckSeqUtils._
 
 /**
 	* Adds functionality to Truck to optimise, load and unload
@@ -76,8 +77,8 @@ trait TruckOptimiser extends Logging {
 			groupSize => {
 				shuffleBySize(groupSize).foldLeft(this) {
 					(best, currTruck) =>
-						if (currTruck.isValid && currTruck.cost.get < best.cost.get) {
-							logg.debug(s"New solution found: ${currTruck.cost.get}")
+						if (currTruck.isValid && currTruck.cost < best.cost) {
+							logg.debug(s"New solution found: ${currTruck.cost}")
 							currTruck
 						}
 						else best
@@ -105,16 +106,16 @@ trait TruckOptimiser extends Logging {
 						val truckCopy = copy(stops = stops.swap(from, to, groupSize, invert))
 						if (truckCopy.isValid) Some(truckCopy)
 						else None
-				}.sortWith(_.cost.get < _.cost.get).headOption
+				}.lowestCostOption
 			}
 
 			(0 to stops.size - groupSize).flatMap {
 				from => doSwap(from, groupSize, invert, this)
-			}.filter(truck => truck.cost.isDefined).sortWith(_.cost.get < _.cost.get).headOption
+			}.lowestCostOption
 		}
 
 		// We add this on so head of list always have the current solution
-		Seq(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
+		Seq(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.lowestCostOption
 	}
 
 	/**
@@ -136,7 +137,7 @@ trait TruckOptimiser extends Logging {
 
 							// If trucks fully reloaded, check the cost.
 							if (t1NewStops.isEmpty && t2NewStops.isEmpty &&
-									t1New.cost.get + t2New.cost.get < bestTruck1.cost.get + bestTruck2.cost.get)
+									t1New.cost + t2New.cost < bestTruck1.cost + bestTruck2.cost)
 								(t1New, t2New)
 							else (bestTruck1, bestTruck2)
 					}
@@ -144,7 +145,7 @@ trait TruckOptimiser extends Logging {
 		}
 
 		(1 to getMaxSwapSize).map{swapSize => doSwapBetween(this, swapTruck, swapSize)}
-			.minBy(truckTup => truckTup._1.cost.get + truckTup._2.cost.get)
+			.minBy(truckTup => truckTup._1.cost + truckTup._2.cost)
 	}
 
 }

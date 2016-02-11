@@ -16,11 +16,12 @@ trait TruckLinks {
 	this: Truck =>
 
 
-	def getLinks: Try[Seq[Link]] = {
+	def getLinks: (Seq[Link], Boolean) = {
 
 		var routeEarliestStartTime: LocalTime = startTime
 		var routeLatestStartTime: LocalTime = endTime
 		var routeJourneyTime = new Duration(0)
+		var isValid = true
 
 		@throws[RouteInvalidException]
 		def getNextLink(stop1: Stop, stop2: Stop): Link = {
@@ -71,7 +72,7 @@ trait TruckLinks {
 			//		| |__________________| |    link e/l starts
 			if (routeEarliestStartTime.isAfter(routeLatestStartTime)) {
 				//logger.debug(s"Route invalid Earliest start: ${routeEarliestStartTime} After routelateststart ${routeLatestStartTime}")
-				throw new RouteInvalidException("Not possible in the time")
+				isValid = false
 			}
 
 			Link(linkWaitTime, linkJourneyDistTime)
@@ -98,13 +99,7 @@ trait TruckLinks {
 			else IndexedSeq()
 		}
 
-		try {
-			Success(IndexedSeq(depotLinks._1) ++ getStopLinks ++ IndexedSeq(depotLinks._2))
-		}
-		catch {
-			case rie: RouteInvalidException =>
-				Failure(rie)
-		}
+		(IndexedSeq(depotLinks._1) ++ getStopLinks ++ IndexedSeq(depotLinks._2), isValid)
 	}
 }
 

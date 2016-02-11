@@ -17,16 +17,22 @@ import TruckSeqUtils._
 	* @param _id
 	*/
 case class Solution(name: String, depot: Depot, stopsToLoad: Seq[Stop], trucks: Seq[Truck], lm: LocationMatrix, userId: Int, _id: ObjectId = new ObjectId)
-		extends SolutionOptimiser {
+		extends Ordered[Solution] with SolutionOptimiser {
+
+	override def compare(solution: Solution): Int = {
+		if (cost < solution.cost) -1
+		else if (cost > solution.cost) 1
+		else 0
+	}
 
 	lazy val isValid: Boolean = {
 		loadedStops.size == loadedStops.distinct.size &&
-				trucks.foldLeft(true)((valid: Boolean, truck: Truck) => valid && truck.isValid) &&
+				trucks.forall(_.isValid) &&
 				stopsToLoad.distinct.size == stopsToLoad.size &&
 				loadedStops.distinct.size == loadedStops.size
 	}
 
-	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()) { (a: DistanceTime, b: Truck) => a + new DistanceTime(b.distance.get, b.time.get) }
+	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()) { (a: DistanceTime, b: Truck) => a + new DistanceTime(b.distance, b.time) }
 
 	lazy val loadedStops: Seq[Stop] = trucks.foldLeft(Seq[Stop]())((stops: Seq[Stop], truck: Truck) => stops ++ truck.stops)
 
