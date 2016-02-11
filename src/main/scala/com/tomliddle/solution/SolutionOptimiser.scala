@@ -8,7 +8,7 @@ import com.tomliddle.entity.Stop
 trait SolutionOptimiser {
 	this: Solution =>
 
-	import TruckListUtils._
+	import TruckSeqUtils._
 
 	/**
 		* Preload the initial set of stops by finding the furthest stop and loading it,
@@ -16,11 +16,11 @@ trait SolutionOptimiser {
 		* @return A valid solution
 		*/
 	def preload: Solution = {
-		val (unloadedStops, loadedTrucks) = trucks.foldLeft(List[Stop](), List[Truck]()) {
-			case ((unloadedStops: List[Stop], truckList: List[Truck]), currTruck: Truck) =>
+		val (unloadedStops, loadedTrucks) = trucks.foldLeft(Seq[Stop](), Seq[Truck]()) {
+			case ((unloadedStops: Seq[Stop], trucks: Seq[Truck]), currTruck: Truck) =>
 				currTruck.load(stopsToLoad) match {
-					case (modifiedTruck: Truck, stopList: List[Stop]) =>
-						(unloadedStops ::: stopList, modifiedTruck :: truckList)
+					case (modifiedTruck: Truck, stops: Seq[Stop]) =>
+						(unloadedStops ++ stops, trucks :+ modifiedTruck)
 				}
 		}
 

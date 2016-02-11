@@ -14,7 +14,7 @@ trait TestObjects {
 	val stop = Stop("1", 0, 0, "234234", startTime, endTime, BigDecimal(1), 1)
 	val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
 
-	private val locationList = List(
+	private val locations = IndexedSeq(
 		stop.copy(x = 1, y = 5),
 		stop.copy(x = 1, y = 1),
 		stop.copy(x = 2, y = 3),
@@ -27,7 +27,7 @@ trait TestObjects {
 		stop.copy(x = 10, y = 10)
 	)
 
-	private val straightLineLocations = List(
+	private val straightLineStops = IndexedSeq(
 		stop.copy(x = 10000, y = 0),
 		stop.copy(x = 20000, y = 0),
 		stop.copy(x = 30000, y = 0),
@@ -40,50 +40,51 @@ trait TestObjects {
 		stop.copy(x = 100000, y = 0)
 	)
 
-	val stops = (0 to locationList.size - 1).map {
-		stopId => locationList(stopId).copy(id = Some(stopId))
-	}.toList
+	val stops = locations.indices.map {
+		stopId => locations(stopId).copy(id = Some(stopId))
+	}
 
-	val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
+	val lm = new LocationMatrix(stops, IndexedSeq(depot)) with SimpleTimeAndDistCalc
 	val truck = Truck("Truck1", startTime, endTime, BigDecimal(100), depot, stops, lm, 1, Some(1))
+	val truck2 = Truck("Truck2", startTime, endTime, BigDecimal(100), depot, straightLineStops, lm, 1, Some(1))
 
 	// Straight line to test distance
-	val stops2 = (0 to straightLineLocations.size - 1).map {
-		id => straightLineLocations(id).copy(id = Some(id))
-	}.toList
-	val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
+	val stops2 = straightLineStops.indices.map {
+		id => straightLineStops(id).copy(id = Some(id))
+	}
+	val lm2 = new LocationMatrix(stops2 , IndexedSeq(depot)) with SimpleTimeAndDistCalc
 	val straightLineTruck: Truck = Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
 
 
 	// With delivery times to test start and end times
 	val straightLineTruckWithTimes: Truck = {
-		val stops2: List[Stop] = (0 to straightLineLocations.size - 1).map {
-			id => straightLineLocations(id).copy(
+		val stops2: IndexedSeq[Stop] = straightLineStops.indices.map {
+			id => straightLineStops(id).copy(
 				id = Some(id),
 				startTime = new LocalTime(0).withHourOfDay(id + 9),
 				endTime = new LocalTime(0).withHourOfDay(id + 10)
 			)
-		}.toList
+		}
 
-		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
+		val lm2 = new LocationMatrix(stops2, IndexedSeq(depot)) with SimpleTimeAndDistCalc
 		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
 	}
 
 	// With delivery times to test start and end times
 	val invalidTruck: Truck = {
-		val stops2: List[Stop] = (0 to straightLineLocations.size - 1).map {
-			id => straightLineLocations(id).copy(
+		val stops2: IndexedSeq[Stop] = straightLineStops.indices.map {
+			id => straightLineStops(id).copy(
 				id = Some(id),
 				startTime = new LocalTime(0).withHourOfDay(11),
 				endTime = new LocalTime(0).withHourOfDay(11)
 			)
-		}.toList
+		}
 
-		val lm2 = new LocationMatrix(stops2, List(depot)) with SimpleTimeAndDistCalc
+		val lm2 = new LocationMatrix(stops2, Seq(depot)) with SimpleTimeAndDistCalc
 		Truck("Truck2", startTime, endTime, BigDecimal(100), depot, stops2, lm2, 1, Some(1))
 	}
 
-	val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm2, 1)
+	val solution = Solution("solution", depot, truck.stops, IndexedSeq(truck), lm2, 1)
 
-	val simpleSolution = Solution("solution", depot, List(), List(truck), lm2, 1)
+	val simpleSolution = Solution("solution", depot, IndexedSeq(), IndexedSeq(truck), lm2, 1)
 }

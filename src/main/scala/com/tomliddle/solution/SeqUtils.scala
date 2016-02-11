@@ -1,11 +1,11 @@
 package com.tomliddle.solution
 
-object ListUtils {
+object SeqUtils {
 
 	/**
 		* Adds functionality to lists to swap and take off sections of a list.
 		*/
-	implicit class SwapList[T](list: List[T]) {
+	implicit class SwapUtils[T](seq: Seq[T]) {
 
 		/** Swaps points in a list.
 			* @param from the 0 based start position
@@ -13,12 +13,12 @@ object ListUtils {
 			* @param size the number to swap
 			* @param reverse reverse the list to be swapped (not the whole list)
 			*/
-		def swap(from: Int, to: Int, size: Int, reverse: Boolean): List[T] = {
-			val (mainList, rest) = takeOff(from, size)
-			val takenOffList = if (reverse) rest.reverse else rest
-			val (left, right) = mainList.splitAt(to)
+		def swap(from: Int, to: Int, size: Int, reverse: Boolean): Seq[T] = {
+			val (mainSeq, rest) = takeOff(from, size)
+			val takenOffSeq = if (reverse) rest.reverse else rest
+			val (left, right) = mainSeq.splitAt(to)
 
-			left ::: takenOffList ::: right
+			left ++ takenOffSeq ++ right
 		}
 
 
@@ -28,11 +28,11 @@ object ListUtils {
 			* @param size size to take
 			* @return (remainder of original list, taken list)
 			*/
-		def takeOff(position: Int, size: Int): (List[T], List[T]) = {
-			require(position + size <= list.size)
+		def takeOff(position: Int, size: Int): (Seq[T], Seq[T]) = {
+			require(position + size <= seq.size)
 			require(position >= 0 && size > 0)
 
-			(list.take(position) ::: list.drop(position + size), list.slice(position, position + size))
+			(seq.take(position) ++ seq.drop(position + size), seq.slice(position, position + size))
 		}
 	}
 

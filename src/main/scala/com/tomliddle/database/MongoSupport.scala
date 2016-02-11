@@ -33,8 +33,8 @@ class MongoSupport(databaseName: String){
 	private val bigDecimalSerializer = new BigDecimalConverter
 	private val solutionDAO = new SolutionDAO
 
-	def getSolutions(userId: Int): List[Solution] = {
-		solutionDAO.find(MongoDBObject("userId" -> userId)).toList
+	def getSolutions(userId: Int): Seq[Solution] = {
+		solutionDAO.find(MongoDBObject("userId" -> userId)).toIndexedSeq
 	}
 
 	def getSolution(userId: Int, name: String): Option[Solution] = {

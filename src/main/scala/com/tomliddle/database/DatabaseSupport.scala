@@ -27,7 +27,7 @@ class DatabaseSupport(db: Database) {
 	//n.b. login == email
 	def getUser(email: String, password: String): Option[User] = {
 		db.withDynSession {
-			users.filter { user => (user.email === email && user.passwordHash === password) }.firstOption
+			users.filter { user => user.email === email && user.passwordHash === password }.firstOption
 		}
 	}
 
@@ -45,9 +45,9 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
-	def getTrucks(userId: Int): List[DBTruck] = {
+	def getTrucks(userId: Int): IndexedSeq[DBTruck] = {
 		db.withDynSession {
-			trucks.filter { truck => truck.userId === userId }.list
+			trucks.filter { truck => truck.userId === userId }.list.toIndexedSeq
 		}
 	}
 
@@ -70,9 +70,9 @@ class DatabaseSupport(db: Database) {
 		}
 	}
 
-	def getStops(userId: Int): List[Stop] = {
+	def getStops(userId: Int): IndexedSeq[Stop] = {
 		db.withDynSession {
-			stops.filter { stop => stop.userId === userId }.list
+			stops.filter { stop => stop.userId === userId }.list.toIndexedSeq
 		}
 	}
 
@@ -89,9 +89,9 @@ class DatabaseSupport(db: Database) {
 	}
 
 	//************************ Depots ***********************************
-	def getDepots(userId: Int): List[Depot] = {
+	def getDepots(userId: Int): IndexedSeq[Depot] = {
 		db.withDynSession {
-			depots.filter { depot => depot.userId === userId }.list
+			depots.filter { depot => depot.userId === userId }.list.toIndexedSeq
 		}
 	}
 }

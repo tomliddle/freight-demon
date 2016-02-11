@@ -41,8 +41,8 @@ class TruckSpec extends WordSpec with Matchers with BeforeAndAfterEach with Test
 
 			"shuffle a truck with one stop" in {
 				val truck: Truck = {
-					val lm = new LocationMatrix(stops, List(depot)) with SimpleTimeAndDistCalc
-					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, List(stops(0)), lm, 1, Some(1))
+					val lm = new LocationMatrix(stops, IndexedSeq(depot)) with SimpleTimeAndDistCalc
+					Truck("Truck1", startTime, endTime, BigDecimal(100), depot, IndexedSeq(stops(0)), lm, 1, Some(1))
 				}
 
 				truck.shuffle.cost should equal (truck.cost)

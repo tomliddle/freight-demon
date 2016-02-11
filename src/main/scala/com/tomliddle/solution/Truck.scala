@@ -25,7 +25,7 @@ case class Truck(
 										endTime: LocalTime,
 										maxWeight: BigDecimal,
 										depot: Depot,
-										stops: List[Stop],
+										stops: Seq[Stop],
 										lm: LocationMatrix,
 										userId: Int,
 										id: Option[Int] = None)
@@ -53,16 +53,16 @@ case class Truck(
 	// TODO this should be part of the truck not generated every time.
 	// There may be circumstances where the links don't need to be re-calculated
 	// LM shouldn't be passed in to the truck either as this is part of the solution object.
-	lazy val links: Try[List[Link]] = getLinks
+	lazy val links: Try[Seq[Link]] = getLinks
 
 	lazy val distance: Option[BigDecimal] = links match {
-			case Success(links: List[Link]) => Some(links.foldLeft(BigDecimal(0)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance })
+			case Success(links: Seq[Link]) => Some(links.foldLeft(BigDecimal(0)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance })
 			case Failure(_) => None
 	}
 
 	// The route time
 	lazy val time: Option[Duration] = links match {
-		case Success(links: List[Link]) => Some(links.foldLeft(new Duration(0)) { (a: Duration, b: Link) => a.plus(b.travelDT.time).plus(b.waitTime) })
+		case Success(links: Seq[Link]) => Some(links.foldLeft(new Duration(0)) { (a: Duration, b: Link) => a.plus(b.travelDT.time).plus(b.waitTime) })
 		case Failure(_) => None
 	}
 

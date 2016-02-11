@@ -2,7 +2,7 @@ package com.tomliddle.solution
 
 import com.tomliddle.entity.{LocationMatrix, Stop, Depot, DistanceTime}
 import org.bson.types.ObjectId
-import TruckListUtils._
+import TruckSeqUtils._
 
 /**
 	* Solution class - immutable, so once it has been defined it has all required properties
@@ -16,7 +16,7 @@ import TruckListUtils._
 	* @param userId
 	* @param _id
 	*/
-case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks: List[Truck], lm: LocationMatrix, userId: Int, _id: ObjectId = new ObjectId)
+case class Solution(name: String, depot: Depot, stopsToLoad: Seq[Stop], trucks: Seq[Truck], lm: LocationMatrix, userId: Int, _id: ObjectId = new ObjectId)
 		extends SolutionOptimiser {
 
 	lazy val isValid: Boolean = {
@@ -28,7 +28,7 @@ case class Solution(name: String, depot: Depot, stopsToLoad: List[Stop], trucks:
 
 	lazy val distanceTime: DistanceTime = trucks.foldLeft(new DistanceTime()) { (a: DistanceTime, b: Truck) => a + new DistanceTime(b.distance.get, b.time.get) }
 
-	lazy val loadedStops: List[Stop] = trucks.foldLeft(List[Stop]())((stops: List[Stop], truck: Truck) => stops ::: truck.stops)
+	lazy val loadedStops: Seq[Stop] = trucks.foldLeft(Seq[Stop]())((stops: Seq[Stop], truck: Truck) => stops ++ truck.stops)
 
 	lazy val maxSolutionSwapSize: Int = trucks.foldLeft(0) { (size: Int, truck: Truck) => size max truck.getMaxSwapSize }
 

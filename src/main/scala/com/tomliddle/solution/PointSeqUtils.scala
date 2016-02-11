@@ -1,14 +1,14 @@
 package com.tomliddle.solution
 
-import com.tomliddle.entity.{Point, Stop}
+import com.tomliddle.entity.Point
 
 
-object PointListUtils {
+object PointSeqUtils {
 
 	/**
 		* Adds get mean function to a List of [T <: Point]
 		*/
-	implicit class PointList[T <: Point](val points: List[T]) {
+	implicit class PointUtils[T <: Point](val points: Seq[T]) {
 
 		def mean: Option[Point] = {
 			if (points.nonEmpty) Some(points.reduceLeft[Point]((a, b) => a + b) / points.size)

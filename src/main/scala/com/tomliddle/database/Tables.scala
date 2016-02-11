@@ -14,9 +14,9 @@ trait TypeConvert {
 
 	implicit def localTime = MappedColumnType.base[LocalTime, Time](dt => new Time(dt.getMillisOfDay), ts => new LocalTime(ts.getTime))
 
-	implicit def listToString = MappedColumnType.base[List[String], String](
+	implicit def listToString = MappedColumnType.base[Seq[String], String](
 		dt => dt.foldLeft(""){(a, b) => s"$a,$b"},
-		ts => List("", "")
+		ts => Seq("", "")
 	)
 }
 
@@ -44,7 +44,7 @@ class Users(tag: Tag) extends Table[User](tag, "USERS") {
 * This is not ideal which is why the move to MongoDB should solve this.
 */
 case class DBTruck(name: String, startTime: LocalTime, endTime: LocalTime, maxWeight: BigDecimal, userId: Int, id: Option[Int] = None) {
-	def toTruck(stops: List[Stop], depot: Depot, lm: LocationMatrix): Truck = {
+	def toTruck(stops: Seq[Stop], depot: Depot, lm: LocationMatrix): Truck = {
 		Truck(name, startTime, endTime, maxWeight, depot, stops, lm, userId, id)
 	}
 }

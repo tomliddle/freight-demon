@@ -104,9 +104,9 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 	// ****************************** SOLUTION *********************
 	post("/solution") {
 		var solution = parsedBody.extract[SolutionForm]
-		val lm = new LocationMatrix(List(), List())
+		val lm = new LocationMatrix(IndexedSeq(), IndexedSeq())
 		// TODO imlement correctly
-		mdb.addSolution(Solution(solution.name, db.getDepots(scentry.user.id.get).head, List(), List(), lm, scentry.user.id.get))
+		mdb.addSolution(Solution(solution.name, db.getDepots(scentry.user.id.get).head, IndexedSeq(), IndexedSeq(), lm, scentry.user.id.get))
 	}
 
 	get("/solution") {
@@ -119,7 +119,7 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 
 		// TODO imlement correctly
 		mdb.getSolutions(scentry.user.id.get).map {
-			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm = lm).preload.optimise
+			sol => sol.copy(stopsToLoad = stops, depot = depots.head, trucks = db.getTrucks(userId).map(_.toTruck(IndexedSeq(), depots.head, lm)), lm = lm).preload.optimise
 		}
 	}
 
@@ -133,7 +133,7 @@ class SecureController(protected val db: DatabaseSupport, mdb: MongoSupport)
 		val depots = db.getDepots(userId)
 		val stops = db.getStops(userId)
 		val lm = new LocationMatrix(stops, depots)
-		Solution(params("name"), depots.head, stops, db.getTrucks(userId).map(_.toTruck(List(), depots.head, lm)), lm, userId)
+		Solution(params("name"), depots.head, stops, db.getTrucks(userId).map(_.toTruck(IndexedSeq(), depots.head, lm)), lm, userId)
 	}
 
 	delete("/solution/:name") {

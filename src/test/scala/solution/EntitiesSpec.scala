@@ -3,7 +3,7 @@ package solution
 
 import com.tomliddle.entity.{Stop, Point}
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
-import com.tomliddle.solution.PointListUtils._
+import com.tomliddle.solution.PointSeqUtils._
 
 class EntitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 
@@ -37,13 +37,13 @@ class EntitiesSpec extends WordSpec with Matchers with BeforeAndAfterEach {
 		"can calculate the mean " should {
 
 			"with 0 stops" in {
-				val mean = List[Stop]().mean
+				val mean = IndexedSeq[Stop]().mean
 
 				mean.isDefined should equal (false)
 			}
 
 			"with 10 stops" in {
-				val mean = List[Point](point, point2, point3, point4).mean
+				val mean = IndexedSeq[Point](point, point2, point3, point4).mean
 
 				mean.get.x should equal (4.5)
 				mean.get.y should equal (16.375)

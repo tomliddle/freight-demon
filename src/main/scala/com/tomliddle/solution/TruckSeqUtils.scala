@@ -3,26 +3,26 @@ package com.tomliddle.solution
 /**
 	* Adds functionality to a list of Trucks to perform swapping of stops and cost calculation
 	*/
-object TruckListUtils {
+object TruckSeqUtils {
 
-	implicit class TruckList(val trucks: List[Truck]) {
+	implicit class TruckUtils(val trucks: Seq[Truck]) {
 
-		def totalCost = trucks.foldLeft(BigDecimal(0)){(a : BigDecimal, b: Truck) => a + b.cost.get}
+		def totalCost = trucks.foldLeft(BigDecimal(0)){(cost , truck) => cost + truck.cost.get}
 
 		/**
 			* Swaps stops from one trucks to all trucks
 			* @return the lowest cost list of trucks
 			*/
-		def swapOneToAll(truck1Pos: Int): List[Truck] = {
+		def swapOneToAll(truck1Pos: Int): Seq[Truck] = {
 
 			trucks.indices.foldLeft(trucks) {
 				(returnTrucks, truck2Pos) => {
 					if (truck1Pos != truck2Pos) {
 						returnTrucks(truck1Pos).swapBetween(returnTrucks(truck2Pos)) match {
 							case (truck1, truck2) =>
-								val patchedTruck = returnTrucks.patch(truck1Pos, List[Truck](truck1), 1).patch(truck2Pos, List[Truck](truck2), 1)
-								assert(returnTrucks.size == trucks.size, s"trucks size: ${trucks.size} returntrucks size: ${returnTrucks.size}")
-								patchedTruck
+								val patchedTrucks: Seq[Truck] = returnTrucks.patch(truck1Pos, Seq[Truck](truck1), 1).patch(truck2Pos, Seq[Truck](truck2), 1)
+								assert(patchedTrucks.size == trucks.size, s"trucks size: ${trucks.size} patched trucks size: ${patchedTrucks.size}")
+								patchedTrucks
 						}
 					}
 					else returnTrucks
@@ -34,7 +34,7 @@ object TruckListUtils {
 			* Swaps stops from all trucks to all trucks
 			* @return the lowest cost list of trucks
 			*/
-		def optimiseAllToAll: List[Truck] = {
+		def optimiseAllToAll: Seq[Truck] = {
 			val swappedTrucks = trucks.indices.map(swapOneToAll)
 
 			// Return the lowest cost list of trucks

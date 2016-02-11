@@ -60,10 +60,10 @@ case class Stop(name: String, override val x: BigDecimal, override val y: BigDec
 	* @param stops
 	* @param depots
 	*/
-case class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends StraightLineTimeAndDistCalc {
+case class LocationMatrix(stops: Seq[Stop], depots: Seq[Depot]) extends StraightLineTimeAndDistCalc {
 
 	private val distancesAndTimes: Map[Point, Map[Point, DistanceTime]] = {
-		(stops ::: depots).map {
+		(stops ++ depots).map {
 			stop1: Point => {
 				stop1 -> stops.map {
 					stop2: Point =>
@@ -74,7 +74,7 @@ case class LocationMatrix(stops: List[Stop], depots: List[Depot]) extends Straig
 	}
 
 	def findFurthestStop(point: Point): Stop  = {
-		distancesAndTimes(point).collect{case (s: Stop, dt: DistanceTime) => (s, dt)}.toList.sortBy(_._2.distance).last._1
+		distancesAndTimes(point).collect{case (s: Stop, dt: DistanceTime) => (s, dt)}.toIndexedSeq.sortBy(_._2.distance).last._1
 	}
 
 	def distanceTimeBetween(stop1: Point, stop2: Point): DistanceTime = distancesAndTimes(stop1)(stop2)

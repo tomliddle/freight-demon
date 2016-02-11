@@ -12,15 +12,15 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 		"calculating the cost" should {
 
 			"calculate the correct cost" in {
-				solution.cost should equal (truck.cost.get * 3)
+				solution.cost should equal (truck.cost.get)
 			}
 
 			"calculate the correct distance " in {
-				solution.distanceTime.distance should equal (truck.distance.get * 3)
+				solution.distanceTime.distance should equal (truck.distance.get)
 			}
 
 			"calculate the correct time " in {
-				solution.distanceTime.time should equal (truck.time.get.plus(truck.time.get).plus(truck.time.get))
+				solution.distanceTime.time should equal (truck.time.get)
 			}
 
 			"calculate the correct shuffled cost" in {
@@ -29,15 +29,15 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 
 				cost should be < (solution.cost)
 
-				cost should equal (truck.shuffle.cost.get * 3)
+				cost should equal (truck.shuffle.cost.get)
 
 			}
 
 			"have the right stops" in {
 				val shuffledSolution = solution.optimise
 
-				solution.loadedStops.size should equal (30)
-				shuffledSolution.loadedStops.size should equal (30)
+				solution.loadedStops.size should equal (10)
+				shuffledSolution.loadedStops.size should equal (10)
 
 			}
 
@@ -46,11 +46,11 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 			}
 
 			"get loaded cities" in {
-				solution.loadedStops.size should equal (30)
+				solution.loadedStops.size should equal (10)
 			}
 
 			"swap 4 " in {
-				val stops = List(
+				val stops = IndexedSeq(
 					Stop("1", -0.09, 51.55, "234234", startTime, endTime, BigDecimal(1), 1),
 					Stop("1", -0.36, 51.58, "234234", startTime, endTime, BigDecimal(1), 1),
 					Stop("1", 0.11, 52.25, "234234", startTime, endTime, BigDecimal(1), 1),
@@ -58,10 +58,10 @@ class SolutionSpec extends WordSpec with Matchers with BeforeAndAfterEach with T
 				)
 
 				val depot: Depot = Depot("Depot1", 0 ,0 , "", 1, Some(1))
-				val solution = Solution("solution", depot, truck.stops, List(truck, truck, truck), lm, 1)
+				val solution = Solution("solution", depot, truck.stops, IndexedSeq(truck), lm, 1)
 				val shuffledSolution = solution.optimise
 
-				solution.loadedStops.size should equal (30)
+				solution.loadedStops.size should equal (10)
 			}
 
 		}

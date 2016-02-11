@@ -16,7 +16,7 @@ trait TruckLinks {
 	this: Truck =>
 
 
-	def getLinks: Try[List[Link]] = {
+	def getLinks: Try[Seq[Link]] = {
 
 		var routeEarliestStartTime: LocalTime = startTime
 		var routeLatestStartTime: LocalTime = endTime
@@ -89,17 +89,17 @@ trait TruckLinks {
 			else (Link(), Link())
 
 
-		def getStopLinks: List[Link] = {
+		def getStopLinks: Seq[Link] = {
 			if (stops.size > 1)
 				stops.sliding(2).map {
-					(currCities: List[Stop]) =>
+					(currCities: Seq[Stop]) =>
 						getNextLink(currCities.head, currCities(1))
-				}.toList
-			else List()
+				}.toIndexedSeq
+			else IndexedSeq()
 		}
 
 		try {
-			Success(List(depotLinks._1) ::: getStopLinks ::: List(depotLinks._2))
+			Success(IndexedSeq(depotLinks._1) ++ getStopLinks ++ IndexedSeq(depotLinks._2))
 		}
 		catch {
 			case rie: RouteInvalidException =>

@@ -2,8 +2,8 @@ package com.tomliddle.solution
 
 import com.tomliddle.entity.Stop
 import com.tomliddle.util.Logging
-import PointListUtils._
-import ListUtils._
+import PointSeqUtils._
+import SeqUtils._
 
 /**
 	* Adds functionality to Truck to optimise, load and unload
@@ -16,22 +16,23 @@ trait TruckOptimiser extends Logging {
 		* @param stop
 		* @return Truck with loaded stop, or None
 		*/
-	def load(stop: Stop): Option[Truck] = copy(stops = stop :: stops).shuffleBySize(1)
+	def load(stop: Stop): Option[Truck] = copy(stops = stops :+ stop).shuffleBySize(1)
 
 
 	/**
-		* @param stops to load
+		* @param stopsToLoad to load
 		* @return ones it couldn't load, plus a valid truck
 		*/
-	def load(stops: List[Stop]): (Truck, List[Stop]) = {
-		val currStop: Stop = nextStopToLoad(stops)
+	def load(stopsToLoad: Seq[Stop]): (Truck, Seq[Stop]) = {
+		val nextToLoad: Stop = nextStopToLoad(stopsToLoad)
+		val orderedStops = stopsToLoad.sortBy(lm.distanceTimeBetween(_, nextToLoad).distance)
 
-		stops.sortBy(lm.distanceTimeBetween(_, currStop).distance).foldLeft(this, List[Stop]()) {
-			case ((truck: Truck, stopList: List[Stop]), currStop: Stop) =>
+		orderedStops.foldLeft(this, IndexedSeq[Stop]()) {
+			case ((truck: Truck, stops: Seq[Stop]), currStop: Stop) =>
 				truck.load(currStop) match {
+					case Some(newTruck) => (newTruck, stops)
 					// Stop wasn't loaded so add the stop to the not loaded ones
-					case Some(newTruck) => (newTruck, stopList)
-					case None => (this, currStop :: stopList)
+					case None => (this, stops :+ currStop)
 				}
 		}
 	}
@@ -42,7 +43,7 @@ trait TruckOptimiser extends Logging {
 		* @param size
 		* @return
 		*/
-	def unload(position: Int, size: Int): (Truck, List[Stop]) = {
+	def unload(position: Int, size: Int): (Truck, Seq[Stop]) = {
 		stops.takeOff(position, size) match {
 			case (loaded, unloaded) => (copy(stops = loaded), unloaded)
 		}
@@ -54,7 +55,7 @@ trait TruckOptimiser extends Logging {
 		* @param stops the list of stops to try.
 		* @return the best stop to load
 		*/
-	private def nextStopToLoad(stops: List[Stop]): Stop = {
+	private def nextStopToLoad(stops: Seq[Stop]): Stop = {
 		stops.mean match {
 			case Some(mean) => stops.minBy(stop => lm.getMetresDistance(stop, mean))
 			case None => lm.findFurthestStop(depot)
@@ -113,33 +114,32 @@ trait TruckOptimiser extends Logging {
 		}
 
 		// We add this on so head of list always have the current solution
-		List(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
+		Seq(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.sortBy(_.cost).headOption
 	}
 
 	/**
 		* Swaps stops from swapTruck to find a lower cost solution for both trucks
  		*/
-	def swapBetween(swapTruck: Truck) : (Truck, Truck) = {
+	def swapBetween(swapTruck: Truck): (Truck, Truck) = {
+		require(swapTruck != this, "trying to swap to same truck")
 
 		def doSwapBetween(truck1: Truck, truck2: Truck, swapSize: Int) : (Truck, Truck) = {
 
 			(0 to truck1.stops.size - swapSize).foldLeft(truck1, truck2) {
-				case (_, truck1Pos) => {
+				case (_, truck1Pos) =>
 					(0 to truck2.stops.size - swapSize).foldLeft(truck1, truck2){
-						case ((bestTruck1: Truck, bestTruck2: Truck), truck2Pos: Int) => {
+						case ((bestTruck1: Truck, bestTruck2: Truck), truck2Pos: Int) =>
 							val (t1Unloaded, t1stops) = truck1.unload(truck1Pos, swapSize)
 							val (t2Unloaded, t2stops) = truck2.unload(truck2Pos, swapSize)
 							val (t1New, t1NewStops) = t1Unloaded.load(t2stops)
 							val (t2New, t2NewStops)  = t2Unloaded.load(t1stops)
 
 							// If trucks fully reloaded, check the cost.
-							if (t1NewStops.size == 0 && t2NewStops.size == 0 &&
+							if (t1NewStops.isEmpty && t2NewStops.isEmpty &&
 									t1New.cost.get + t2New.cost.get < bestTruck1.cost.get + bestTruck2.cost.get)
 								(t1New, t2New)
 							else (bestTruck1, bestTruck2)
-						}
 					}
-				}
 			}
 		}
 
