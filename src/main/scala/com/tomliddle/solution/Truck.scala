@@ -28,15 +28,9 @@ case class Truck(
 										lm: LocationMatrix,
 										userId: Int,
 										id: Option[Int] = None)
-	extends TruckOptimiser with Ordered[Truck] with TruckLinks with Logging  {
+	extends TruckOptimiser with TruckLinks with Logging  {
 
 	require(stops.size == stops.distinct.size, "Stops aren't distinct")
-
-		override def compare(truck: Truck): Int = {
-			if (cost < truck.cost) -1
-			else if (cost > truck.cost) 1
-			else 0
-		}
 
 	lazy val totalWeight: BigDecimal = {
 		stops.foldLeft(BigDecimal(0)) { (totalWeight, link) => totalWeight + link.maxWeight }

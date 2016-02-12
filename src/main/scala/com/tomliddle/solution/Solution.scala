@@ -17,13 +17,7 @@ import TruckSeqUtils._
 	* @param _id
 	*/
 case class Solution(name: String, depot: Depot, stopsToLoad: Seq[Stop], trucks: Seq[Truck], lm: LocationMatrix, userId: Int, _id: ObjectId = new ObjectId)
-		extends Ordered[Solution] with SolutionOptimiser {
-
-	override def compare(solution: Solution): Int = {
-		if (cost < solution.cost) -1
-		else if (cost > solution.cost) 1
-		else 0
-	}
+		extends SolutionOptimiser {
 
 	lazy val isValid: Boolean = {
 		loadedStops.size == loadedStops.distinct.size &&

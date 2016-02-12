@@ -1,6 +1,7 @@
 package com.tomliddle.solution
 
 import com.tomliddle.entity.Stop
+import com.tomliddle.common.OrderingDefaults._
 
 /**
 	* Adds functionality to Solution to optimise
@@ -52,6 +53,6 @@ trait SolutionOptimiser {
 		* Swaps stops from all trucks to all trucks
 		* @return the lowest cost list of trucks
 		*/
-	def optimiseBetweenTrucks: Solution = trucks.indices.map(swapOneToAll).max
+	def optimiseBetweenTrucks: Solution = trucks.indices.map(swapOneToAll).min
 
 }

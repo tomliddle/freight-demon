@@ -6,6 +6,8 @@ import PointSeqUtils._
 import SeqUtils._
 import TruckSeqUtils._
 
+import scala.collection.immutable
+
 /**
 	* Adds functionality to Truck to optimise, load and unload
 	*/
@@ -98,15 +100,15 @@ trait TruckOptimiser extends Logging {
 		require(groupSize > 0, "groupsize is 0")
 		require(groupSize <= stops.size, "groupsize too big")
 
-		def swap(groupSize: Int, invert: Boolean): Option[Truck] = {
+		def swap(groupSize: Int, invert: Boolean = false): Option[Truck] = {
 
-			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Option[Truck] = {
+			def doSwap(from: Int, groupSize: Int, invert: Boolean, solution: Truck): Seq[Truck] = {
 				(0 to stops.size - groupSize).flatMap {
 					to =>
 						val truckCopy = copy(stops = stops.swap(from, to, groupSize, invert))
 						if (truckCopy.isValid) Some(truckCopy)
 						else None
-				}.lowestCostOption
+				}
 			}
 
 			(0 to stops.size - groupSize).flatMap {
@@ -115,7 +117,7 @@ trait TruckOptimiser extends Logging {
 		}
 
 		// We add this on so head of list always have the current solution
-		Seq(Some(this), swap(groupSize, false), swap(groupSize, true)).flatten.lowestCostOption
+		Seq(Some(this), swap(groupSize), swap(groupSize, true)).flatten.lowestCostOption
 	}
 
 	/**

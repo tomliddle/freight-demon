@@ -1,5 +1,7 @@
 package com.tomliddle.solution
 
+import com.tomliddle.common.OrderingDefaults._
+
 /**
 	* Adds functionality to a list of Trucks to perform swapping of stops and cost calculation
 	*/
