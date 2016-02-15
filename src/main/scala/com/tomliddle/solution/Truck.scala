@@ -1,13 +1,15 @@
 package com.tomliddle.solution
 
 
+import java.math.{RoundingMode, MathContext}
+
 import com.tomliddle.entity.{LocationMatrix, Stop, Depot, Link}
 import com.tomliddle.util.Logging
 import org.joda.time.{Duration, LocalTime}
-import scala.math.BigDecimal.RoundingMode
 
 /**
 	* A truck with information about its route.
+	*
 	* @param name
 	* @param startTime
 	* @param endTime
@@ -33,12 +35,11 @@ case class Truck(
 	require(stops.size == stops.distinct.size, "Stops aren't distinct")
 
 	lazy val totalWeight: BigDecimal = {
-		stops.foldLeft(BigDecimal(0)) { (totalWeight, link) => totalWeight + link.maxWeight }
-				.setScale(2, RoundingMode.HALF_UP)
+		stops.foldLeft(BigDecimal(0, 2)) { (totalWeight, link) => totalWeight + link.maxWeight }
 	}
 
 	// For now we use the distance * 1.2 to represent cost.
-	lazy val cost: BigDecimal = (distance * 1.2).setScale(2, RoundingMode.HALF_UP)
+	lazy val cost: BigDecimal = distance * 1.2
 
 	// The max number of stops that should be swapped during optimisation
 	lazy val getMaxSwapSize = stops.size / 2
@@ -49,7 +50,7 @@ case class Truck(
 	lazy val (links, valid) = getLinks
 
 	lazy val distance: BigDecimal = {
-			links.foldLeft(BigDecimal(0)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance }
+			links.foldLeft(BigDecimal(0, 2)) { (a: BigDecimal, b: Link) => a + b.travelDT.distance }
 	}
 
 	// The route time
